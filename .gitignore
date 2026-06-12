@@ -1,0 +1,16 @@
+# Secretos — NUNCA se commitean
+.claude-secrets/
+.env
+.env.*
+
+# Previsualizaciones offline (pesadas y regenerables)
+preview/
+
+# Sistema / temporales
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+
+# Respaldo del repositorio git (bundle) — git no puede operar dentro de esta carpeta montada
+Respaldo_Git/

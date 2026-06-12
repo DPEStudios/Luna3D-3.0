@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo — Luna3D</title>
+<meta name="description" content="Explora el catálogo completo de Luna3D: más de 300 piezas hiper-optimizadas con impresión 3D. Filtra por categoría, precio y colección.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+
+<div id="nav-mount"></div>
+
+<main class="page">
+
+  <section class="block" style="padding-top: calc(var(--nav-h) + 40px); padding-bottom: 80px;">
+    <div class="wrap catalog-head" style="padding:0 0 26px;">
+      <span class="kicker">Catálogo Luna3D</span>
+      <h1 id="cat-title">Todo el catálogo</h1>
+      <p id="cat-subtitle">Explora nuestras categorías y filtra por colección o precio. Haz clic en un producto para ver su ficha completa.</p>
+    </div>
+
+    <div class="wrap catalog-layout">
+      <aside class="filters" id="filters">
+        <div class="filter-group">
+          <h4>Categorías</h4>
+          <div class="filter-chips" id="filter-cats"></div>
+        </div>
+        <div class="filter-group">
+          <h4>Precio</h4>
+          <div class="filter-chips" id="filter-price"></div>
+        </div>
+      </aside>
+
+      <div class="catalog-main">
+        <div class="chiprow" id="collection-chips"></div>
+        <div class="cat-toolbar">
+          <button class="btn glass filter-toggle" id="filter-toggle">Filtros</button>
+          <div class="res" id="result-count"></div>
+          <div class="sortsel">
+            <span class="muted" style="font-size:13px;">Ordenar:</span>
+            <select id="sort">
+              <option value="relevance">Relevancia</option>
+              <option value="price-asc">Precio: menor a mayor</option>
+              <option value="price-desc">Precio: mayor a menor</option>
+              <option value="rating">Mejor valorados</option>
+              <option value="new">Novedades</option>
+            </select>
+          </div>
+        </div>
+        <div class="prod-grid" id="catalog-grid"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="footer-mount"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="catalog.js"></script>
+</body>
+</html>

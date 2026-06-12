@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luna3D — Tu idea hecha realidad</title>
+<meta name="description" content="Luna 3D — fabricación de piezas hiper-optimizadas con impresión 3D. Decoración, regalos, gadgets y diseños personalizados con calidad crepuscular y alta ingeniería.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+
+<div id="nav-mount"></div>
+
+<main class="page">
+
+  <!-- ===================== HERO BANNER ===================== -->
+  <section class="hero-banner" data-screen-label="Home — Hero">
+    <div class="hero-slider" id="hero-slider">
+      <div class="hero-slide">
+        <a href="catalogo.html">
+          <img src="Imágenes/banner_impresiones_utiles.png"
+               alt="Impresiones 3D Útiles — 20% OFF" draggable="false">
+        </a>
+      </div>
+      <div class="hero-slide">
+        <a href="catalogo.html">
+          <img src="Imágenes/banner_maseteros.png"
+               alt="Diseños que dan vida a tu espacio — 20% OFF" draggable="false">
+        </a>
+      </div>
+    </div>
+    <!-- Barra inferior de navegación -->
+    <div class="hero-nav-bar">
+      <div class="hero-dots" id="hero-dots">
+        <button class="hero-dot active" data-idx="0" aria-label="Slide 1"></button>
+        <button class="hero-dot"        data-idx="1" aria-label="Slide 2"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FEATURE STRIP ===================== -->
+  <section class="block reveal" style="padding-top:20px;">
+    <div class="wrap">
+      <div class="feature-strip" id="feature-strip"></div>
+    </div>
+  </section>
+
+  <!-- ===================== SECCIÓN 1: HOT SALE & NUEVOS LANZAMIENTOS ===================== -->
+  <section class="block reveal product-showcases large-showcase" id="seccion-1">
+    <div class="wrap">
+      <div class="showcase-panel hot">
+        <div class="block-head">
+          <div class="bh-left">
+            <span class="kicker">Hot Sale</span>
+            <h2 class="section-title">Favoritos con precio de galaxia</h2>
+          </div>
+          <a class="link-all" href="catalogo.html?col=hot">Ver ofertas <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div class="wide-carousel" id="hot-sale-carousel"></div>
+      </div>
+
+      <div class="showcase-panel new">
+        <div class="block-head">
+          <div class="bh-left">
+            <span class="kicker">Nuevos lanzamientos</span>
+            <h2 class="section-title">Recién salidos de la órbita</h2>
+          </div>
+          <a class="link-all" href="catalogo.html?col=new">Ver novedades <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div class="wide-carousel" id="new-carousel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECCIÓN 2: REGALOS (GIFT FINDER) ===================== -->
+  <section class="block reveal" id="seccion-2">
+    <div class="wrap">
+      <div class="block-head">
+        <div class="bh-left">
+          <span class="kicker">Regalos</span>
+          <h2 class="section-title">Encuentra el regalo perfecto</h2>
+          <p class="lead">Usa nuestro recomendador interactivo para encontrar ideas únicas según sus gustos y tu presupuesto.</p>
+        </div>
+      </div>
+      
+      <div class="gift-finder-container glass">
+        <div class="gift-finder-sidebar">
+          <div class="finder-group">
+            <h4>¿Para quién es?</h4>
+            <div class="finder-options" id="gift-recipient-opts">
+              <button class="finder-btn active" data-recipient="gamer">🎮 Gamer & Geek</button>
+              <button class="finder-btn" data-recipient="hogar">🏠 Decoración Hogar</button>
+              <button class="finder-btn" data-recipient="oficina">💼 Oficina & Orden</button>
+              <button class="finder-btn" data-recipient="especial">💎 Regalo Especial</button>
+            </div>
+          </div>
+          
+          <div class="finder-group">
+            <h4>Presupuesto</h4>
+            <div class="finder-options" id="gift-budget-opts">
+              <button class="finder-btn active" data-budget="all">Cualquier precio</button>
+              <button class="finder-btn" data-budget="low">Bajo $8.000</button>
+              <button class="finder-btn" data-budget="high">Sobre $8.000</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="gift-finder-results">
+          <div class="prod-grid" id="gift-results-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECCIÓN 3: OFERTAS DESTACADAS ===================== -->
+  <section class="block reveal" id="seccion-3">
+    <div class="wrap">
+      <div class="block-head">
+        <div class="bh-left">
+          <span class="kicker">Ofertas</span>
+          <h2 class="section-title">Promociones destacadas</h2>
+          <p class="lead">Descuentos especiales por tiempo limitado en piezas seleccionadas. ¡Llevate tu favorita antes de que termine el tiempo!</p>
+        </div>
+        <div class="offers-timer glass" id="offers-countdown">
+          <span class="timer-label">Termina en:</span>
+          <span class="timer-clock" id="timer-clock">00d : 00h : 00m : 00s</span>
+        </div>
+      </div>
+      
+      <div class="prod-grid" id="offers-grid"></div>
+      
+      <div style="display:flex; justify-content:center; margin-top:40px;">
+        <a class="btn primary" href="catalogo.html?col=limited">Ver catálogo de ofertas</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECCIÓN 4: PREGUNTAS FRECUENTES ===================== -->
+  <section class="block reveal" id="seccion-4">
+    <div class="wrap">
+      <div class="block-head">
+        <div class="bh-left">
+          <span class="kicker">Preguntas frecuentes</span>
+          <h2 class="section-title">Qué ocurre después de comprar</h2>
+          <p class="lead">Conoce el proceso completo de compra, fabricación, entrega y nuestras garantías.</p>
+        </div>
+      </div>
+      <div class="faq-list" id="faq-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section class="block reveal">
+    <div class="wrap">
+      <div class="cta-banner">
+        <div class="glow-c"></div>
+        <span class="kicker" style="justify-content:center;">¿Tienes una idea?</span>
+        <h2 style="margin-top:18px;">La hacemos realidad, optimizada<br>y lista para sorprender</h2>
+        <p>Sube tu modelo o cuéntanos tu idea. Nuestro equipo la optimiza, la imprime y te la envía a cualquier rincón de Chile.</p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+          <a class="btn primary" href="catalogo.html">Explorar catálogo</a>
+          <a class="btn glass" href="mailto:contacto@luna3d.cl">Pedir diseño personalizado</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TESTIMONIOS ===================== -->
+  <section class="block reveal" id="opiniones">
+    <div class="wrap">
+      <div class="block-head">
+        <div class="bh-left">
+          <span class="kicker">Lo que opinan</span>
+          <h2 class="section-title">Clientes felices en todo Chile</h2>
+        </div>
+      </div>
+    </div>
+    <div class="tmarquee"><div class="tmarquee-track" id="tmarquee"></div></div>
+  </section>
+</main>
+
+
+<div id="footer-mount"></div>
+
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="home.js"></script>
+</body>
+</html>

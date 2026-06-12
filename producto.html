@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producto — Luna3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+
+<div id="nav-mount"></div>
+
+<main class="page">
+  <div class="wrap pd-wrap">
+    <nav class="breadcrumb" id="breadcrumb"></nav>
+    <div class="pd-grid" id="pd-grid"></div>
+
+    <section class="block reveal" style="padding:90px 0 0;">
+      <div class="block-head">
+        <div class="bh-left">
+          <span class="kicker">También te puede gustar</span>
+          <h2 class="section-title">Más piezas de la colección</h2>
+        </div>
+        <div class="related-actions">
+          <button class="icon-btn" id="related-prev" aria-label="Anterior"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="icon-btn" id="related-next" aria-label="Siguiente"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <a class="link-all" href="catalogo.html">Ver catálogo <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div class="prod-grid related-carousel" id="related-grid"></div>
+    </section>
+  </div>
+</main>
+
+<div id="footer-mount"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="product.js"></script>
+</body>
+</html>
