@@ -132,3 +132,30 @@ Para restaurar a cualquier commit: clonar el bundle y copiar los archivos.
   precio no se puede añadir nada al carrito en la web real; (2) **pago con tarjeta / MercadoPago**
   (sesiones 5–6); (3) revisar rutas/imagen social de Open Graph al publicar en luna3d.cl (sesión 8).
 
+
+## Estado al cierre de la sesión 5 (13-jun-2026)
+
+- **MercadoPago — preparación (canal de venta 2, base lista).** Investigación + decisión de
+  arquitectura + wrapper de pago, **sin tocar** la lógica del sitio ni la venta por WhatsApp.
+- **Hosting investigado:** la v2 en producción de `luna3d.cl` corre **Next.js / Node**
+  (optimizador `/_next/image`), así que el entorno ya soporta **funciones serverless** (probable
+  Vercel). *Daniel debe confirmarlo con acceso al panel del host.*
+- **Decisión (ADR 2026-06-13):** el endpoint que crea la preferencia MercadoPago vive como
+  **función serverless** junto al sitio estático (el "Plan B" del plan resulta el camino natural).
+  El Access Token va como variable de entorno, **nunca** en el repo ni en el cliente.
+- **Construido:**
+  - `paymentGateway.js` — wrapper de cliente **agnóstico** (`window.LUNA_PAY`): `buildOrderPayload`
+    (pura) + `createCheckout`. En **modo `mock`** prueba el flujo sin backend.
+  - `api/create-preference.js` — función serverless (Vercel/Netlify, Node) con `MP_ACCESS_TOKEN`
+    del entorno. **Recomendado.**
+  - `api/create-preference.php` — equivalente PHP (solo si el hosting fuese cPanel).
+  - `PAGOS_MercadoPago_Web_Luna3D_v3.md` — ADR + flujo + despliegue + lo que falta.
+- **Verificación:** `node --check` en los 7 JS (incl. wrapper y endpoint) + smoke test jsdom
+  (3 páginas intactas + pruebas del wrapper de pago) → **16/16, 0 fallos**.
+- **Commits sesión 5:** `eae7d23` (código + doc/ADR) + commit de README. Bundle regenerado y verificado.
+- **Pendiente de Daniel (antes de la sesión 6):** cuenta vendedor MercadoPago + **Access Token TEST**,
+  confirmar el hosting (Vercel/Netlify vs PHP) y el dominio para `back_urls`.
+- **Próxima sesión (6 — integración):** cablear el botón "Pagar con tarjeta" del carrito a
+  `LUNA_PAY.createCheckout`, crear `pago-exito/fallido/pendiente.html`, re-validar precios
+  server-side y probar el flujo completo en **sandbox**. (Siguen pendientes la carga de contenido
+  real — sesión 3 — y las páginas legales.)
