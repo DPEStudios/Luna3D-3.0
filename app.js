@@ -247,6 +247,47 @@ function syncCart(){
   renderDrawer();
 }
 
+/* ---------- WHATSAPP · venta directa (SoC: lógica pura + un único punto de cambio) ----------
+   Número comercial en formato wa.me (sin "+" ni espacios). ÚNICA fuente del número:
+   el footer, el botón flotante y el checkout del carrito lo reutilizan. */
+const WHATSAPP_NUMERO = '56983357145';   // +56 9 8335 7145 — número real de Daniel (confirmado 2026-06-13)
+
+/* Formatea el número legible: 56983357145 -> +56 9 8335 7145 */
+function waDisplay(n){
+  const m = String(n).match(/^56(9)(\d{4})(\d{4})$/);
+  return m ? `+56 ${m[1]} ${m[2]} ${m[3]}` : '+' + n;
+}
+/* Link de chat simple (sin pedido), para footer y botón flotante */
+function waChatURL(){ return `https://wa.me/${WHATSAPP_NUMERO}`; }
+
+/* PURE: arma la URL wa.me del pedido desde el carrito y total. No toca el DOM.
+   Salta ítems sin precio (defensa: no deberían existir en el carrito). */
+function buildWhatsappOrder(cart, total){
+  const lineas = (cart || [])
+    .filter(it => it && it.price != null && !Number.isNaN(it.price))
+    .map(it => `• ${it.qty}× ${it.name} — ${CLP(it.price * it.qty)}`);
+  const texto = [
+    '¡Hola Luna 3D! Quiero hacer este pedido:',
+    '',
+    ...lineas,
+    '',
+    `Total: ${CLP(total)}`,
+    '',
+    'Para coordinar la entrega te dejo mis datos:',
+    'Nombre: ',
+    'Comuna: ',
+  ].join('\n');
+  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`;
+}
+
+/* UI: abre el pedido por WhatsApp en pestaña nueva. Edge: carrito vacío (o sin
+   ítems con precio) -> toast y no abre nada. */
+function checkoutWhatsapp(){
+  const vendibles = getCart().filter(it => it && it.price != null && !Number.isNaN(it.price));
+  if(!vendibles.length){ toast('Tu carrito está vacío'); return; }
+  window.open(buildWhatsappOrder(vendibles, cartTotal()), '_blank', 'noopener');
+}
+
 /* ---------- FAVORITOS (localStorage) ---------- */
 const FKEY='luna3d_favs';
 function getFavs(){ try{return JSON.parse(localStorage.getItem(FKEY))||[];}catch(e){return[];} }
@@ -838,7 +879,7 @@ function buildFooter(){
           <a class="soc soc-fb" href="https://facebook.com/luna3d" target="_blank" rel="noopener" aria-label="Facebook"><span class="soc-ico">${svg('facebook')}</span><span class="soc-txt"><span class="soc-name">Facebook</span><span class="soc-handle">/luna3d</span></span></a>
           <a class="soc soc-tt" href="https://tiktok.com/@luna3d" target="_blank" rel="noopener" aria-label="TikTok"><span class="soc-ico">${svg('tiktok')}</span><span class="soc-txt"><span class="soc-name">TikTok</span><span class="soc-handle">@luna3d</span></span></a>
           <a class="soc soc-yt" href="https://youtube.com/@luna3d" target="_blank" rel="noopener" aria-label="YouTube"><span class="soc-ico">${svg('youtube')}</span><span class="soc-txt"><span class="soc-name">YouTube</span><span class="soc-handle">@luna3d</span></span></a>
-          <a class="soc soc-wa" href="https://wa.me/56912345678" target="_blank" rel="noopener" aria-label="WhatsApp"><span class="soc-ico">${svg('whatsapp')}</span><span class="soc-txt"><span class="soc-name">WhatsApp</span><span class="soc-handle">+56 9 1234 5678</span></span></a>
+          <a class="soc soc-wa" href="${waChatURL()}" target="_blank" rel="noopener" aria-label="WhatsApp"><span class="soc-ico">${svg('whatsapp')}</span><span class="soc-txt"><span class="soc-name">WhatsApp</span><span class="soc-handle">${waDisplay(WHATSAPP_NUMERO)}</span></span></a>
         </div>
       </section>
 
@@ -927,7 +968,8 @@ function renderDrawer(){
     </div>`).join('');
   foot.innerHTML=`
     <div class="dtotal"><span>Total</span><b>${CLP(cartTotal())}</b></div>
-    <button class="btn primary block">Ir a pagar ${svg('arrow')}</button>`;
+    <button class="btn primary block" onclick="LUNA.checkoutWhatsapp()">Pedir por WhatsApp ${svg('whatsapp')}</button>
+    <button class="btn ghost block" disabled title="Pago con tarjeta — disponible próximamente">Pagar con tarjeta · pronto</button>`;
 }
 
 /* ---------- AUTH MODAL (UI lista; backend pendiente) ---------- */
@@ -1001,7 +1043,7 @@ function buildFloatingActions(){
   d.id='float-actions';
   d.className='float-actions';
   d.innerHTML=`
-    <a class="float-btn whatsapp-float" href="https://wa.me/56912345678" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <a class="float-btn whatsapp-float" href="${waChatURL()}" target="_blank" rel="noopener" aria-label="WhatsApp">
       ${svg('whatsapp')}
       <span class="float-tip">¿Tienes dudas? Escríbenos por WhatsApp</span>
     </a>
@@ -1074,7 +1116,8 @@ function initReveal(){
 
 /* ---------- expose + boot ---------- */
 window.LUNA={ addToCart, add:addFromCard, changeQty, removeItem, openDrawer, closeDrawer,
-  toggleFav, isFav, getFavs, openAuth, productCard, buildNav, buildFooter, svg, toast, CLP };
+  toggleFav, isFav, getFavs, openAuth, productCard, buildNav, buildFooter, svg, toast, CLP,
+  checkoutWhatsapp, buildWhatsappOrder };
 
 function boot(){
   buildLoader(); initStars(); buildDaySky(); buildShootingStars(); buildFloatingActions(); buildDrawer(); buildAuth(); syncCart(); syncFavs(); initReveal();
