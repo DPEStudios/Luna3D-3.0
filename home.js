@@ -92,10 +92,10 @@
   ];
   const fsEl = document.getElementById('feature-strip');
   if(fsEl) {
-    const hotProductsForMini = PRODUCTS.filter(p => p.reviews > 80).slice(0, 4);
+    const hotProductsForMini = PRODUCTS.filter(p => p.featured).slice(0, 4);
     fsEl.innerHTML = FS.map((f, i) => {
       let extraHtml = '';
-      if (i === 0) {
+      if (i === 0 && hotProductsForMini.length) {
         extraHtml = `
           <div class="mini-carousel-wrapper">
             <div class="mini-carousel">
@@ -133,44 +133,49 @@
   }
 
   /* ---------- showcase carousels (Sección 1) ---------- */
+  function showMedia(p){
+    return p.img
+      ? `<img src="${p.img}" alt="${p.name}" loading="lazy">`
+      : `<span class="ph-label">FOTO<br>${p.name}</span>`;
+  }
+  // Estado vacío de un carrusel cuando aún no hay productos curados.
+  const showEmpty = msg => `<div class="empty-state" style="min-width:240px;">${msg}</div>`;
   function saleCard(p, tag){
-    if (tag === 'Nuevo') {
-      return `<article class="show-prod">
-        <a class="show-img" href="producto.html?id=${p.id}">
-          <span class="pbadge">${tag}</span>
-          <span class="ph-label">FOTO<br>${p.name}</span>
-        </a>
-        <div class="show-body">
-          <span class="pcat">${p.catName}</span>
-          <h3><a href="producto.html?id=${p.id}">${p.name}</a></h3>
-          <div class="show-price"><b>${CLP(p.price)}</b></div>
-        </div>
-      </article>`;
+    const hasPrice = p.price != null;
+    // Solo calculamos "precio antes" y descuento cuando hay precio real y no es un "Nuevo".
+    let priceHtml;
+    if (tag === 'Nuevo' || !hasPrice) {
+      priceHtml = `<div class="show-price"><b>${CLP(p.price)}</b></div>`;
+    } else {
+      const was = Math.round(p.price * 1.22 / 100) * 100;
+      const discount = Math.max(10, Math.round((1 - p.price / was) * 100));
+      priceHtml = `<div class="show-price"><b>${CLP(p.price)}</b><span>${CLP(was)}</span><em>-${discount}%</em></div>`;
     }
-
-    const was = Math.round(p.price * 1.22 / 100) * 100;
-    const discount = Math.max(10, Math.round((1 - p.price / was) * 100));
     return `<article class="show-prod">
       <a class="show-img" href="producto.html?id=${p.id}">
         <span class="pbadge">${tag}</span>
-        <span class="ph-label">FOTO<br>${p.name}</span>
+        ${showMedia(p)}
       </a>
       <div class="show-body">
         <span class="pcat">${p.catName}</span>
         <h3><a href="producto.html?id=${p.id}">${p.name}</a></h3>
-        <div class="show-price"><b>${CLP(p.price)}</b><span>${CLP(was)}</span><em>-${discount}%</em></div>
+        ${priceHtml}
       </div>
     </article>`;
   }
   const hotEl = document.getElementById('hot-sale-carousel');
   if(hotEl){
-    const hot = PRODUCTS.filter(p => p.reviews > 80).slice(0,8);
-    hotEl.innerHTML = hot.map(p => saleCard(p, 'Hot Sale')).join('');
+    const hot = PRODUCTS.filter(p => p.featured).slice(0,8);
+    hotEl.innerHTML = hot.length
+      ? hot.map(p => saleCard(p, 'Destacado')).join('')
+      : showEmpty('Pronto destacaremos productos aquí.');
   }
   const newEl = document.getElementById('new-carousel');
   if(newEl){
-    const fresh = PRODUCTS.filter(p => p.badge === 'Nuevo').slice(0,8);
-    newEl.innerHTML = fresh.map(p => saleCard({...p, price:p.price}, 'Nuevo')).join('');
+    const fresh = PRODUCTS.filter(p => p.tag === 'Nuevo').slice(0,8);
+    newEl.innerHTML = fresh.length
+      ? fresh.map(p => saleCard(p, 'Nuevo')).join('')
+      : showEmpty('Muy pronto: nuevos lanzamientos.');
   }
 
   /* ---------- regalos (Sección 2 - Gift Finder) ---------- */
@@ -186,18 +191,15 @@
     function updateResults() {
       resultsEl.classList.add('fade-out');
       setTimeout(() => {
-        let cats = [];
-        if (activeRecipient === 'gamer') cats = ['cat-5', 'cat-10', 'cat-15'];
-        else if (activeRecipient === 'hogar') cats = ['cat-1', 'cat-6', 'cat-11'];
-        else if (activeRecipient === 'oficina') cats = ['cat-2', 'cat-7', 'cat-12'];
-        else if (activeRecipient === 'especial') cats = ['cat-4', 'cat-8', 'cat-14'];
-
+        // Mapeo persona → categorías leído desde los datos (campo `personas`).
+        const cats = CATEGORIES.filter(c => (c.personas || []).includes(activeRecipient)).map(c => c.id);
         let list = PRODUCTS.filter(p => cats.includes(p.cat));
 
+        // Presupuesto null-safe: los productos sin precio solo aparecen en "Cualquier precio".
         if (activeBudget === 'low') {
-          list = list.filter(p => p.price < 8000);
+          list = list.filter(p => p.price != null && p.price < 8000);
         } else if (activeBudget === 'high') {
-          list = list.filter(p => p.price >= 8000);
+          list = list.filter(p => p.price != null && p.price >= 8000);
         }
 
         const sliced = list.slice(0, 4);
@@ -230,8 +232,10 @@
   /* ---------- ofertas destacadas (Sección 3) ---------- */
   const offersEl = document.getElementById('offers-grid');
   if (offersEl) {
-    const offers = PRODUCTS.filter(p => p.badge === 'Oferta').slice(0, 4);
-    offersEl.innerHTML = offers.map(p => LUNA.productCard(p)).join('');
+    const offers = PRODUCTS.filter(p => p.tag === 'Oferta').slice(0, 4);
+    offersEl.innerHTML = offers.length
+      ? offers.map(p => LUNA.productCard(p)).join('')
+      : `<div class="empty-state" style="grid-column:1/-1;">Aún no hay ofertas activas. ¡Vuelve pronto!</div>`;
   }
 
   (function initCountdown() {

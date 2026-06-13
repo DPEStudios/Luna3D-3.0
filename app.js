@@ -228,9 +228,10 @@ const CKEY='luna3d_cart';
 function getCart(){ try{return JSON.parse(localStorage.getItem(CKEY))||[];}catch(e){return[];} }
 function saveCart(c){ localStorage.setItem(CKEY,JSON.stringify(c)); syncCart(); }
 function cartCount(){ return getCart().reduce((s,i)=>s+i.qty,0); }
-function cartTotal(){ return getCart().reduce((s,i)=>s+i.price*i.qty,0); }
+function cartTotal(){ return getCart().reduce((s,i)=>s+(i.price||0)*i.qty,0); }
 function addToCart(id){
   const p = PROD_BY_ID[id]; if(!p) return;
+  if(p.price==null){ toast(`${p.name}: disponible próximamente`); return; }  // sin precio aún → no se vende
   const c=getCart(); const ex=c.find(i=>i.id===id);
   if(ex) ex.qty++; else c.push({id:p.id,name:p.name,price:p.price,qty:1});
   saveCart(c); toast(`${p.name} añadido al carrito`);
@@ -270,11 +271,9 @@ function syncFavs(){
 const escapeHTML = str => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
 const MEGA_COLLECTIONS = [
-  {id:'all',     label:'Todos los productos'},
-  {id:'top',     label:'Más vendidos',        test:p=>p.reviews>=100},
-  {id:'new',     label:'Nuevos lanzamientos', test:p=>p.badge},
-  {id:'limited', label:'Edición limitada',    test:p=>p.price>=14000},
-  {id:'staff',   label:'Favoritos del staff', test:p=>p.fav},
+  {id:'all',      label:'Todos los productos'},
+  {id:'featured', label:'Destacados', test:p=>p.featured},
+  {id:'new',      label:'Novedades',  test:p=>p.tag==='Nuevo'},
 ];
 
 function buildNav(active){
@@ -561,8 +560,8 @@ function buildNav(active){
   const trigger = document.getElementById('mega-trigger');
   const panel = document.getElementById('megamenu-panel');
   
-  let activeCat = 'cat-1';
-  let activeCol = 'staff';
+  let activeCat = (CATEGORIES[0] && CATEGORIES[0].id) || '';
+  let activeCol = 'all';
   let megaTimeout;
 
   function openMega() {
@@ -1033,20 +1032,29 @@ function buildLoader(){
 }
 
 /* ---------- PRODUCT CARD ---------- */
+function prodMedia(p){
+  return p.img
+    ? `<img src="${p.img}" alt="${escapeHTML(p.name)}" loading="lazy">`
+    : `<span class="ph-label">FOTO<br>${p.name}</span>`;
+}
 function productCard(p){
+  const buyable = p.price != null;
+  const cartBtn = buyable
+    ? `<button class="pcart" aria-label="Añadir" onclick="LUNA.add('${p.id}',this)">${svg('plus')}</button>`
+    : `<button class="pcart disabled" aria-label="Disponible próximamente" title="Disponible próximamente" disabled>${svg('plus')}</button>`;
   return `
   <article class="prod">
     <a class="pimg" href="producto.html?id=${p.id}">
-      ${p.badge?`<span class="pbadge">${p.badge}</span>`:''}
+      ${p.tag?`<span class="pbadge">${p.tag}</span>`:''}
       <button class="pfav ${isFav(p.id)?'on':''}" aria-label="Favorito" aria-pressed="${isFav(p.id)}" onclick="event.preventDefault();LUNA.toggleFav('${p.id}',this)">${svg(isFav(p.id)?'heartFill':'heart')}</button>
-      <span class="ph-label">FOTO<br>${p.name}</span>
+      ${prodMedia(p)}
     </a>
     <div class="pbody">
       <span class="pcat">${p.catName}</span>
       <h3 class="pname"><a href="producto.html?id=${p.id}">${p.name}</a></h3>
       <div class="pfoot">
         <span class="price">${CLP(p.price)}</span>
-        <button class="pcart" aria-label="Añadir" onclick="LUNA.add('${p.id}',this)">${svg('plus')}</button>
+        ${cartBtn}
       </div>
     </div>
   </article>`;

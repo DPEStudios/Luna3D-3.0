@@ -1,59 +1,102 @@
 /* ============================================================
    LUNA3D — Datos del catálogo (v3)
-   15 categorías × 20 productos = 300 productos.
-   Nombres simples y placeholders, listos para reemplazar por el
-   contenido real (nombre, precio, foto) producto por producto.
-   Generación determinista: los valores no cambian entre cargas.
+   SESIÓN 2 (2026-06-12): estructura de catálogo REAL.
+
+   5 categorías reales (Set 5) × 4 slots placeholder cada una = 20.
+   Cada slot está listo para llenar con contenido VERDADERO en la
+   sesión 3 (nombre, foto, precio, variantes), según la pauta de
+   fotos y precios.
+
+   REGLA (no inventar datos): los slots traen
+     price:null    → la UI muestra "Precio a confirmar"
+     img:null      → la UI muestra el placeholder "FOTO"
+     reviews:0, rating:null  → sin reseñas inventadas
+   'featured' y 'tag' son flags de CURACIÓN (no métricas de venta):
+   sirven para poblar las secciones de la Home y son editables.
+
+   Para llenar un producto real en la sesión 3, basta reemplazar
+   name, price e img (y opcionalmente colors/sizes/desc/tag).
    ============================================================ */
-const CLP = n => "$" + n.toLocaleString("es-CL");
 
-const CAT_ICONS = ["home","chip","star","gem","toy","plant","cube","spark","shield","truck","home","chip","star","gem","toy"];
+/* Precio CLP — null-safe: sin precio aún → "Precio a confirmar" */
+const CLP = n => (n == null || Number.isNaN(n))
+  ? "Precio a confirmar"
+  : "$" + n.toLocaleString("es-CL");
 
-const CATEGORIES = Array.from({ length: 15 }, (_, i) => ({
-  id:   `cat-${i + 1}`,
-  name: `Categoría ${i + 1}`,
-  icon: CAT_ICONS[i % CAT_ICONS.length],
-  desc: `Productos de la categoría ${i + 1}, impresos a pedido en Chile.`,
-}));
+/* ---------- Variantes por defecto (sobrescribibles por producto) ----------
+   Colores = paleta de marca (Manual de Marca v1.0). Los colores REALES de
+   filamento en stock se definen producto por producto en la sesión 3
+   (ver pauta). Un producto puede traer su propio `colors` y `sizes`. */
+const DEFAULT_COLORS = [
+  { name:'Aurora',   css:'linear-gradient(125deg,#E81F9D,#8E2BE6)' },
+  { name:'Magenta',  css:'#E81F9D' },
+  { name:'Violeta',  css:'#9B27E0' },
+  { name:'Estrella', css:'#F5F6FB' },
+  { name:'Espacial', css:'#0B1437' },
+];
+/* Sin tallas inventadas: un único tamaño hasta que Daniel defina variantes */
+const DEFAULT_SIZES = ['Único'];
+
+/* ---------- CATEGORÍAS REALES (Set 5) ----------
+   `personas` mapea cada categoría a los perfiles del buscador de regalos
+   de la Home (gamer / hogar / oficina / especial). Así el gift finder
+   lee desde los datos en vez de IDs hardcodeados. */
+const CATEGORIES = [
+  { id:'maceteros',   name:'Maceteros y jardín',           icon:'plant', desc:'Maceteros, materas y piezas para tus plantas, impresos a pedido en Chile.',  personas:['hogar'] },
+  { id:'decoracion',  name:'Decoración hogar',             icon:'home',  desc:'Objetos decorativos y funcionales para darle personalidad a tus espacios.',  personas:['hogar','especial'] },
+  { id:'llaveros',    name:'Llaveros y accesorios',        icon:'gem',   desc:'Llaveros, pines y accesorios personalizables, ideales para regalar.',        personas:['especial'] },
+  { id:'cultura-pop', name:'Cultura pop y coleccionables', icon:'star',  desc:'Figuras, coleccionables y piezas de cultura pop, gaming y geek.',             personas:['gamer','especial'] },
+  { id:'oficina',     name:'Organización y oficina',       icon:'cube',  desc:'Organizadores, soportes y utilidades para tu escritorio y home office.',     personas:['oficina'] },
+];
+
+const CAT_NAME = Object.fromEntries(CATEGORIES.map(c => [c.id, c.name]));
+
+/* ---------- CATÁLOGO INICIAL (slots placeholder) ----------
+   Definición compacta por categoría:
+     [ catId, prefijoNombre, nº slots, featuredSlots[], nuevoSlots[] ]
+   featured/nuevo son flags de curación para la Home (editables). */
+const CATALOG_SEED = [
+  ['maceteros',   'Macetero',      4, [1, 2], [3]],
+  ['decoracion',  'Decoración',    4, [1],    [2]],
+  ['llaveros',    'Llavero',       4, [1],    []],
+  ['cultura-pop', 'Coleccionable', 4, [1],    [2]],
+  ['oficina',     'Organizador',   4, [1],    []],
+];
 
 const PRODUCTS = [];
-CATEGORIES.forEach((c, ci) => {
-  for (let j = 1; j <= 20; j++) {
-    const seed    = ci * 20 + j;
-    const price   = 2000 + ((seed * 733) % 19) * 1000;     // $2.000 – $20.000
-    const rating  = Math.round((4 + (seed % 11) / 10) * 10) / 10; // 4.0 – 5.0
-    const reviews = (seed * 37) % 260;                     // 0 – 259
-    const badge   = j % 7 === 0 ? "Nuevo" : (seed % 13 === 0 ? "Oferta" : null);
+CATALOG_SEED.forEach(([cat, label, count, featured, nuevo]) => {
+  for (let j = 1; j <= count; j++) {
     PRODUCTS.push({
-      id:      `${c.id}-p${j}`,
-      name:    `Producto ${j}`,
-      cat:     c.id,
-      catName: c.name,
-      price,
-      badge,
-      rating,
-      reviews,
-      fav:     seed % 5 === 0,        // marca de "favorito del staff" (no es el favorito del usuario)
+      id:       `${cat}-${j}`,
+      cat,
+      catName:  CAT_NAME[cat],
+      name:     `${label} ${j}`,        // PLACEHOLDER — reemplazar en sesión 3
+      price:    null,                    // sin precio inventado
+      img:      null,                    // sin foto aún → placeholder "FOTO"
+      tag:      nuevo.includes(j) ? 'Nuevo' : null,   // 'Nuevo' | 'Oferta' | null
+      featured: featured.includes(j),    // destacado del equipo (no métrica)
+      rating:   null,                    // sin reseñas reales
+      reviews:  0,
+      colors:   null,                    // null → DEFAULT_COLORS
+      sizes:    null,                    // null → DEFAULT_SIZES
+      desc:     null,                    // null → PROD_DESC
     });
   }
 });
 
 const PROD_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
 
-/* Selecciones para la Home */
-const FEATURED  = CATEGORIES.slice(0, 8).map(c => `${c.id}-p1`);
-const NOVEDADES = PRODUCTS.filter(p => p.badge === "Nuevo").slice(0, 6).map(p => p.id);
-const HERO_CHIPS = CATEGORIES.slice(0, 6).map(c => c.name);
-
+/* ---------- Testimonios — PROVISORIOS ----------
+   Se reemplazan por reseñas reales en la sesión 3. `buy` referencia
+   la categoría para no apuntar a productos placeholder. */
 const TESTIMONIALS = [
-  { name:"Daniel",    p:"Me encantó el diseño, la calidad de impresión es brutal y llegó súper rápido.",      buy:"Producto 3" },
-  { name:"Valentina", p:"Perfecto para mi escritorio, el acabado mate se ve premium. Lo recomiendo 100%.",     buy:"Producto 7" },
-  { name:"Matías",    p:"Muy buen producto, encajó perfecto. Le falta un poco de color, pero se ve genial.",   buy:"Producto 12" },
-  { name:"Camila",    p:"Un regalo ideal, a mi hermana le fascinó. La atención al detalle es increíble.",      buy:"Producto 5" },
-  { name:"Joaquín",   p:"Calidad superior a lo esperado. El empaque cuidado y la entrega puntual.",            buy:"Producto 9" },
-  { name:"Francisca", p:"Ideal para mi home office. Encajó exacto con lo que buscaba.",                        buy:"Producto 2" },
-  { name:"Javiera",   p:"Los detalles impresos son impresionantes. Se nota el diseño premium.",                buy:"Producto 15" },
-  { name:"Tomás",     p:"Mi hijo quedó feliz con el juguete. Resistente y bien terminado.",                    buy:"Producto 8" },
+  { name:'Valentina', p:'La calidad de impresión es brutal y el acabado mate se ve premium.',          buy:'Maceteros y jardín' },
+  { name:'Matías',    p:'Encajó perfecto y llegó súper rápido. Lo recomiendo 100%.',                    buy:'Organización y oficina' },
+  { name:'Camila',    p:'Un regalo ideal, a mi hermana le fascinó. La atención al detalle es increíble.', buy:'Llaveros y accesorios' },
+  { name:'Joaquín',   p:'Calidad superior a lo esperado, con empaque cuidado y entrega puntual.',        buy:'Cultura pop y coleccionables' },
+  { name:'Francisca', p:'Perfecto para mi home office, encajó exacto con lo que buscaba.',               buy:'Decoración hogar' },
+  { name:'Tomás',     p:'Se nota el diseño premium y la pieza es resistente y bien terminada.',          buy:'Cultura pop y coleccionables' },
 ];
 
-const PROD_DESC = "Pieza hiper-optimizada e impresa en 3D con tecnología de alta resolución. Diseño de calidad crepuscular y alta ingeniería, fabricado en Chile a pedido. Acabado premium, resistente y listo para sorprender.";
+/* Descripción por defecto (cuando un producto aún no tiene `desc` real) */
+const PROD_DESC = "Pieza impresa en 3D a pedido en Chile, con tecnología de alta resolución. Diseño optimizado, acabado premium y resistente. El detalle real de este producto se completará pronto.";

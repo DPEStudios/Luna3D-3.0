@@ -6,17 +6,16 @@
   LUNA.buildFooter();
 
   const COLLECTIONS=[
-    {id:'all',   label:'Todos'},
-    {id:'new',   label:'Nuevos lanzamientos', test:p=>p.badge},
-    {id:'top',   label:'Más vendidos',        test:p=>p.reviews>=100},
-    {id:'staff', label:'Favoritos del staff', test:p=>p.fav},
-    {id:'limited',label:'Edición limitada',   test:p=>p.price>=14000},
+    {id:'all',      label:'Todos'},
+    {id:'featured', label:'Destacados', test:p=>p.featured},
+    {id:'new',      label:'Novedades',  test:p=>p.tag==='Nuevo'},
   ];
+  // Filtros de precio: los productos sin precio (placeholder) solo aparecen en "Todos los precios".
   const PRICE=[
     {id:'all', label:'Todos los precios', test:()=>true},
-    {id:'p1',  label:'Bajo $6.000',       test:p=>p.price<6000},
-    {id:'p2',  label:'$6.000 – $12.000',  test:p=>p.price>=6000&&p.price<12000},
-    {id:'p3',  label:'Sobre $12.000',     test:p=>p.price>=12000},
+    {id:'p1',  label:'Bajo $6.000',       test:p=>p.price!=null&&p.price<6000},
+    {id:'p2',  label:'$6.000 – $12.000',  test:p=>p.price!=null&&p.price>=6000&&p.price<12000},
+    {id:'p3',  label:'Sobre $12.000',     test:p=>p.price!=null&&p.price>=12000},
   ];
 
   const state={cat:'all',collection:'all',price:'all',sort:'relevance'};
@@ -70,11 +69,12 @@
       list = list.filter(p => p.name.toLowerCase().includes(query) || p.catName.toLowerCase().includes(query));
     }
 
+    // Orden null-safe: sin precio van al final; sin rating cuentan como 0.
     switch(state.sort){
-      case 'price-asc': list.sort((a,b)=>a.price-b.price);break;
-      case 'price-desc':list.sort((a,b)=>b.price-a.price);break;
-      case 'rating':    list.sort((a,b)=>b.rating-a.rating);break;
-      case 'new':       list.sort((a,b)=>(b.badge?1:0)-(a.badge?1:0));break;
+      case 'price-asc': list.sort((a,b)=>(a.price??Infinity)-(b.price??Infinity));break;
+      case 'price-desc':list.sort((a,b)=>(b.price??-Infinity)-(a.price??-Infinity));break;
+      case 'rating':    list.sort((a,b)=>(b.rating??0)-(a.rating??0));break;
+      case 'new':       list.sort((a,b)=>(b.tag?1:0)-(a.tag?1:0));break;
     }
     return list;
   }

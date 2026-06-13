@@ -1750,3 +1750,10 @@ body.light-mode .nav.scrolled{background:rgba(242,246,251,.78);}
 /* Gift finder: transición suave al filtrar (reconstrucción 2026-06-12) */
 .gift-finder-results .prod-grid{transition:opacity .18s ease;}
 .gift-finder-results .prod-grid.fade-out{opacity:0;}
+
+/* ---------- Sesión 2: fotos reales + estados sin precio ---------- */
+/* Cuando llegue la foto real (sesión 3), la imagen llena el contenedor. */
+.show-img img,.pd-main-img img,.mini-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+/* Botón de añadir deshabilitado en productos placeholder (sin precio). */
+.pcart.disabled,.pcart:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.btn.primary[disabled]{opacity:.5;cursor:not-allowed;}
