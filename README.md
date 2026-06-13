@@ -104,3 +104,31 @@ Para restaurar a cualquier commit: clonar el bundle y copiar los archivos.
 - **Commits sesión 2:** `1256d4b` (catálogo real) + commit de docs. Bundle regenerado y verificado.
 - **Pendiente próximo (sesión 3):** cargar 10–20 productos reales con foto y precio según la pauta,
   reemplazar testimonios/FAQ por contenido verdadero y redactar textos legales.
+
+## Estado al cierre de la sesión 4 (13-jun-2026)
+
+- **Venta por WhatsApp (primera versión vendible):** el carrito ya genera el pedido por WhatsApp.
+  - `buildWhatsappOrder(cart, total)` — función **pura** (no toca el DOM): arma la URL
+    `https://wa.me/<n>?text=<pedido>` URL-encoded con saludo, una línea por ítem
+    `• {qty}× {nombre} — {CLP(precio×qty)}`, `Total:` y cierre pidiendo nombre y comuna.
+  - `checkoutWhatsapp()` (capa UI) abre el pedido en pestaña nueva. Edge cases: carrito vacío
+    (o sin ítems con precio) → toast y no abre; ítems con `price==null` se saltan.
+  - Botón primario **"Pedir por WhatsApp"** en el pie del drawer. El "Pagar con tarjeta" quedó
+    como botón secundario **deshabilitado** ("pronto") hasta integrar MercadoPago (sesiones 5–6).
+- **Número centralizado:** una sola constante `WHATSAPP_NUMERO` en `app.js`, reutilizada por footer,
+  botón flotante y checkout. Reemplaza el antiguo placeholder `56912345678`; el footer muestra el
+  número legible vía `waDisplay()`. **Número real configurado: `56983357145` (+56 9 8335 7145).**
+- **SEO/Open Graph (extra):** `title`/`description` + Open Graph y Twitter Card en las 3 páginas,
+  con `og:image` = logo de `assets/`. Base `https://luna3d.cl/` (revisar al publicar, sesión 8).
+  De paso se corrigió la `description` inventada del catálogo ("más de 300 piezas").
+- **Verificación:** `node --check` en los 5 JS + smoke test jsdom (3 páginas + 5 pruebas del pedido
+  WhatsApp con carrito sembrado) → **27/27, 0 fallos**.
+- **Commits sesión 4:** `317adef` (WhatsApp) + `675e75e` (SEO). Bundle regenerado y verificado
+  (verify + clon de prueba + `node --check`).
+- **Cómo probarlo:** servir la carpeta (`python3 -m http.server 8080`), abrir un producto **con
+  precio** (los del catálogo aún son placeholder sin precio), añadirlo al carrito y pulsar
+  "Pedir por WhatsApp": abre WhatsApp con el pedido hacia +56 9 8335 7145.
+- **Pendientes:** (1) **carga de contenido real (sesión 3)** sigue pendiente — sin productos con
+  precio no se puede añadir nada al carrito en la web real; (2) **pago con tarjeta / MercadoPago**
+  (sesiones 5–6); (3) revisar rutas/imagen social de Open Graph al publicar en luna3d.cl (sesión 8).
+
