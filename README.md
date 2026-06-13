@@ -57,6 +57,8 @@ dependencia de React/Babel). Está activo por ahora para que lo pruebes y lo con
 lock+rename quedan corruptas con bytes nulos (comprobado 2x el 11 y 12-jun-2026). Además el
 montaje bloquea `rm`, así que un `.git` roto solo puede moverse a `_Papelera/`, no borrarse.
 
+**LECCIÓN SESIÓN 2 (crítica):** las ediciones hechas con las *file-tools* (Read/Write/Edit) escriben bien en la carpeta de Daniel, pero **NO son visibles para el VM/bash** (bash lee una vista vieja del montaje). Si se comitea con `WORK_TREE=/mnt`, git tomaría las versiones truncadas/viejas. Regla: **trabaja el repo en `$HOME` con `WORK_TREE=$HOME/luna3d-repo`** (reconstruyendo ahí los cambios y verificándolos con node + smoke test), commitea desde ahí, y copia el bundle al montaje con `cp` (las escrituras de archivo único bash→montaje sí son fiables, md5 verificado). Alternativa: hacer las ediciones directamente con bash para que el VM las vea.
+
 **Flujo correcto en cada sesión de Claude:**
 
 ```bash
@@ -83,3 +85,22 @@ Para restaurar a cualquier commit: clonar el bundle y copiar los archivos.
 - Panel Tweaks retirado (sin React/Babel). Los .jsx están en `_Papelera/2026-06-12_0045_.../`.
 - Smoke test jsdom: las 3 páginas renderizan todas sus secciones sin errores.
 - Pendiente próximo (sesión 2): estructura de catálogo real en data.js + pauta de fotos/precios.
+
+## Estado al cierre de la sesión 2 (12-jun-2026)
+
+- **Catálogo real:** `data.js` reescrito con **5 categorías reales** (Maceteros y jardín, Decoración
+  hogar, Llaveros y accesorios, Cultura pop y coleccionables, Organización y oficina) y **20 slots**
+  placeholder con schema de contenido real: `name, price, img, tag, featured, rating, reviews,
+  colors, sizes, desc`. Sin precios ni reseñas inventadas (`price`/`rating` = null, `reviews` = 0).
+- **Gift finder por datos:** el mapeo persona→categoría se lee del campo `personas` de cada categoría
+  (ya no hay IDs `cat-N` hardcodeados).
+- **Páginas null-safe:** sin precio → "Precio a confirmar" y botón de compra desactivado; foto real o
+  placeholder `FOTO`; selector de tamaño solo si hay variantes; colecciones por `featured`/`tag`.
+- **Verificación:** `node --check` en los 5 JS + smoke test jsdom de las 3 páginas (catálogo = 20
+  productos, 6 filtros, persona→categoría, etc.) → **0 fallos**.
+- **Pauta entregada:** `Pauta_Fotos_y_Precios_Web_Luna3D_v3_2026-06-12.(md|pdf)` — fotografía
+  (fondo/luz/encuadre/formato/nombres por ID) + plantilla de precios (desde el Excel maestro) + cómo
+  se carga en `data.js`. Tarea de Daniel antes de la sesión 3.
+- **Commits sesión 2:** `1256d4b` (catálogo real) + commit de docs. Bundle regenerado y verificado.
+- **Pendiente próximo (sesión 3):** cargar 10–20 productos reales con foto y precio según la pauta,
+  reemplazar testimonios/FAQ por contenido verdadero y redactar textos legales.
