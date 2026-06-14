@@ -14,3 +14,6 @@ node_modules/
 
 # Respaldo del repositorio git (bundle) — git no puede operar dentro de esta carpeta montada
 Respaldo_Git/
+
+# Borradores de productos (fotos pesadas; la fuente de verdad tras subir es Supabase)
+_Borradores_Productos/
