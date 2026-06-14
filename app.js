@@ -774,9 +774,13 @@ function buildNav(active){
     };
   }
 
-  // --- Favorites Button Click ---
+  // --- Favorites Button — re-renderizar al abrir el popover (hover o click) ---
   const favBtn = document.getElementById('fav-btn');
   if (favBtn) {
+    // mouseenter en el wrapper: el popover se muestra por CSS hover,
+    // así que re-renderizamos aquí para tener datos frescos (Supabase asíncrono)
+    const favWrap = favBtn.closest('.nav-pop-wrap');
+    if (favWrap) favWrap.addEventListener('mouseenter', renderFavPopover);
     favBtn.onclick = () => {
       renderFavPopover();
       const favs=getFavs();
