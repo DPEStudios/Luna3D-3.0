@@ -188,3 +188,39 @@ publicación controlada por el "OK" de Daniel.
   en `.claude-secrets/supabase.env` (pasos en `SETUP_Supabase_Fase_A.md`). Con eso arranca la
   **Fase B** (la web lee de la vista pública vía `catalogData.js` + wrapper `LUNA_DATA`, con
   Loading/Error/Empty; WhatsApp y carrito intactos).
+
+
+## Fábrica de Catálogo — Fase B (la web lee de Supabase) completada (14-jun-2026)
+
+La web ya obtiene el catálogo desde la **vista pública `products_public`** (solo `estado='publicado'`)
+con la **anon key**, en vez de los datos en memoria de `data.js`. Como hoy todo está en borrador, la
+web se ve **vacía** (Empty) hasta publicar el primer producto — es lo correcto y esperado.
+
+- **`catalogData.js` (nuevo):** wrapper **agnóstico** `window.LUNA_DATA` (mismo estilo que
+  `LUNA_PAY`). `getCatalog()` consulta `/rest/v1/products_public?select=*` (timeout 8s con
+  AbortController) y `bootstrap()` orquesta y **nunca rechaza**. `mapRow()` mapea cada fila a la
+  **misma forma de objeto** que ya consumen home/catalog/product (incluye `catName` desde `CAT_NAME`,
+  conserva nulos para que la UI aplique sus defaults `DEFAULT_COLORS/SIZES/PROD_DESC`).
+- **Config del cliente:** `URL` + `anon` embebidas en `catalogData.js` (públicas y seguras por el
+  modelo anon + RLS). La `service_role` **jamás** vive en el cliente.
+- **Arranque asíncrono** en las 3 páginas (`await LUNA_DATA.bootstrap()` -> render). Hidrata
+  **en su lugar** los `const PRODUCTS` / `PROD_BY_ID` (splice/push + delete/assign) para que
+  `app.js` (megamenú, carrito, favoritos — que los lee **perezosamente**) siga consistente **sin
+  tocar `app.js`**.
+- **Resiliencia visual:** *Loading* en los grids; *Empty* (mensajes honestos + guard "Producto no
+  disponible" en producto.html); *Error* -> **fallback a la semilla `data.js`** (la página nunca se
+  rompe). `data.js` permanece como semilla/fallback y fuente de constantes de presentación.
+- **No se tocó** `app.js`, `paymentGateway.js` ni la lógica de MercadoPago.
+- **Verificación:** `node --check` (7 JS); **smoke jsdom 18/18** (Loading/Empty/Error/seed en las 3
+  páginas); **e2e con red REAL contra Supabase** (publicar `maceteros-1` con service_role -> la web lo
+  renderiza `source:supabase` -> revertir a borrador); curl confirmó que la vista no expone `estado`.
+- **Commit:** `b53991a`. Bundle regenerado, verificado y clonado de prueba; 7 archivos copiados al
+  montaje con md5 ok.
+- **Demo del "OK" de la fábrica:** publicar un producto con service_role
+  (`PATCH products?id=eq.<id> -d '{"estado":"publicado"}'`) -> aparece en la web; bajarlo a borrador
+  -> desaparece. Así funcionará la aprobación en chat de las fases siguientes.
+- **PENDIENTE DE DANIEL (recordatorio):** **rotar la `service_role` key** (se reveló al copiarla en el
+  setup): Supabase -> Settings -> API -> rotar; actualizar `.claude-secrets/supabase.env` y el entorno
+  del hosting.
+- **Próximo:** la carga de contenido real pasa a ser **INSERT/UPDATE en `products`** (no editar
+  `data.js`) + subir fotos al bucket `productos`; luego publicar con el "OK".
