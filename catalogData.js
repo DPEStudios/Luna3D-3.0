@@ -6,10 +6,11 @@
    getCatalog() y recibe productos con la MISMA forma que data.js.
    Si mañana se cambia Supabase por otra DB, se toca SOLO este archivo.
 
-   SEGURIDAD: aquí viven la URL y la ANON key. Ambas son públicas y
-   seguras por diseño (modelo anon + RLS de Supabase: anon solo puede
-   leer la vista 'products_public'). La SERVICE_ROLE key NUNCA vive en
-   el cliente, ni en el repo, ni en el chat.
+   SEGURIDAD: aquí viven la URL y la PUBLISHABLE key (sb_publishable_…).
+   Ambas son públicas y seguras por diseño (la publishable tiene los
+   mismos privilegios bajos que la anon legada: solo lee la vista pública
+   bajo RLS). La SECRET key (sb_secret_…) NUNCA vive en el cliente, ni en
+   el repo, ni en el chat. (Migración a llaves nuevas Supabase 2026-06-14.)
 
    Estado: la web lee SOLO productos 'publicado' desde la vista pública.
    Con todo en borrador, la web se ve vacía (Empty) — es lo esperado.
@@ -20,7 +21,7 @@
   // ---- CONFIG pública (un solo lugar) ------------------------------------
   var SUPABASE = {
     url:  'https://dlvechohqlwysryxguqm.supabase.co',
-    anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsdmVjaG9ocWx3eXNyeXhndXFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzODA1MzQsImV4cCI6MjA5Njk1NjUzNH0.JPAXePprE94aLWNhfB0TXFQYY6uuZfFVOKZO0RVvvIU',
+    publishable: 'sb_publishable_RCPEm-eSaMst0ipp1eumYA_z9l4TqzL',
   };
   var ENDPOINT  = SUPABASE.url + '/rest/v1/products_public?select=*';
   var TIMEOUT_MS = 8000;
@@ -55,7 +56,9 @@
     var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS) : null;
     return fetch(ENDPOINT, {
-      headers: { apikey: SUPABASE.anon, Authorization: 'Bearer ' + SUPABASE.anon },
+      // Llaves nuevas Supabase: la publishable viaja SOLO en 'apikey'.
+      // (NO en 'Authorization: Bearer' — ahí se parsea como JWT y se rechaza.)
+      headers: { apikey: SUPABASE.publishable },
       signal: ctrl ? ctrl.signal : undefined,
     }).then(function (resp) {
       if (timer) clearTimeout(timer);
