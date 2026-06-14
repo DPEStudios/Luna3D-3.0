@@ -159,3 +159,32 @@ Para restaurar a cualquier commit: clonar el bundle y copiar los archivos.
   `LUNA_PAY.createCheckout`, crear `pago-exito/fallido/pendiente.html`, re-validar precios
   server-side y probar el flujo completo en **sandbox**. (Siguen pendientes la carga de contenido
   real — sesión 3 — y las páginas legales.)
+
+
+## Fábrica de Catálogo — Fase A (Supabase) preparada (14-jun-2026)
+
+Track paralelo a las sesiones de venta (ver `PROMPT_FabricaCatalogo_Web_Luna3D_v3.md`). Objetivo:
+que el alta de un producto pase de "editar código + redeploy" a **un INSERT por API**, con la
+publicación controlada por el "OK" de Daniel.
+
+- **Artefactos pegar-y-ejecutar en `supabase/`** (Daniel aún no creó el proyecto; queda listo para
+  cuando pegue las llaves):
+  - `01_schema.sql` — tabla `products` (esquema §3: campos web + internos), vista pública
+    `products_public` (solo columnas seguras + solo `estado='publicado'`), RLS (anon no toca la
+    tabla base; escritura solo `service_role`), trigger `updated_at` y la **regla dura de
+    publicación** como CHECK (`products_publish_guard`).
+  - `02_seed.sql` — migra los 20 slots actuales de `data.js` como **borradores** (invisibles en la
+    web), `fuente='original'`, `riesgo_ip='verde'`. Idempotente (`ON CONFLICT DO NOTHING`).
+  - `03_storage.sql` — bucket público `productos` + lectura pública / escritura solo `service_role`.
+  - `ENV_TEMPLATE.txt` + `SETUP_Supabase_Fase_A.md` — molde de llaves y guía paso a paso.
+- **Seguridad:** la `service_role` va solo a `.claude-secrets/` y al entorno del hosting, nunca al
+  repo ni al chat (decisión de Daniel). La `anon` (solo lectura de la vista) sí puede ir al cliente.
+- **Verificación (Postgres 14 real en el sandbox):** los 3 SQL ejecutan sin error; seed = 20
+  borradores; la regla de publicación se probó en 5 casos → permite original/curado válidos y
+  **bloquea** riesgo `rojo`, `riesgo_ip` nulo y curado sin licencia comercial (se reforzó con
+  `coalesce` porque con SQL de 3 valores un dato faltante evaluaba a NULL y el CHECK lo dejaba pasar);
+  la vista pública no expone ningún campo interno (`costo/margen/licencia/...`); bucket creado público.
+- **Pendiente de Daniel:** crear el proyecto en supabase.com y pegar `URL` + `anon` + `service_role`
+  en `.claude-secrets/supabase.env` (pasos en `SETUP_Supabase_Fase_A.md`). Con eso arranca la
+  **Fase B** (la web lee de la vista pública vía `catalogData.js` + wrapper `LUNA_DATA`, con
+  Loading/Error/Empty; WhatsApp y carrito intactos).

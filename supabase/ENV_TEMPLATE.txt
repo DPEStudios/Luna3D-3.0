@@ -1,0 +1,24 @@
+============================================================
+LUNA 3D — Web v3 · Plantilla de variables Supabase
+============================================================
+
+NO pegues llaves reales en este archivo (es plantilla, va al repo).
+Las llaves reales van a:
+  · .claude-secrets/supabase.env   (para el agente — NO va al repo)
+  · variables de entorno del hosting (Vercel/Netlify) — para la escritura
+
+Copia las 3 líneas de abajo a .claude-secrets/supabase.env y rellénalas.
+
+------------------------------------------------------------
+# Project URL (Settings → API → Project URL). Pública, segura.
+SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
+
+# anon public key (Settings → API). Pública: puede ir al cliente.
+# Solo da acceso de LECTURA a la vista products_public (por RLS).
+SUPABASE_ANON_KEY=eyJhbGciOi...
+
+# service_role key (Settings → API). ¡¡SECRETA!! Omite RLS.
+# SOLO en .claude-secrets/ y en el entorno del servidor/hosting.
+# NUNCA en el repo, NUNCA en el navegador, NUNCA en el chat.
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...
+------------------------------------------------------------
