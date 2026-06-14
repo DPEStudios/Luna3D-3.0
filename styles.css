@@ -1764,70 +1764,121 @@ body.light-mode .tst-icon-sun {
    Regla: header oscuro permanece; resto adapta a paleta día.
    ============================================================ */
 
-/* --- NAV: fondo oscuro SIEMPRE en modo claro (no solo al scrollear) --- */
+/* --- NAV MODO CLARO: "atardecer" ---
+   Inicio: transparente sobre daysky (igual que noche sobre cosmos).
+   Elementos en magenta/violeta — cálidos y legibles sobre celeste.
+   Scroll: panel de vidrio claro que nace del propio celeste, sin azul oscuro.
+   ----------------------------------------------------------- */
+
+/* NAV base — transparente (el cielo es el fondo) */
 body.light-mode .nav{
-  background:rgba(8,13,33,.84);
+  background:transparent;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  border-bottom-color:transparent;
+}
+
+/* NAV scrolled — vidrio claro, mismo tono que el daysky */
+body.light-mode .nav.scrolled{
+  background:rgba(234,242,250,.88);
   backdrop-filter:blur(var(--blur));
   -webkit-backdrop-filter:blur(var(--blur));
-  border-bottom-color:rgba(255,255,255,.07);
-}
-body.light-mode .nav.scrolled{
-  background:rgba(8,13,33,.94);
-  border-bottom-color:rgba(255,255,255,.11);
+  border-bottom-color:rgba(11,20,55,.10);
 }
 
-/* Nav links — texto claro sobre nav oscuro (selectores reales del HTML) */
+/* Nav links: violeta funcional (legible + cálido sobre celeste) */
 body.light-mode .nav-links a{
-  color:#C4C9DE;
+  color:#7B4FC8;
 }
 body.light-mode .nav-links a:hover{
-  color:#F5F6FB;
-  background:rgba(255,255,255,.07);
+  color:#9B27E0;
+  background:rgba(123,79,200,.10);
 }
 body.light-mode .nav-links a.active{
-  color:#F5F6FB;
+  color:#0B1437;
 }
 
-/* Icon buttons — claro sobre nav oscuro */
+/* Nav links scrolled: tinta lunar sobre fondo claro */
+body.light-mode .nav.scrolled .nav-links a{
+  color:#42507E;
+}
+body.light-mode .nav.scrolled .nav-links a:hover{
+  color:#0B1437;
+  background:rgba(11,20,55,.06);
+}
+body.light-mode .nav.scrolled .nav-links a.active{
+  color:#0B1437;
+}
+
+/* Icon buttons: magenta (rosado atardecer) */
 body.light-mode .icon-btn{
-  color:#C4C9DE;
+  color:#E81F9D;
 }
 body.light-mode .icon-btn:hover{
-  color:#F5F6FB;
-  background:rgba(255,255,255,.08);
-  border-color:rgba(255,255,255,.12);
+  color:#9B27E0;
+  background:rgba(232,31,157,.10);
+  border-color:rgba(232,31,157,.25);
+}
+
+/* Icon buttons scrolled: violeta sobrio */
+body.light-mode .nav.scrolled .icon-btn{
+  color:#7B4FC8;
+}
+body.light-mode .nav.scrolled .icon-btn:hover{
+  color:#E81F9D;
+  background:rgba(123,79,200,.10);
+  border-color:rgba(123,79,200,.20);
 }
 
 /* Logo */
-body.light-mode .logo-text{color:#F5F6FB;}
-body.light-mode .nav-logo svg path,
-body.light-mode .nav-logo svg circle{stroke:#F5F6FB;}
+body.light-mode .logo-text{color:#0B1437;}
+body.light-mode .nav.scrolled .logo-text{color:#0B1437;}
 
-/* Botón Catálogo — claro sobre nav oscuro, borde aurora */
+/* Botón Catálogo — aurora sobre cielo */
 body.light-mode .btn-catalog{
-  color:#C4C9DE;
-  border-color:rgba(232,31,157,.40);
-  background:rgba(255,255,255,.03);
+  color:#7B4FC8;
+  border-color:rgba(232,31,157,.50);
+  background:rgba(232,31,157,.06);
 }
 body.light-mode .btn-catalog:hover,
 body.light-mode .btn-catalog.active,
 body.light-mode .btn-catalog.catalog-active{
-  color:#F5F6FB;
-  background:rgba(232,31,157,.10);
-  border-color:rgba(232,31,157,.65);
+  color:#9B27E0;
+  background:rgba(232,31,157,.14);
+  border-color:rgba(232,31,157,.75);
 }
 
-/* Barra de búsqueda: sobre nav oscuro */
+/* Botón Catálogo scrolled */
+body.light-mode .nav.scrolled .btn-catalog{
+  color:#7B4FC8;
+  border-color:rgba(123,79,200,.40);
+  background:rgba(123,79,200,.06);
+}
+body.light-mode .nav.scrolled .btn-catalog:hover{
+  color:#0B1437;
+  background:rgba(123,79,200,.12);
+  border-color:rgba(123,79,200,.65);
+}
+
+/* Barra de búsqueda — sobre cielo (top) */
 body.light-mode .nav-search{
-  background:rgba(255,255,255,.08);
-  border-color:rgba(255,255,255,.15);
+  background:rgba(11,20,55,.07);
+  border-color:rgba(11,20,55,.18);
 }
 body.light-mode .nav-search-input{
-  color:#F5F6FB;
+  color:#0B1437;
 }
-body.light-mode .nav-search-input::placeholder{color:rgba(196,201,222,.55);}
-body.light-mode .nav-search-btn{color:#C4C9DE;}
-body.light-mode .nav-search-btn:hover{color:#F5F6FB;}
+body.light-mode .nav-search-input::placeholder{color:rgba(11,20,55,.40);}
+body.light-mode .nav-search-btn{color:#7B4FC8;}
+body.light-mode .nav-search-btn:hover{color:#E81F9D;}
+
+/* Barra de búsqueda scrolled */
+body.light-mode .nav.scrolled .nav-search{
+  background:rgba(11,20,55,.06);
+  border-color:rgba(11,20,55,.14);
+}
+body.light-mode .nav.scrolled .nav-search-input{color:#0B1437;}
+body.light-mode .nav.scrolled .nav-search-btn{color:#7B4FC8;}
 
 /* --- MEGAMENÚ: versión clara --- */
 body.light-mode .megamenu-panel{
