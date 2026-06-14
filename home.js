@@ -83,6 +83,19 @@
     ).join('');
   }
 
+  /* ---------- catálogo async: Loading -> Supabase -> render ---------- */
+  (function showCatalogLoading(){
+    const LOAD = '<div class="empty-state" style="grid-column:1/-1;min-width:240px;">Cargando productos…</div>';
+    ['feature-strip','hot-sale-carousel','new-carousel','offers-grid','gift-results-grid'].forEach(id=>{
+      const el=document.getElementById(id); if(el && !el.innerHTML.trim()) el.innerHTML=LOAD;
+    });
+  })();
+
+  // Hidrata el catálogo desde Supabase (o fallback a data.js) y luego renderiza
+  // las secciones que dependen de PRODUCTS. El mapeo/render es idéntico al previo.
+  (async function renderCatalogSections(){
+    await LUNA_DATA.bootstrap();
+
   /* ---------- feature strip ---------- */
   const FS = [
     {ico:'star',  b:'Más vendidos', p:'Descubre los productos favoritos de nuestros clientes.'},
@@ -237,6 +250,8 @@
       ? offers.map(p => LUNA.productCard(p)).join('')
       : `<div class="empty-state" style="grid-column:1/-1;">Aún no hay ofertas activas. ¡Vuelve pronto!</div>`;
   }
+
+  })(); // fin renderCatalogSections (async)
 
   (function initCountdown() {
     const clock = document.getElementById('timer-clock');

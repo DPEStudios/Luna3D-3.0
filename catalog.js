@@ -5,6 +5,15 @@
   LUNA.buildNav('catalogo');
   LUNA.buildFooter();
 
+  // Loading: estado de carga mientras llega Supabase.
+  const _catGrid = document.getElementById('catalog-grid');
+  if(_catGrid) _catGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Cargando catálogo…</div>';
+
+  // Arranque async: hidrata PRODUCTS desde Supabase (o fallback a data.js),
+  // luego construye filtros y render. Empty/Sin resultados ya lo maneja el render.
+  (async function(){
+    await LUNA_DATA.bootstrap();
+
   const COLLECTIONS=[
     {id:'all',      label:'Todos'},
     {id:'featured', label:'Destacados', test:p=>p.featured},
@@ -125,4 +134,5 @@
   }
 
   syncFilters(); render();
+  })(); // fin arranque async
 })();

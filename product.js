@@ -5,9 +5,27 @@
   LUNA.buildNav('');
   LUNA.buildFooter();
 
+  // Loading mientras llega Supabase.
+  const _pdGrid = document.getElementById('pd-grid');
+  if(_pdGrid) _pdGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:60px 0;">Cargando producto…</div>';
+
+  (async function(){
+    await LUNA_DATA.bootstrap();
+
   const params=new URLSearchParams(location.search);
   const id=params.get('id');
   const p=PROD_BY_ID[id]||PRODUCTS[0];
+
+  // Empty/Not-found: catálogo vacío (todo en borrador) o id inexistente.
+  if(!p){
+    const g=document.getElementById('pd-grid');
+    if(g) g.innerHTML='<div class="empty-state" style="grid-column:1/-1;padding:60px 0;text-align:center;">'
+      +'<p style="font-size:18px;color:var(--star);font-family:var(--font-display);margin-bottom:8px;">Producto no disponible</p>'
+      +'Pronto publicaremos nuevos productos. <a href="catalogo.html" style="color:var(--magenta);">Ver catálogo</a></div>';
+    const rg=document.getElementById('related-grid'); if(rg) rg.innerHTML='';
+    document.title='Producto no disponible — Luna3D';
+    return;
+  }
 
   // Variantes desde el producto, con fallback a los valores por defecto de marca.
   const COLORS = p.colors || DEFAULT_COLORS;
@@ -126,4 +144,5 @@
   // update title
   document.title=`${p.name} — Luna3D`;
   scrollTo(0,0);
+  })(); // fin arranque async
 })();

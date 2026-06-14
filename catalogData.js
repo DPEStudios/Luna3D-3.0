@@ -1,0 +1,115 @@
+/* ============================================================
+   LUNA3D — Capa de datos del catálogo (wrapper AGNÓSTICO) · FASE B
+   ------------------------------------------------------------
+   SoC: este es el ÚNICO archivo del cliente que conoce la base de
+   datos (Supabase). La UI llama a window.LUNA_DATA.bootstrap() /
+   getCatalog() y recibe productos con la MISMA forma que data.js.
+   Si mañana se cambia Supabase por otra DB, se toca SOLO este archivo.
+
+   SEGURIDAD: aquí viven la URL y la ANON key. Ambas son públicas y
+   seguras por diseño (modelo anon + RLS de Supabase: anon solo puede
+   leer la vista 'products_public'). La SERVICE_ROLE key NUNCA vive en
+   el cliente, ni en el repo, ni en el chat.
+
+   Estado: la web lee SOLO productos 'publicado' desde la vista pública.
+   Con todo en borrador, la web se ve vacía (Empty) — es lo esperado.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  // ---- CONFIG pública (un solo lugar) ------------------------------------
+  var SUPABASE = {
+    url:  'https://dlvechohqlwysryxguqm.supabase.co',
+    anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsdmVjaG9ocWx3eXNyeXhndXFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzODA1MzQsImV4cCI6MjA5Njk1NjUzNH0.JPAXePprE94aLWNhfB0TXFQYY6uuZfFVOKZO0RVvvIU',
+  };
+  var ENDPOINT  = SUPABASE.url + '/rest/v1/products_public?select=*';
+  var TIMEOUT_MS = 8000;
+
+  // ---- PURE: fila de products_public -> forma de objeto del catálogo ------
+  // Misma forma que data.js (incluye catName derivado de CAT_NAME). Preserva
+  // nulos para que la UI aplique sus defaults (DEFAULT_COLORS / DEFAULT_SIZES
+  // / PROD_DESC) sin duplicar lógica. No toca DOM ni red.
+  function mapRow(row) {
+    var catName = (typeof CAT_NAME !== 'undefined' && CAT_NAME[row.cat]) || row.cat || '';
+    return {
+      id:       row.id,
+      cat:      row.cat,
+      catName:  catName,
+      name:     row.name,
+      price:    (row.price == null ? null : Number(row.price)),
+      img:      (row.img != null ? row.img : null),
+      gallery:  (Array.isArray(row.gallery) ? row.gallery : null),
+      tag:      (row.tag != null ? row.tag : null),
+      featured: !!row.featured,
+      rating:   (row.rating == null ? null : Number(row.rating)),
+      reviews:  (row.reviews == null ? 0 : Number(row.reviews)),
+      colors:   (row.colors && row.colors.length ? row.colors : null),
+      sizes:    (row.sizes  && row.sizes.length  ? row.sizes  : null),
+      desc:     (row.desc != null && row.desc !== '' ? row.desc : null),
+    };
+  }
+
+  // ---- Consulta la vista pública. Resuelve con array de publicados. -------
+  // Rechaza si la red / Supabase falla (la capa de boot decide el fallback).
+  function getCatalog() {
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS) : null;
+    return fetch(ENDPOINT, {
+      headers: { apikey: SUPABASE.anon, Authorization: 'Bearer ' + SUPABASE.anon },
+      signal: ctrl ? ctrl.signal : undefined,
+    }).then(function (resp) {
+      if (timer) clearTimeout(timer);
+      if (!resp.ok) throw new Error('Supabase respondió ' + resp.status);
+      return resp.json();
+    }).then(function (rows) {
+      if (!Array.isArray(rows)) throw new Error('Respuesta inesperada de Supabase');
+      return rows.map(mapRow);
+    });
+  }
+
+  // ---- Hidrata EN SU LUGAR los globales que lee app.js perezosamente ------
+  // (megamenú, carrito, favoritos). PRODUCTS y PROD_BY_ID son const: no se
+  // reasignan; se reemplaza el CONTENIDO del array y del objeto (mutación).
+  function applyToGlobals(list) {
+    if (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS)) {
+      PRODUCTS.splice(0, PRODUCTS.length);
+      Array.prototype.push.apply(PRODUCTS, list);
+    }
+    if (typeof PROD_BY_ID !== 'undefined' && PROD_BY_ID) {
+      Object.keys(PROD_BY_ID).forEach(function (k) { delete PROD_BY_ID[k]; });
+      list.forEach(function (p) { PROD_BY_ID[p.id] = p; });
+    }
+  }
+
+  // ---- Orquesta: intenta Supabase; si falla, conserva el seed de data.js --
+  // Devuelve { source:'supabase'|'fallback', count, error? }. NUNCA rechaza:
+  // garantiza que la web jamás se rompe por una caída de Supabase.
+  var _state = { source: null, count: 0, ready: false };
+  function bootstrap() {
+    return getCatalog().then(function (list) {
+      applyToGlobals(list);
+      _state = { source: 'supabase', count: list.length, ready: true };
+      return _state;
+    }).catch(function (err) {
+      var msg = String((err && err.message) || err);
+      _state = {
+        source: 'fallback',
+        count: (typeof PRODUCTS !== 'undefined' ? PRODUCTS.length : 0),
+        ready: true,
+        error: msg,
+      };
+      if (typeof console !== 'undefined') {
+        console.warn('[LUNA_DATA] Supabase no disponible; usando semilla data.js:', msg);
+      }
+      return _state;
+    });
+  }
+
+  window.LUNA_DATA = {
+    config: SUPABASE,
+    mapRow: mapRow,
+    getCatalog: getCatalog,
+    bootstrap: bootstrap,
+    state: function () { return _state; },
+  };
+})();
