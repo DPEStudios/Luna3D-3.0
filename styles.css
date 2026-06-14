@@ -1731,8 +1731,6 @@ body.light-mode .tst-icon-sun {
 }
 @keyframes ds-flap{from{transform:scaleY(1);}to{transform:scaleY(.5);}}
 
-/* nav con scroll sobre cielo claro — mantener oscuro (identidad de marca) */
-body.light-mode .nav.scrolled{background:rgba(8,13,33,.88);}
 
 @media (prefers-reduced-motion: reduce){
   .ds-moon,.ds-cloud,.ds-birds .bird svg{animation:none;}
@@ -1766,21 +1764,60 @@ body.light-mode .nav.scrolled{background:rgba(8,13,33,.88);}
    Regla: header oscuro permanece; resto adapta a paleta día.
    ============================================================ */
 
-/* --- NAV: texto e íconos sobre fondo oscuro (nav permanece oscuro en día) --- */
-body.light-mode .nav-link,
-body.light-mode .nav-icon-btn,
-body.light-mode .btn-catalog{
+/* --- NAV: fondo oscuro SIEMPRE en modo claro (no solo al scrollear) --- */
+body.light-mode .nav{
+  background:rgba(8,13,33,.84);
+  backdrop-filter:blur(var(--blur));
+  -webkit-backdrop-filter:blur(var(--blur));
+  border-bottom-color:rgba(255,255,255,.07);
+}
+body.light-mode .nav.scrolled{
+  background:rgba(8,13,33,.94);
+  border-bottom-color:rgba(255,255,255,.11);
+}
+
+/* Nav links — texto claro sobre nav oscuro (selectores reales del HTML) */
+body.light-mode .nav-links a{
   color:#C4C9DE;
 }
-body.light-mode .nav-link:hover,
-body.light-mode .nav-icon-btn:hover{
+body.light-mode .nav-links a:hover{
+  color:#F5F6FB;
+  background:rgba(255,255,255,.07);
+}
+body.light-mode .nav-links a.active{
   color:#F5F6FB;
 }
+
+/* Icon buttons — claro sobre nav oscuro */
+body.light-mode .icon-btn{
+  color:#C4C9DE;
+}
+body.light-mode .icon-btn:hover{
+  color:#F5F6FB;
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.12);
+}
+
+/* Logo */
 body.light-mode .logo-text{color:#F5F6FB;}
 body.light-mode .nav-logo svg path,
 body.light-mode .nav-logo svg circle{stroke:#F5F6FB;}
 
-/* Barra de búsqueda: sobre nav oscuro, mantener colores noche */
+/* Botón Catálogo — claro sobre nav oscuro, borde aurora */
+body.light-mode .btn-catalog{
+  color:#C4C9DE;
+  border-color:rgba(232,31,157,.40);
+  background:rgba(255,255,255,.03);
+}
+body.light-mode .btn-catalog:hover,
+body.light-mode .btn-catalog.active,
+body.light-mode .btn-catalog.catalog-active{
+  color:#F5F6FB;
+  background:rgba(232,31,157,.10);
+  border-color:rgba(232,31,157,.65);
+}
+
+/* Barra de búsqueda: sobre nav oscuro */
 body.light-mode .nav-search{
   background:rgba(255,255,255,.08);
   border-color:rgba(255,255,255,.15);
@@ -1791,16 +1828,6 @@ body.light-mode .nav-search-input{
 body.light-mode .nav-search-input::placeholder{color:rgba(196,201,222,.55);}
 body.light-mode .nav-search-btn{color:#C4C9DE;}
 body.light-mode .nav-search-btn:hover{color:#F5F6FB;}
-
-/* Botón Catálogo en nav: borde aurora sobre fondo oscuro */
-body.light-mode .btn-catalog{
-  border-color:rgba(232,31,157,.45);
-  color:#F5F6FB;
-}
-body.light-mode .btn-catalog:hover{
-  background:rgba(232,31,157,.12);
-  border-color:rgba(232,31,157,.7);
-}
 
 /* --- MEGAMENÚ: versión clara --- */
 body.light-mode .megamenu-panel{
