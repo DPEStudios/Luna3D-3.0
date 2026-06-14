@@ -86,7 +86,7 @@
   /* ---------- catálogo async: Loading -> Supabase -> render ---------- */
   (function showCatalogLoading(){
     const LOAD = '<div class="empty-state" style="grid-column:1/-1;min-width:240px;">Cargando productos…</div>';
-    ['feature-strip','hot-sale-carousel','new-carousel','offers-grid','gift-results-grid'].forEach(id=>{
+    ['feature-strip','mas-vendidos-split','nuevos-split','offers-grid','gift-results-grid'].forEach(id=>{
       const el=document.getElementById(id); if(el && !el.innerHTML.trim()) el.innerHTML=LOAD;
     });
   })();
@@ -98,10 +98,9 @@
 
   /* ---------- feature strip ---------- */
   const FS = [
-    {ico:'star',  b:'Más vendidos', p:'Descubre los productos favoritos de nuestros clientes.'},
+    {ico:'star',  b:'Más vendidos', p:'Descubre los productos favoritos de nuestros clientes.', wide:true},
     {ico:'gem',   b:'¿Buscas un regalo?', p:'Encuentra ideas únicas para sorprender.'},
     {ico:'spark', b:'Oferta de la semana', p:'Todas las semanas incorporamos promociones especiales.'},
-    {ico:'help',  b:'Preguntas frecuentes', p:'Conoce el proceso completo de compra y entrega.'},
   ];
   const fsEl = document.getElementById('feature-strip');
   if(fsEl) {
@@ -124,7 +123,8 @@
             </div>
           </div>`;
       }
-      return `<div class="fs">
+      const clickAttr = f.wide ? " role='button' tabindex='0' onclick=\"document.getElementById('seccion-1').scrollIntoView({behavior:'smooth'})\" style='cursor:pointer'" : '';
+      return `<div class="fs${f.wide ? ' fs--wide' : ''}"${clickAttr}>
         <div class="fs-ico">${LUNA.svg(f.ico)}</div>
         <b>${f.b}</b>
         <p>${f.p}</p>
@@ -176,20 +176,41 @@
       </div>
     </article>`;
   }
-  const hotEl = document.getElementById('hot-sale-carousel');
-  if(hotEl){
-    const hot = PRODUCTS.filter(p => p.featured).slice(0,8);
-    hotEl.innerHTML = hot.length
-      ? hot.map(p => saleCard(p, 'Destacado')).join('')
-      : showEmpty('Pronto destacaremos productos aquí.');
+  // Tarjeta compacta — usada en showcase y gift finder
+  function compactCard(p) {
+    const img = p.img
+      ? `<img src="${p.img}" alt="${p.name}" loading="lazy">`
+      : `<span class="cc-ph">${LUNA.svg('cube')}</span>`;
+    return `<a class="compact-card" href="producto.html?id=${p.id}">`+
+      `<div class="cc-img">${img}</div>`+
+      `<div class="cc-info">`+
+        `<span class="cc-name">${p.name}</span>`+
+        `<span class="cc-price">${CLP(p.price)}</span>`+
+      `</div>`+
+    `</a>`;
   }
-  const newEl = document.getElementById('new-carousel');
-  if(newEl){
-    const fresh = PRODUCTS.filter(p => p.tag === 'Nuevo').slice(0,8);
-    newEl.innerHTML = fresh.length
-      ? fresh.map(p => saleCard(p, 'Nuevo')).join('')
-      : showEmpty('Muy pronto: nuevos lanzamientos.');
+
+  function renderShowcaseSplit(splitId, products, bannerContent) {
+    const el = document.getElementById(splitId); if (!el) return;
+    const prods = products.slice(0, 6);
+    const gridHtml = prods.length
+      ? prods.map(compactCard).join('')
+      : `<div class="empty-state" style="grid-column:1/-1;">Próximamente aquí.</div>`;
+    el.innerHTML = `<div class="showcase-split">`+
+      `<div class="showcase-promo-banner">${bannerContent}</div>`+
+      `<div class="showcase-compact-grid">${gridHtml}</div>`+
+    `</div>`;
   }
+
+  renderShowcaseSplit('mas-vendidos-split', PRODUCTS.filter(p => p.featured),
+    `<span class="kicker">${LUNA.svg('star')} Más vendidos</span>`+
+    `<h3>Los productos que más aman nuestros clientes</h3>`+
+    `<a class="btn primary" href="catalogo.html" style="margin-top:8px;display:inline-block;">Ver catálogo</a>`);
+
+  renderShowcaseSplit('nuevos-split', PRODUCTS.filter(p => p.tag === 'Nuevo'),
+    `<span class="kicker">${LUNA.svg('spark')} Novedades</span>`+
+    `<h3>Lo último en impresión 3D artesanal</h3>`+
+    `<a class="btn primary" href="catalogo.html" style="margin-top:8px;display:inline-block;">Ver novedades</a>`);
 
   /* ---------- regalos (Sección 2 - Gift Finder) ---------- */
   (function initGiftFinder() {
@@ -215,12 +236,12 @@
           list = list.filter(p => p.price != null && p.price >= 8000);
         }
 
-        const sliced = list.slice(0, 4);
+        const sliced = list.slice(0, 6);
 
         if (sliced.length === 0) {
           resultsEl.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">No se encontraron regalos que coincidan con los filtros.</div>`;
         } else {
-          resultsEl.innerHTML = sliced.map(p => LUNA.productCard(p)).join('');
+          resultsEl.innerHTML = sliced.map(compactCard).join('');
         }
         resultsEl.classList.remove('fade-out');
       }, 180);

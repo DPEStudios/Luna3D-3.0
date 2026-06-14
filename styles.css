@@ -361,6 +361,17 @@ section.block{padding:80px 0;position:relative;}
 .feature-strip .fs .fs-ico svg{width:19px;height:19px;}
 .feature-strip .fs b{font-family:var(--font-display);font-weight:600;color:var(--star);font-size:16px;}
 .feature-strip .fs p{font-size:13.5px;color:var(--muted);line-height:1.5;}
+/* Bloque Más Vendidos — doble ancho en el strip */
+.feature-strip .fs.fs--wide{grid-column:span 2;}
+/* Mini-carousel dentro del bloque fs--wide */
+.mini-carousel-wrapper{margin-top:8px;overflow:hidden;border-radius:10px;}
+.mini-carousel{position:relative;}
+.mini-slide{display:none;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:10px;text-decoration:none;}
+.mini-slide.active{display:flex;}
+.mini-slide-img-placeholder{width:36px;height:36px;border-radius:7px;background:rgba(255,255,255,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,.25);}
+.mini-slide-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.mini-slide-name{font-size:12px;color:var(--star);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mini-slide-price{font-family:var(--font-mono);font-size:11px;color:var(--magenta-bright);}
 
 /* ============================================================
    HOME SHOWCASES / FAQ
@@ -378,6 +389,29 @@ section.block{padding:80px 0;position:relative;}
 .wide-carousel{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,320px);gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;}
 .wide-carousel::-webkit-scrollbar{height:8px;}
 .wide-carousel::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px;}
+/* ── Showcase split: banner izq + compact grid der ──────────────── */
+.showcase-split{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:start;margin-top:18px;}
+.showcase-promo-banner{display:flex;flex-direction:column;gap:12px;padding:24px 20px;
+  background:linear-gradient(135deg,rgba(232,31,157,.10),rgba(155,39,224,.08));
+  border:1px solid rgba(232,31,157,.22);border-radius:16px;}
+.showcase-promo-banner .kicker{color:var(--magenta-bright);font-size:12px;}
+.showcase-promo-banner h3{font-family:var(--font-display);font-size:16px;color:var(--star);line-height:1.35;margin:0;}
+.showcase-promo-banner .btn{font-size:13px;padding:9px 18px;}
+.showcase-compact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+/* Compact product card */
+.compact-card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;text-decoration:none;background:rgba(255,255,255,.03);
+  transition:border-color .2s var(--ease),box-shadow .2s var(--ease),transform .2s var(--ease);}
+.compact-card:hover{border-color:var(--magenta);box-shadow:0 0 14px rgba(232,31,157,.14);transform:translateY(-2px);}
+.cc-img{aspect-ratio:1;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.cc-img img{width:100%;height:100%;object-fit:cover;}
+.cc-ph{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:rgba(255,255,255,.14);}
+.cc-ph svg{width:28px;height:28px;}
+.cc-info{padding:8px 10px;display:flex;flex-direction:column;gap:3px;}
+.cc-name{font-size:12px;color:var(--star);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.cc-price{font-family:var(--font-mono);font-size:11px;color:var(--magenta-bright);}
+/* Gift finder — 3 cols para tarjetas compactas */
+#gift-results-grid{grid-template-columns:repeat(3,1fr);gap:14px;}
 .show-prod{
   scroll-snap-align:start;border:1px solid var(--line);border-radius:18px;overflow:hidden;
   background:rgba(11,20,55,.52);min-height:390px;display:flex;flex-direction:column;
@@ -910,6 +944,9 @@ body.light-mode .newsletter-form input::placeholder{color:#7A89B0;}
   .hero[data-hero="split"] .hero-orbit{margin-top:40px;}
   .cat-grid{grid-template-columns:1fr 1fr;}
   .feature-strip{grid-template-columns:1fr 1fr;}
+  .feature-strip .fs.fs--wide{grid-column:span 1;}
+  .showcase-split{grid-template-columns:1fr;}
+  .showcase-compact-grid{grid-template-columns:repeat(2,1fr);}
   .catalog-layout{grid-template-columns:1fr;}
   .filters{position:static;display:none;}
   .filters.open{display:flex;}
@@ -926,6 +963,9 @@ body.light-mode .newsletter-form input::placeholder{color:#7A89B0;}
   .catalog-main .prod-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
   .cat-grid{grid-template-columns:1fr;}
   .feature-strip{grid-template-columns:1fr;}
+  .showcase-split{grid-template-columns:1fr;}
+  .showcase-compact-grid{grid-template-columns:repeat(2,1fr);}
+  #gift-results-grid{grid-template-columns:repeat(2,1fr);}
   .footer-top{grid-template-columns:1fr;}
   .pd-specs{grid-template-columns:1fr;}
   .prod .pname{font-size:15px;}
@@ -1951,6 +1991,14 @@ body.light-mode .feature-strip .fs:hover{
 body.light-mode .fs-title{color:#0B1437;}
 body.light-mode .fs-sub{color:#5C6B94;}
 body.light-mode .fs-icon{color:#7B4FC8;}
+/* Compact card — modo claro */
+body.light-mode .compact-card{background:rgba(255,255,255,.80);border-color:rgba(11,20,55,.10);}
+body.light-mode .compact-card:hover{border-color:var(--magenta);box-shadow:0 2px 14px rgba(11,20,55,.10);}
+body.light-mode .cc-name{color:var(--tinta,#0B1437);}
+body.light-mode .cc-ph{color:rgba(11,20,55,.15);}
+body.light-mode .showcase-promo-banner{background:linear-gradient(135deg,rgba(232,31,157,.07),rgba(155,39,224,.05));border-color:rgba(232,31,157,.18);}
+body.light-mode .showcase-promo-banner h3{color:var(--tinta,#0B1437);}
+body.light-mode .mini-slide{background:rgba(11,20,55,.05);}
 
 /* --- TARJETAS DE PRODUCTO: profundidad en claro --- */
 body.light-mode .prod-card{
