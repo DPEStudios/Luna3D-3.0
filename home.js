@@ -212,6 +212,34 @@
     `<h3>Lo último en impresión 3D artesanal</h3>`+
     `<a class="btn primary" href="catalogo.html" style="margin-top:8px;display:inline-block;">Ver novedades</a>`);
 
+  /* ---------- grid de categorias 'Encuentra tu producto' (S4) ---------- */
+  (function renderCatGrid() {
+    var catGridEl = document.getElementById('cat-grid');
+    if (!catGridEl) return;
+    var CAT_ICONS = {
+      'maceteros':   '🌱',
+      'decoracion':  '✨',
+      'llaveros':    '🔑',
+      'cultura-pop': '⭐',
+      'oficina':     '📐',
+      'custom':      '💬'
+    };
+    var tiles = CATEGORIES.map(function(c) {
+      return { id: c.id, name: c.name, desc: c.desc || '', link: 'catalogo.html?cat=' + c.id, ext: false };
+    }).concat([
+      { id: 'custom', name: 'Personalizado', desc: 'Algo especial en mente? Cotiza tu idea.', link: 'https://wa.me/56983357145', ext: true }
+    ]);
+    catGridEl.innerHTML = tiles.map(function(t) {
+      var icon = CAT_ICONS[t.id] || '✶';
+      var extAttr = t.ext ? ' target="_blank" rel="noopener"' : '';
+      return '<a class="cat-tile" href="' + t.link + '" data-cat="' + t.id + '"' + extAttr + '>' +
+             '<span class="cat-tile-icon">' + icon + '</span>' +
+             '<span class="cat-tile-name">' + t.name + '</span>' +
+             '<span class="cat-tile-desc">' + t.desc + '</span>' +
+             '</a>';
+    }).join('');
+  })();
+
   /* ---------- regalos (Sección 2 - Gift Finder) ---------- */
   (function initGiftFinder() {
     const resultsEl = document.getElementById('gift-results-grid');

@@ -2070,3 +2070,212 @@ body.light-mode footer{
 body.light-mode .footer-link{color:#42507E;}
 body.light-mode .footer-link:hover{color:#7B4FC8;}
 body.light-mode .footer-copy{color:#5C6B94;}
+
+
+/* ========================================================================
+   S4 — Categorias "Encuentra tu producto"
+   ======================================================================== */
+
+.cat-hero {
+  display: grid;
+  grid-template-columns: 1fr 1.65fr;
+  gap: 48px;
+  align-items: center;
+  padding: clamp(36px, 5vw, 56px);
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+  border: 1px solid var(--glass-line);
+  position: relative;
+  overflow: hidden;
+}
+.cat-hero::after {
+  content: "";
+  position: absolute;
+  right: -80px;
+  bottom: -80px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(155,39,224,.15), transparent 65%);
+  pointer-events: none;
+  filter: blur(20px);
+}
+.cat-hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  position: relative;
+  z-index: 1;
+}
+.cat-hero-left .section-title {
+  font-size: clamp(34px, 4.2vw, 52px);
+  line-height: 1.05;
+}
+.cat-hero-left > p {
+  color: var(--silver);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 32ch;
+}
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+.cat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 18px;
+  border-radius: 18px;
+  text-decoration: none;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.cat-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(60% 80% at 85% 115%, var(--cat-glow, #E81F9D), transparent 65%);
+  opacity: .18;
+  transition: opacity .25s var(--ease);
+  pointer-events: none;
+}
+.cat-tile[data-cat="maceteros"]   { --cat-glow: #00C896; --cat-glow-sh: rgba(0,200,150,.22); }
+.cat-tile[data-cat="decoracion"]  { --cat-glow: #E81F9D; --cat-glow-sh: rgba(232,31,157,.22); }
+.cat-tile[data-cat="llaveros"]    { --cat-glow: #F0C050; --cat-glow-sh: rgba(240,192,80,.22); }
+.cat-tile[data-cat="cultura-pop"] { --cat-glow: #9B27E0; --cat-glow-sh: rgba(155,39,224,.22); }
+.cat-tile[data-cat="oficina"]     { --cat-glow: #60A5FA; --cat-glow-sh: rgba(96,165,250,.22); }
+.cat-tile[data-cat="custom"]      { --cat-glow: #E81F9D; --cat-glow-sh: rgba(232,31,157,.22); }
+.cat-tile:hover {
+  transform: translateY(-4px);
+  border-color: var(--cat-glow, var(--magenta));
+  box-shadow: 0 16px 36px rgba(0,0,0,.28), 0 0 28px var(--cat-glow-sh, rgba(232,31,157,.2));
+}
+.cat-tile:hover::before { opacity: .30; }
+.cat-tile-icon { font-size: 28px; line-height: 1; margin-bottom: 2px; }
+.cat-tile-name { font-family: var(--font-display); font-weight: 700; color: var(--star); font-size: 15.5px; line-height: 1.2; }
+.cat-tile-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+body.light-mode .cat-hero {
+  background: #FFFFFF;
+  border-color: rgba(11,20,55,.10);
+  box-shadow: var(--shadow-day);
+}
+body.light-mode .cat-tile {
+  background: #FFFFFF;
+  border-color: rgba(11,20,55,.10);
+}
+body.light-mode .cat-tile:hover {
+  box-shadow: 0 12px 28px rgba(11,20,55,.12), 0 0 24px var(--cat-glow-sh, rgba(232,31,157,.15));
+}
+body.light-mode .cat-tile-name { color: #0B1437; }
+body.light-mode .cat-tile-desc { color: #5C6B94; }
+
+@media (max-width: 900px) {
+  .cat-hero { grid-template-columns: 1fr; }
+  .cat-grid  { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .cat-grid  { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+/* ========================================================================
+   S5 — Oferta de la semana (banner integrado con countdown)
+   ======================================================================== */
+
+.offer-hero-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: clamp(28px, 4vw, 40px) clamp(28px, 4vw, 44px);
+  border-radius: 22px;
+  margin-bottom: 24px;
+  background: linear-gradient(110deg, rgba(232,31,157,.20), rgba(11,20,55,.65) 52%, rgba(155,39,224,.16));
+  border: 1px solid rgba(232,31,157,.28);
+  position: relative;
+  overflow: hidden;
+}
+.offer-hero-banner::before {
+  content: "";
+  position: absolute;
+  right: -40px;
+  top: -50px;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(232,31,157,.28), transparent 65%);
+  pointer-events: none;
+  filter: blur(8px);
+}
+.offer-hero-text { flex: 1 1 280px; position: relative; }
+.offer-hero-text .section-title { font-size: clamp(24px, 3.2vw, 38px); }
+.offer-hero-text .lead { margin-top: 10px; font-size: 15px; max-width: 55ch; }
+.offer-hero-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(232,31,157,.35);
+  border-radius: 16px;
+  padding: 18px 28px;
+  flex-shrink: 0;
+  position: relative;
+}
+.offer-hero-timer .timer-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--magenta-bright, #E81F9D);
+}
+.offer-hero-timer .timer-clock {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--star);
+  font-size: clamp(20px, 3.5vw, 32px);
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+body.light-mode .offer-hero-banner {
+  background: linear-gradient(110deg, rgba(232,31,157,.10), rgba(207,227,246,.75) 52%, rgba(155,39,224,.07));
+  border-color: rgba(232,31,157,.20);
+}
+body.light-mode .offer-hero-timer {
+  background: rgba(255,255,255,.75);
+  border-color: rgba(232,31,157,.25);
+}
+body.light-mode .offer-hero-timer .timer-clock { color: #0B1437; }
+
+@media (max-width: 600px) {
+  .offer-hero-banner { flex-direction: column; align-items: flex-start; }
+  .offer-hero-timer  { width: 100%; align-items: center; }
+}
+
+
+/* ========================================================================
+   S5 — FAQ centrada y compacta
+   ======================================================================== */
+
+.faq-list { gap: 10px; max-width: 760px; margin: 0 auto; }
+
+
+/* ========================================================================
+   S5 — Newsletter footer mas discreta
+   ======================================================================== */
+
+.footer-newsletter { margin-top: 36px; padding: 22px 30px; border-radius: 18px; }
+.fn-title { font-size: 20px; }
+@media (max-width: 1024px) { .footer-newsletter { padding: 20px 24px; } }
+@media (max-width: 768px)  { .footer-newsletter { flex-direction: column; align-items: flex-start; gap: 16px; padding: 18px 20px; } }
