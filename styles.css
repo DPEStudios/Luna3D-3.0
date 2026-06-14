@@ -37,7 +37,7 @@
   --font-body:"Manrope",sans-serif;
   --font-mono:"Space Mono",monospace;
 
-  --maxw:1280px;
+  --maxw:1400px;
   --nav-h:74px;
   --ease:cubic-bezier(.22,.61,.36,1);
   --ease-theme:cubic-bezier(.45,.05,.25,1); /* easing oficial de transición día/noche (manual de marca) */
@@ -70,7 +70,7 @@ input,textarea,select{font-family:inherit;}
   background:radial-gradient(circle,rgba(232,31,157,.22),transparent 62%);}
 .page{position:relative;z-index:1;}
 
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
 
 /* ---------- utility text ---------- */
 .kicker{
@@ -811,9 +811,9 @@ body.light-mode .newsletter-form input::placeholder{color:#7A89B0;}
    ============================================================ */
 .hero-banner {
   position: relative;
-  /* alineado al mismo ancho de contenido que el resto del body (.wrap: 1200px máx, gutter 40px) */
+  /* alineado al mismo ancho de contenido que el resto del body (.wrap: 1400px máx, gutter 32px) */
   margin-top: calc(var(--nav-h) + 20px);
-  width:min(1200px,calc(100% - 80px));
+  width:min(1336px,calc(100% - 64px));
   margin-left:auto;
   margin-right:auto;
   border-radius:22px;
@@ -1118,7 +1118,7 @@ body.light-mode .newsletter-form input::placeholder{color:#7A89B0;}
   top: var(--nav-h);
   left: 50%;
   transform: translateX(-50%) translateY(-15px) scale(0.97);
-  width: calc(100% - 80px);
+  width: calc(100% - 64px);
   max-width: var(--maxw);
   background: rgba(8, 13, 33, 0.85);
   backdrop-filter: blur(20px);
@@ -1536,11 +1536,13 @@ body.light-mode {
   --silver: #42507E;   /* Texto secundario */
   --muted: #5C6B94;    /* Texto de apoyo */
   --muted-2: #7A89B0;
-  --line: rgba(11, 20, 55, 0.1);
-  --line-soft: rgba(11, 20, 55, 0.05);
-  --glass: rgba(11, 20, 55, 0.03);
-  --glass-2: rgba(11, 20, 55, 0.06);
-  --glass-line: rgba(11, 20, 55, 0.1);
+  --line: rgba(11, 20, 55, 0.14);
+  --line-soft: rgba(11, 20, 55, 0.08);
+  --glass: rgba(11, 20, 55, 0.05);
+  --glass-2: rgba(11, 20, 55, 0.10);
+  --glass-line: rgba(11, 20, 55, 0.15);
+  --shadow-day: 0 2px 12px rgba(11, 20, 55, 0.10), 0 1px 3px rgba(11, 20, 55, 0.07);
+  --shadow-day-lg: 0 8px 32px rgba(11, 20, 55, 0.14), 0 2px 8px rgba(11, 20, 55, 0.09);
   --grad: linear-gradient(125deg, #E5A8CD 0%, #B79CE4 100%); /* Rosa Bruma → Lila Pastel */
   --grad-rev: linear-gradient(305deg, #E5A8CD 0%, #B79CE4 100%);
   --grad-soft: linear-gradient(125deg, rgba(229, 168, 205, .12), rgba(183, 156, 228, .12));
@@ -1729,8 +1731,8 @@ body.light-mode .tst-icon-sun {
 }
 @keyframes ds-flap{from{transform:scaleY(1);}to{transform:scaleY(.5);}}
 
-/* nav con scroll sobre cielo claro */
-body.light-mode .nav.scrolled{background:rgba(242,246,251,.78);}
+/* nav con scroll sobre cielo claro — mantener oscuro (identidad de marca) */
+body.light-mode .nav.scrolled{background:rgba(8,13,33,.88);}
 
 @media (prefers-reduced-motion: reduce){
   .ds-moon,.ds-cloud,.ds-birds .bird svg{animation:none;}
@@ -1754,6 +1756,138 @@ body.light-mode .nav.scrolled{background:rgba(242,246,251,.78);}
 /* ---------- Sesión 2: fotos reales + estados sin precio ---------- */
 /* Cuando llegue la foto real (sesión 3), la imagen llena el contenedor. */
 .show-img img,.pd-main-img img,.mini-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+
 /* Botón de añadir deshabilitado en productos placeholder (sin precio). */
 .pcart.disabled,.pcart:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
 .btn[disabled],.btn.primary[disabled]{opacity:.5;cursor:not-allowed;}
+
+/* ============================================================
+   SESIÓN 1 — Overrides de componentes en Modo Claro
+   Regla: header oscuro permanece; resto adapta a paleta día.
+   ============================================================ */
+
+/* --- NAV: texto e íconos sobre fondo oscuro (nav permanece oscuro en día) --- */
+body.light-mode .nav-link,
+body.light-mode .nav-icon-btn,
+body.light-mode .btn-catalog{
+  color:#C4C9DE;
+}
+body.light-mode .nav-link:hover,
+body.light-mode .nav-icon-btn:hover{
+  color:#F5F6FB;
+}
+body.light-mode .logo-text{color:#F5F6FB;}
+body.light-mode .nav-logo svg path,
+body.light-mode .nav-logo svg circle{stroke:#F5F6FB;}
+
+/* Barra de búsqueda: sobre nav oscuro, mantener colores noche */
+body.light-mode .nav-search{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.15);
+}
+body.light-mode .nav-search-input{
+  color:#F5F6FB;
+}
+body.light-mode .nav-search-input::placeholder{color:rgba(196,201,222,.55);}
+body.light-mode .nav-search-btn{color:#C4C9DE;}
+body.light-mode .nav-search-btn:hover{color:#F5F6FB;}
+
+/* Botón Catálogo en nav: borde aurora sobre fondo oscuro */
+body.light-mode .btn-catalog{
+  border-color:rgba(232,31,157,.45);
+  color:#F5F6FB;
+}
+body.light-mode .btn-catalog:hover{
+  background:rgba(232,31,157,.12);
+  border-color:rgba(232,31,157,.7);
+}
+
+/* --- MEGAMENÚ: versión clara --- */
+body.light-mode .megamenu-panel{
+  background:rgba(255,255,255,.96);
+  border-color:rgba(11,20,55,.12);
+  box-shadow:0 24px 64px rgba(11,20,55,.14),0 2px 8px rgba(11,20,55,.08);
+}
+body.light-mode .megamenu-cat-title{color:#0B1437;}
+body.light-mode .megamenu-link{color:#42507E;}
+body.light-mode .megamenu-link:hover{color:#7B4FC8;background:rgba(123,79,200,.07);}
+body.light-mode .megamenu-divider{border-color:rgba(11,20,55,.10);}
+body.light-mode .megamenu-featured-label{color:#5C6B94;}
+
+/* --- FEATURE STRIP (accesos rápidos): versión clara --- */
+body.light-mode .feature-strip .fs{
+  background:#FFFFFF;
+  border:1px solid rgba(11,20,55,.12);
+  box-shadow:var(--shadow-day);
+}
+body.light-mode .feature-strip .fs:hover{
+  box-shadow:var(--shadow-day-lg);
+  border-color:rgba(123,79,200,.25);
+}
+body.light-mode .fs-title{color:#0B1437;}
+body.light-mode .fs-sub{color:#5C6B94;}
+body.light-mode .fs-icon{color:#7B4FC8;}
+
+/* --- TARJETAS DE PRODUCTO: profundidad en claro --- */
+body.light-mode .prod-card{
+  background:#FFFFFF;
+  border-color:rgba(11,20,55,.10);
+  box-shadow:var(--shadow-day);
+}
+body.light-mode .prod-card:hover{
+  box-shadow:var(--shadow-day-lg);
+  border-color:rgba(123,79,200,.20);
+}
+body.light-mode .prod-name{color:#0B1437;}
+body.light-mode .prod-price{color:#7B4FC8;}
+body.light-mode .prod-cat{color:#5C6B94;}
+
+/* --- SIDEBAR/DRAWER DE CARRITO: oscuro (coherente con nav) --- */
+body.light-mode .sidebar-menu{
+  background:rgba(8,13,33,.96);
+}
+
+/* --- BOTÓN SCROLL-TOP: discreto oscuro en claro --- */
+body.light-mode .scroll-top{
+  background:rgba(11,20,55,.70);
+  color:#F5F6FB;
+  border-color:rgba(11,20,55,.25);
+}
+body.light-mode .scroll-top:hover{
+  background:rgba(11,20,55,.88);
+}
+
+/* --- SECCIONES Y FONDOS GENERALES --- */
+body.light-mode .section-title{color:#0B1437;}
+body.light-mode .section-sub{color:#42507E;}
+
+/* Hero banner: borde sutil en modo claro */
+body.light-mode .hero-banner{
+  border-color:rgba(11,20,55,.12);
+  box-shadow:var(--shadow-day-lg);
+}
+
+/* Carrusel dots en claro */
+body.light-mode .slider-dot{background:rgba(11,20,55,.25);}
+body.light-mode .slider-dot.active{background:#7B4FC8;}
+
+/* Gift Finder */
+body.light-mode .gf-tag{
+  background:#FFFFFF;
+  border-color:rgba(11,20,55,.12);
+  color:#0B1437;
+}
+body.light-mode .gf-tag:hover,
+body.light-mode .gf-tag.active{
+  background:#7B4FC8;
+  border-color:#7B4FC8;
+  color:#FFFFFF;
+}
+
+/* Footer en claro */
+body.light-mode footer{
+  border-top:1px solid rgba(11,20,55,.10);
+}
+body.light-mode .footer-link{color:#42507E;}
+body.light-mode .footer-link:hover{color:#7B4FC8;}
+body.light-mode .footer-copy{color:#5C6B94;}
