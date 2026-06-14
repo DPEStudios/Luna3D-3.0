@@ -134,9 +134,13 @@ input,textarea,select{font-family:inherit;}
   text-align:left;color:var(--silver);padding:9px 10px;border-radius:10px;transition:.16s;
 }
 .nav-popover.compact button:hover,.nav-popover.compact a:hover{background:var(--glass);color:var(--star);}
-.fav-pop-item{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line-soft);}
-.fav-pop-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.fav-pop-item b{margin:0;color:var(--magenta-bright);font-family:var(--font-mono);font-size:12px;}
+.fav-pop-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft);}
+.fav-pop-thumb{width:38px;height:38px;border-radius:7px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.06);}
+.fav-pop-thumb--ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.25);}
+.fav-pop-thumb--ph svg{width:18px;height:18px;}
+.fav-pop-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.fav-pop-info span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;}
+.fav-pop-info b{color:var(--magenta-bright);font-family:var(--font-mono);font-size:11px;}
 .fav-pop-all{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--star);font-weight:700;}
 .fav-pop-all svg{width:15px;height:15px;}
 .cart-count{
@@ -1044,22 +1048,41 @@ body.light-mode .newsletter-form input::placeholder{color:#7A89B0;}
 .btn-catalog:hover svg, .btn-catalog.active svg {
   color: var(--magenta-bright);
 }
-/* En página de catálogo: indica página activa, sin hover-megamenu (hover desactivado por JS) */
+/* En página de catálogo: indica página activa; hover del megamenú sigue activo */
 .btn-catalog.catalog-active {
   background: rgba(232, 31, 157, 0.06);
   border-color: var(--magenta);
   box-shadow: 0 0 16px rgba(232, 31, 157, 0.15);
-  cursor: default;
 }
-/* Suprimir efecto hover visual cuando está en modo activo */
-.btn-catalog.catalog-active:hover {
-  background: rgba(232, 31, 157, 0.06);
-  border-color: var(--magenta);
-  box-shadow: 0 0 16px rgba(232, 31, 157, 0.15);
+
+/* Botón Favoritos — acción secundaria, sin destello */
+.btn-fav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: rgba(255,255,255,.60);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13.5px;
+  transition: all .2s var(--ease);
 }
-/* Desfasar el brillo del botón Favoritos para que no se sincronice con Catálogo */
-#fav-btn::after {
-  animation-delay: -4s;
+.btn-fav svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  transition: color .2s;
+}
+.btn-fav:hover {
+  background: rgba(232,31,157,.06);
+  border-color: rgba(232,31,157,.30);
+  color: rgba(255,255,255,.90);
+}
+.btn-fav:hover svg {
+  color: var(--magenta-bright);
 }
 
 .nav-search {
@@ -1858,6 +1881,29 @@ body.light-mode .nav.scrolled .btn-catalog:hover{
   color:#0B1437;
   background:rgba(123,79,200,.12);
   border-color:rgba(123,79,200,.65);
+}
+
+/* Botón Favoritos — modo claro */
+body.light-mode .btn-fav{
+  color:rgba(11,20,55,.45);
+  border-color:rgba(11,20,55,.12);
+}
+body.light-mode .btn-fav:hover{
+  background:rgba(232,31,157,.06);
+  border-color:rgba(232,31,157,.28);
+  color:#9B27E0;
+}
+body.light-mode .btn-fav:hover svg{
+  color:#E81F9D;
+}
+body.light-mode .nav.scrolled .btn-fav{
+  color:rgba(11,20,55,.40);
+  border-color:rgba(11,20,55,.10);
+}
+body.light-mode .nav.scrolled .btn-fav:hover{
+  background:rgba(232,31,157,.06);
+  border-color:rgba(232,31,157,.25);
+  color:#7B4FC8;
 }
 
 /* Barra de búsqueda — sobre cielo (top) */

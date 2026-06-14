@@ -7,8 +7,9 @@
 /* ---------- ICONS ---------- */
 const I = {
   cart:'<path d="M3 3h2l.4 2M7 13h10l3-8H6.4M7 13L5.4 5M7 13l-2 4h12" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.4" fill="currentColor"/><circle cx="17" cy="20" r="1.4" fill="currentColor"/>',
-  heart:'<path d="M12 20s-7-4.6-9.2-9C1.3 8 2.6 4.8 6 4.8c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.4 0 4.7 3.2 3.2 6.2C19 15.4 12 20 12 20z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
-  heartFill:'<path d="M12 20s-7-4.6-9.2-9C1.3 8 2.6 4.8 6 4.8c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.4 0 4.7 3.2 3.2 6.2C19 15.4 12 20 12 20z" fill="currentColor"/>',
+  heart:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
+  heartFill:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+ 
   star:'<path d="M12 2.5l2.6 6.1 6.6.5-5 4.3 1.5 6.5L12 16.9 6.3 20.4l1.5-6.5-5-4.3 6.6-.5z" fill="currentColor"/>',
   arrow:'<path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   plus:'<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/>',
@@ -337,7 +338,7 @@ function buildNav(active){
         </button>
 
         <div class="nav-pop-wrap">
-          <button class="btn-catalog" id="fav-btn" aria-label="Favoritos">
+          <button class="btn-fav" id="fav-btn" aria-label="Favoritos">
             ${svg('heart')}
             <span>Favoritos</span>
           </button>
@@ -635,22 +636,14 @@ function buildNav(active){
     const isOnCatalog = location.pathname.endsWith('catalogo.html') ||
                         location.href.includes('catalogo.html');
 
-    if (isOnCatalog) {
-      // En catálogo: botón indica página activa, sin hover-megamenu
-      trigger.classList.add('catalog-active');
-    } else {
-      // En el resto del sitio: abrir megamenu al hover (sin vibración)
-      trigger.onmouseenter = () => {
-        openMega();
-      };
-      trigger.onmouseleave = scheduleCloseMega;
+    // En catálogo: marca el botón como página activa (hover del megamenú sigue activo)
+    if (isOnCatalog) trigger.classList.add('catalog-active');
 
-      // Mantener abierto cuando el mouse entra al panel
-      panel.onmouseenter = () => {
-        clearTimeout(megaTimeout);
-      };
-      panel.onmouseleave = scheduleCloseMega;
-    }
+    // Hover del megamenú activo en todas las páginas, incluyendo catalogo.html
+    trigger.onmouseenter = () => { openMega(); };
+    trigger.onmouseleave = scheduleCloseMega;
+    panel.onmouseenter = () => { clearTimeout(megaTimeout); };
+    panel.onmouseleave = scheduleCloseMega;
 
     // Click navega al catálogo completo
     trigger.onclick = e => {
@@ -710,6 +703,13 @@ function buildNav(active){
         catsEl.querySelectorAll('.mega-cat-item').forEach(el => el.classList.toggle('active', el.dataset.cat === activeCat));
         renderProdsAndTitle();
       }
+    };
+
+    // Click en categoría principal → navegar al catálogo filtrado por cat
+    catsEl.onclick = e => {
+      const item = e.target.closest('.mega-cat-item');
+      if (!item) return;
+      location.href = `catalogo.html?cat=${encodeURIComponent(item.dataset.cat)}`;
     };
 
     subsEl.onmouseover = e => {
@@ -814,7 +814,11 @@ function renderFavPopover(){
   const body=document.getElementById('fav-popover-body'); if(!body)return;
   const favs=getFavs().map(id=>PROD_BY_ID[id]).filter(Boolean).slice(0,4);
   if(!favs.length){ body.innerHTML='No tienes favoritos guardados'; return; }
-  body.innerHTML=favs.map(p=>`<a class="fav-pop-item" href="producto.html?id=${p.id}"><span>${p.name}</span><b>${CLP(p.price)}</b></a>`).join('')+
+  body.innerHTML=favs.map(p=>
+    `<a class="fav-pop-item" href="producto.html?id=${p.id}">`+
+    (p.img ? `<img class="fav-pop-thumb" src="${p.img}" alt="${escapeHTML(p.name)}" loading="lazy">` : `<div class="fav-pop-thumb fav-pop-thumb--ph">${svg('cube')}</div>`)+
+    `<div class="fav-pop-info"><span>${escapeHTML(p.name)}</span><b>${CLP(p.price)}</b></div>`+
+    `</a>`).join('')+
     `<a class="fav-pop-all" href="catalogo.html">Ver catálogo ${svg('arrow')}</a>`;
 }
 
