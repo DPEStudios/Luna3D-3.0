@@ -887,14 +887,13 @@ function buildFooter(){
           <a class="soc soc-fb" href="https://facebook.com/luna3d" target="_blank" rel="noopener" aria-label="Facebook"><span class="soc-ico">${svg('facebook')}</span><span class="soc-txt"><span class="soc-name">Facebook</span><span class="soc-handle">/luna3d</span></span></a>
           <a class="soc soc-tt" href="https://tiktok.com/@luna3d" target="_blank" rel="noopener" aria-label="TikTok"><span class="soc-ico">${svg('tiktok')}</span><span class="soc-txt"><span class="soc-name">TikTok</span><span class="soc-handle">@luna3d</span></span></a>
           <a class="soc soc-yt" href="https://youtube.com/@luna3d" target="_blank" rel="noopener" aria-label="YouTube"><span class="soc-ico">${svg('youtube')}</span><span class="soc-txt"><span class="soc-name">YouTube</span><span class="soc-handle">@luna3d</span></span></a>
-          <a class="soc soc-wa" href="${waChatURL()}" target="_blank" rel="noopener" aria-label="WhatsApp"><span class="soc-ico">${svg('whatsapp')}</span><span class="soc-txt"><span class="soc-name">WhatsApp</span><span class="soc-handle">${waDisplay(WHATSAPP_NUMERO)}</span></span></a>
+          <a class="soc soc-wa" href="${waChatURL()}" target="_blank" rel="noopener" aria-label="WhatsApp"><span class="soc-ico">${svg('whatsapp')}</span><span class="soc-txt"><span class="soc-name">WhatsApp</span><span class="soc-handle">Contáctanos por WhatsApp</span></span></a>
         </div>
       </section>
 
       <!-- INFORMACIÓN LEGAL -->
       <div class="footer-bottom">
         <div class="fb-left">
-          <img class="brand-logo" src="${LOGO(themeLogoKey())}" alt="Luna3D">
           <span>© 2026 Estrella 3D SpA. Todos los derechos reservados.</span>
         </div>
         <div class="fb-legal">
@@ -1058,7 +1057,8 @@ function buildFloatingActions(){
     <button class="float-btn scroll-top" id="scroll-top" aria-label="Volver arriba">${svg('arrowUp')}</button>`;
   document.body.appendChild(d);
   const top=document.getElementById('scroll-top');
-  const onScroll=()=>top.classList.toggle('show', scrollY>500);
+  const wa=d.querySelector('.whatsapp-float');
+  const onScroll=()=>{ const p=scrollY>500; top.classList.toggle('show',p); wa.classList.toggle('wa-up',p); };
   top.onclick=()=>scrollTo({top:0,behavior:'smooth'});
   onScroll();
   addEventListener('scroll',onScroll,{passive:true});

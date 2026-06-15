@@ -2279,3 +2279,58 @@ body.light-mode .offer-hero-timer .timer-clock { color: #0B1437; }
 .fn-title { font-size: 20px; }
 @media (max-width: 1024px) { .footer-newsletter { padding: 20px 24px; } }
 @media (max-width: 768px)  { .footer-newsletter { flex-direction: column; align-items: flex-start; gap: 16px; padding: 18px 20px; } }
+
+/* ============================================================
+   SESIÓN 6 — Footer + Botones flotantes
+   ============================================================ */
+
+/* --- Footer inferior: ocultar logo pequeño del fb-left --- */
+.footer-bottom .fb-left .brand-logo { display: none; }
+
+/* Copyright alineado a la izquierda */
+.footer-bottom { justify-content: space-between; }
+
+/* --- Botones flotantes: WA comienza abajo, sube al aparecer scroll-top --- */
+/* WA usa CSS var --wa-y para posición desplazada por defecto (scroll-top oculto
+   no ocupa espacio en el DOM, por lo que WA naturalmente queda abajo;
+   el translateY se usa solo para combinar hover sin conflicto) */
+.whatsapp-float {
+  --wa-y: 0px;
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1), filter .22s var(--ease);
+}
+/* Cuando scroll-top es visible: WA ya está en posición natural (flex lo empuja arriba);
+   la transición suave la da el layout + la clase wa-up es señal para el hover */
+.whatsapp-float.wa-up { --wa-y: 0px; }
+
+/* Hover: mantener el efecto existente independiente del estado wa-up */
+.float-btn.whatsapp-float:hover { transform: translateY(-3px) scale(1.02); }
+
+/* scroll-top: animación de entrada más vistosa (scale + slide desde abajo) */
+.scroll-top {
+  transform: scale(.75) translateY(10px);
+  transition: opacity .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1), visibility .01s;
+}
+.scroll-top.show {
+  transform: scale(1) translateY(0);
+}
+
+/* --- S6 corrección: WA realmente comienza abajo (translateY ocupa la posición del scroll-top) --- */
+/* Con visibility:hidden, scroll-top SIEMPRE ocupa espacio en el flex.
+   translateY(66px) mueve WA abajo para coincidir visualmente con scroll-top oculto.
+   Al aparecer scroll-top (.wa-up), WA hace slide up a su posición natural. */
+.whatsapp-float {
+  --wa-y: 66px; /* 54px btn + 12px gap = altura de scroll-top + gap */
+  transform: translateY(var(--wa-y));
+  /* transition ya definida en el bloque anterior */
+}
+.whatsapp-float.wa-up { --wa-y: 0px; }
+
+/* Hover combinado: respeta la posición actual de WA */
+.float-btn.whatsapp-float:hover {
+  transform: translateY(calc(var(--wa-y) - 3px)) scale(1.02);
+}
+
+/* Mobile (≤560px): float-btn es 48px → offset = 48+12 = 60px */
+@media (max-width: 560px) {
+  .whatsapp-float { --wa-y: 60px; }
+}
