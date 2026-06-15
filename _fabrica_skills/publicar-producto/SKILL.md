@@ -30,7 +30,13 @@ tocar código ni re-desplegar**: publicar = cambiar un campo en la base de datos
    listos".
 3. **No inventar datos.** Si a un borrador le falta precio/costo/gramos/tiempo/foto,
    **no lo subas**: avísale a Daniel qué le falta y déjalo pendiente.
-4. **Papelera segura** para cualquier borrado de archivos del usuario.
+4. **Respeta la DECISIÓN de Daniel** (campo `decision` en la ficha):
+   - `listo` → candidato a subir/publicar. `subir --todos` solo toma estos.
+   - `pendiente` → NO entra en lote; solo se sube si Daniel lo nombra por slug.
+   - `rechazado` → NUNCA se sube (el editor ya lo movió a `_Papelera`).
+5. **Categorías libres.** No valides contra ninguna lista cerrada. Se envían a la
+   base `cat` (slug), `cat_nombre` (etiqueta) y `subcat`.
+6. **Papelera segura** para cualquier borrado de archivos del usuario.
 
 ## Flujo de trabajo
 
@@ -39,6 +45,7 @@ tocar código ni re-desplegar**: publicar = cambiar un campo en la base de datos
 python3 scripts/subir_producto.py listar
 ```
 Muestra cada borrador con su `estado_local` (📝 borrador / ⬆️ subido / ✅ publicado),
+su `decision` (🕓 pendiente / 🟢 listo / 🔴 rechazado), categoría › subcategoría,
 precio, y si está **LISTO** o qué datos le **faltan**. Resume esto a Daniel y
 pregúntale cuáles subir/publicar.
 

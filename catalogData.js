@@ -31,11 +31,13 @@
   // nulos para que la UI aplique sus defaults (DEFAULT_COLORS / DEFAULT_SIZES
   // / PROD_DESC) sin duplicar lógica. No toca DOM ni red.
   function mapRow(row) {
-    var catName = (typeof CAT_NAME !== 'undefined' && CAT_NAME[row.cat]) || row.cat || '';
+    // catName: categoría conocida (data.js) → etiqueta dinámica (cat_nombre) → slug.
+    var catName = (typeof CAT_NAME !== 'undefined' && CAT_NAME[row.cat]) || row.cat_nombre || row.cat || '';
     return {
       id:       row.id,
       cat:      row.cat,
       catName:  catName,
+      subcat:   (row.subcat != null && row.subcat !== '' ? row.subcat : null),
       name:     row.name,
       price:    (row.price == null ? null : Number(row.price)),
       img:      (row.img != null ? row.img : null),

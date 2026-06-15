@@ -8,9 +8,12 @@ Sube borradores locales de _Borradores_Productos/ a Supabase:
   2) hace UPSERT de la fila en la tabla `products` como `estado='borrador'`,
   3) publica / despublica con el OK de Daniel.
 
-SoC: este es el ÚNICO archivo que conoce la forma de subir a Supabase.
-Seguridad: la SECRET key se lee del .env del proyecto (nunca se imprime ni se
-hardcodea). Se envía SOLO en el header `apikey` (llaves nuevas Supabase).
+DECISIÓN de Daniel (campo `decision`): solo se suben/publican en lote los que
+están en 'listo'. Los 'pendiente' se ignoran en --todos (se pueden subir por
+slug explícito). Los 'rechazado' nunca se suben.
+
+Categorías LIBRES: no se valida contra ninguna lista cerrada. Se envía `cat`
+(slug), `cat_nombre` (etiqueta) y `subcat` a la base.
 
 Uso:
   python3 subir_producto.py listar
@@ -21,7 +24,6 @@ Opcional: --proyecto /ruta/a/Web_Luna3D_v3  (si no, se autodescubre)
 """
 import sys, os, json, glob, mimetypes, argparse, urllib.request, urllib.error, datetime
 
-# ---------- Localizar el proyecto (autodescubrimiento robusto) ----------
 def find_proyecto(arg=None):
     cands = []
     if arg: cands.append(arg)
@@ -47,9 +49,8 @@ def load_env(proyecto):
         raise SystemExit("ERROR: faltan SUPABASE_URL o SECRET en el .env.")
     return url.rstrip('/'), secret
 
-# ---------- HTTP helpers (urllib, sin dependencias) ----------
 def http(method, url, secret, data=None, headers=None, raw=False):
-    h = {'apikey': secret}            # llaves nuevas: SOLO apikey (no Bearer)
+    h = {'apikey': secret}
     if headers: h.update(headers)
     body = data if raw else (json.dumps(data).encode('utf-8') if data is not None else None)
     if data is not None and not raw: h['Content-Type'] = 'application/json'
@@ -60,16 +61,14 @@ def http(method, url, secret, data=None, headers=None, raw=False):
     except urllib.error.HTTPError as e:
         return e.code, e.read()
 
-# ---------- Campos obligatorios para poder publicar ----------
 REQUERIDOS_WEB = ['name', 'price', 'cat']     # + imagen subida
 REQUERIDOS_INT = ['costo', 'gramos', 'tiempo_min']
-CATS_VALIDAS = ['maceteros', 'decoracion', 'llaveros', 'cultura-pop', 'oficina']
 
 def borradores_dir(proyecto): return os.path.join(proyecto, '_Borradores_Productos')
 
 def iter_fichas(proyecto):
     base = borradores_dir(proyecto)
-    for fp in sorted(glob.glob(os.path.join(base, '*', '*', 'ficha.json'))):
+    for fp in sorted(glob.glob(os.path.join(base, '**', 'ficha.json'), recursive=True)):
         try:
             with open(fp, encoding='utf-8') as f: yield fp, json.load(f)
         except Exception as e:
@@ -77,9 +76,7 @@ def iter_fichas(proyecto):
 
 def faltantes(ficha, carpeta):
     falt = [c for c in REQUERIDOS_WEB if ficha.get(c) in (None, '', [])]
-    if ficha.get('cat') not in CATS_VALIDAS: falt.append("cat-inválida")
     falt += [c for c in REQUERIDOS_INT if ficha.get(c) in (None, '')]
-    # imagen: o ya subida (img URL) o archivo local presente
     tiene_img = bool(ficha.get('img')) or bool(_imagen_local(ficha, carpeta))
     if not tiene_img: falt.append('foto')
     return falt
@@ -108,7 +105,8 @@ def calc_margen(ficha):
         except Exception: return None
     return None
 
-# ---------- Subcomandos ----------
+DEC_MARCA = {'pendiente':'🕓','listo':'🟢','rechazado':'🔴'}
+
 def cmd_listar(proyecto, url, secret, args):
     print(f"📦 Borradores en {borradores_dir(proyecto)}\n")
     n = 0
@@ -116,9 +114,12 @@ def cmd_listar(proyecto, url, secret, args):
         n += 1; carpeta = os.path.dirname(fp)
         falt = faltantes(ficha, carpeta)
         estado = ficha.get('estado_local', 'borrador')
+        decision = ficha.get('decision', 'pendiente')
         marca = {'borrador':'📝','subido':'⬆️','publicado':'✅'}.get(estado, '❔')
+        dm = DEC_MARCA.get(decision, '❔')
         precio = ficha.get('price'); precio_s = f"${int(precio):,}".replace(',', '.') if precio else "—"
-        print(f"{marca} [{estado}] {ficha.get('id','?')}  ·  {ficha.get('name','(sin nombre)')}  ·  {ficha.get('cat','?')}  ·  {precio_s}")
+        sub = f" › {ficha.get('subcat')}" if ficha.get('subcat') else ""
+        print(f"{marca}{dm} [{estado}/{decision}] {ficha.get('id','?')}  ·  {ficha.get('name','(sin nombre)')}  ·  {ficha.get('cat_nombre') or ficha.get('cat','?')}{sub}  ·  {precio_s}")
         print(f"     {'LISTO para subir' if not falt else 'faltan: ' + ', '.join(falt)}")
     if n == 0: print("  (no hay borradores todavía)")
     print(f"\nTotal: {n} borrador(es).")
@@ -128,7 +129,6 @@ def _subir_imagen(url, secret, proyecto, slug, ruta_local, sufijo=''):
     ext = os.path.splitext(ruta_local)[1].lstrip('.').lower() or 'jpg'
     objeto = f"{slug}{sufijo}.{ext}"
     with open(ruta_local, 'rb') as f: data = f.read()
-    # upsert del objeto (x-upsert para reemplazar si ya existe)
     st, body = http('POST', f"{url}/storage/v1/object/productos/{objeto}", secret,
                     data=data, raw=True, headers={'Content-Type': ctype, 'x-upsert': 'true'})
     if st not in (200, 201):
@@ -139,6 +139,8 @@ def _fila_db(ficha, img_url, galeria_urls):
     def jb(v): return v if v else None
     return {
         'id': ficha['id'], 'cat': ficha['cat'], 'name': ficha['name'],
+        'cat_nombre': ficha.get('cat_nombre') or None,
+        'subcat': ficha.get('subcat') or None,
         'price': ficha.get('price'),
         'img': img_url, 'gallery': galeria_urls or None,
         'tag': ficha.get('tag') or None,
@@ -159,17 +161,25 @@ def _guardar_ficha(fp, ficha):
     ficha['actualizado'] = datetime.datetime.now().isoformat(timespec='seconds')
     with open(fp, 'w', encoding='utf-8') as f: json.dump(ficha, f, ensure_ascii=False, indent=2)
 
-def _seleccion(proyecto, slugs, todos, filtro_estado=None):
+def _seleccion(proyecto, slugs, todos, filtro_estado=None, solo_listos=False):
+    """todos=True recorre todo. solo_listos exige decision=='listo'. Nunca incluye
+    'rechazado'. Por slug explícito se respeta lo que pida Daniel (salvo rechazado)."""
     sel = []
     for fp, ficha in iter_fichas(proyecto):
-        if todos or ficha.get('id') in slugs:
-            if filtro_estado and ficha.get('estado_local') not in filtro_estado: continue
-            sel.append((fp, ficha))
+        es_pedido = todos or ficha.get('id') in slugs
+        if not es_pedido: continue
+        if ficha.get('decision') == 'rechazado':
+            continue
+        if todos and solo_listos and ficha.get('decision') != 'listo':
+            continue
+        if filtro_estado and ficha.get('estado_local') not in filtro_estado:
+            continue
+        sel.append((fp, ficha))
     return sel
 
 def cmd_subir(proyecto, url, secret, args):
-    sel = _seleccion(proyecto, set(args.slugs), args.todos)
-    if not sel: raise SystemExit("No hay borradores que coincidan.")
+    sel = _seleccion(proyecto, set(args.slugs), args.todos, solo_listos=True)
+    if not sel: raise SystemExit("No hay borradores que coincidan (¿marcaste alguno como 'listo'?).")
     for fp, ficha in sel:
         carpeta = os.path.dirname(fp); falt = faltantes(ficha, carpeta)
         if falt:

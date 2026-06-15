@@ -365,15 +365,17 @@ section.block{padding:80px 0;position:relative;}
 .feature-strip .fs p{font-size:13.5px;color:var(--muted);line-height:1.5;}
 /* Bloque Más Vendidos — doble ancho en el strip */
 .feature-strip .fs.fs--wide{grid-column:span 2;}
-/* Mini-carousel dentro del bloque fs--wide */
-.mini-carousel-wrapper{margin-top:8px;overflow:hidden;border-radius:10px;}
-.mini-carousel{position:relative;}
-.mini-slide{display:none;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:10px;text-decoration:none;}
-.mini-slide.active{display:flex;}
-.mini-slide-img-placeholder{width:36px;height:36px;border-radius:7px;background:rgba(255,255,255,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,.25);}
-.mini-slide-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
-.mini-slide-name{font-size:12px;color:var(--star);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.mini-slide-price{font-family:var(--font-mono);font-size:11px;color:var(--magenta-bright);}
+/* ===== Photo Carousel dentro del bloque fs--wide ===== */
+.mini-carousel-wrapper{margin-top:12px;overflow:hidden;border-radius:12px;position:relative;height:150px;border:1px solid var(--glass-line);}
+.mini-carousel{position:relative;width:100%;height:100%;}
+.mini-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:11px;text-decoration:none;}
+.mini-slide.active{opacity:1;}
+.mini-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.mini-slide-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;color:rgba(255,255,255,.3);font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+.mini-slide-ph svg{width:30px;height:30px;opacity:.3;}
+.mini-dots{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2;}
+.mini-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .35s,transform .35s;}
+.mini-dot.active{background:rgba(255,255,255,.85);transform:scale(1.3);}
 
 /* ============================================================
    HOME SHOWCASES / FAQ

@@ -17,3 +17,6 @@ Respaldo_Git/
 
 # Borradores de productos (fotos pesadas; la fuente de verdad tras subir es Supabase)
 _Borradores_Productos/
+
+# Fotos crudas pendientes de procesar (regenerables / pesadas)
+_Futuros_Productos/

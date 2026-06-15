@@ -1,16 +1,16 @@
 /* ============================================================
    LUNA3D — Catálogo: filtros, colecciones, orden (funcionales)
+   Categorías y SUBCATEGORÍAS dinámicas: las categorías conocidas
+   (data.js) se complementan con las que traigan los productos, y
+   cada categoría muestra sus subcategorías reales (campo subcat).
    ============================================================ */
 (function(){
   LUNA.buildNav('catalogo');
   LUNA.buildFooter();
 
-  // Loading: estado de carga mientras llega Supabase.
   const _catGrid = document.getElementById('catalog-grid');
   if(_catGrid) _catGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Cargando catálogo…</div>';
 
-  // Arranque async: hidrata PRODUCTS desde Supabase (o fallback a data.js),
-  // luego construye filtros y render. Empty/Sin resultados ya lo maneja el render.
   (async function(){
     await LUNA_DATA.bootstrap();
 
@@ -19,7 +19,6 @@
     {id:'featured', label:'Destacados', test:p=>p.featured},
     {id:'new',      label:'Novedades',  test:p=>p.tag==='Nuevo'},
   ];
-  // Filtros de precio: los productos sin precio (placeholder) solo aparecen en "Todos los precios".
   const PRICE=[
     {id:'all', label:'Todos los precios', test:()=>true},
     {id:'p1',  label:'Bajo $6.000',       test:p=>p.price!=null&&p.price<6000},
@@ -27,17 +26,53 @@
     {id:'p3',  label:'Sobre $12.000',     test:p=>p.price!=null&&p.price>=12000},
   ];
 
-  const state={cat:'all',collection:'all',price:'all',sort:'relevance'};
+  // ----- Categorías DINÁMICAS: conocidas (data.js) + las que traigan productos -----
+  const _known = new Set((typeof CATEGORIES!=='undefined'?CATEGORIES:[]).map(c=>c.id));
+  const CATLIST = (typeof CATEGORIES!=='undefined'?CATEGORIES:[]).map(c=>({id:c.id,name:c.name}));
+  PRODUCTS.forEach(p=>{
+    if(p.cat && !_known.has(p.cat)){ _known.add(p.cat); CATLIST.push({id:p.cat,name:p.catName||p.cat}); }
+  });
+  const catNameOf = id => (CATLIST.find(c=>c.id===id)||{}).name || id;
 
-  // read ?cat=
+  // ----- Subcategorías reales por categoría (desde los productos) -----
+  const SUBMAP = {};
+  PRODUCTS.forEach(p=>{
+    if(p.subcat){ (SUBMAP[p.cat]=SUBMAP[p.cat]||[]); if(!SUBMAP[p.cat].includes(p.subcat)) SUBMAP[p.cat].push(p.subcat); }
+  });
+  Object.values(SUBMAP).forEach(arr=>arr.sort((a,b)=>a.localeCompare(b,'es')));
+
+  const state={cat:'all',subcat:'all',collection:'all',price:'all',sort:'relevance'};
+
+  // read ?cat= y ?subcat=
   const params=new URLSearchParams(location.search);
-  if(params.get('cat')&&CATEGORIES.some(c=>c.id===params.get('cat'))) state.cat=params.get('cat');
+  if(params.get('cat')&&CATLIST.some(c=>c.id===params.get('cat'))) state.cat=params.get('cat');
+  if(params.get('subcat')) state.subcat=params.get('subcat');
 
-  // ----- build category filter -----
+  // ----- category filter -----
   const fc=document.getElementById('filter-cats');
   const catBtn=(id,label,count)=>`<button data-cat="${id}" class="${state.cat===id?'active':''}">${label}<span class="cnt">${count}</span></button>`;
-  fc.innerHTML=catBtn('all','Todo',PRODUCTS.length)+CATEGORIES.map(c=>catBtn(c.id,c.name,PRODUCTS.filter(p=>p.cat===c.id).length)).join('');
-  fc.onclick=e=>{const b=e.target.closest('button');if(!b)return;state.cat=b.dataset.cat;syncFilters();render();};
+  fc.innerHTML=catBtn('all','Todo',PRODUCTS.length)+CATLIST.map(c=>catBtn(c.id,c.name,PRODUCTS.filter(p=>p.cat===c.id).length)).join('');
+  fc.onclick=e=>{const b=e.target.closest('button');if(!b)return;state.cat=b.dataset.cat;state.subcat='all';syncFilters();render();};
+
+  // ----- subcategory filter (inyectado bajo Categorías) -----
+  let fsGroup=document.getElementById('filter-subs-group');
+  if(!fsGroup){
+    fsGroup=document.createElement('div');
+    fsGroup.className='filter-group';
+    fsGroup.id='filter-subs-group';
+    fsGroup.innerHTML='<h4>Subcategoría</h4><div class="filter-chips" id="filter-subs"></div>';
+    const catsGroup=fc.closest('.filter-group');
+    if(catsGroup&&catsGroup.parentNode) catsGroup.parentNode.insertBefore(fsGroup, catsGroup.nextSibling);
+  }
+  const fs=document.getElementById('filter-subs');
+  function renderSubs(){
+    const subs=(state.cat!=='all'&&SUBMAP[state.cat])?SUBMAP[state.cat]:[];
+    if(!subs.length){ fsGroup.style.display='none'; fs.innerHTML=''; return; }
+    fsGroup.style.display='';
+    const subBtn=(id,label)=>`<button data-subcat="${id}" class="${state.subcat===id?'active':''}">${label}</button>`;
+    fs.innerHTML=subBtn('all','Todas')+subs.map(s=>subBtn(s,s)).join('');
+  }
+  fs.onclick=e=>{const b=e.target.closest('button');if(!b)return;state.subcat=b.dataset.subcat;syncFilters();render();};
 
   // ----- price filter -----
   const fp=document.getElementById('filter-price');
@@ -59,26 +94,26 @@
     fc.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.cat===state.cat));
     fp.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.price===state.price));
     cc.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.col===state.collection));
-    // title
+    renderSubs();
+    fs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.subcat===state.subcat));
     const tEl=document.getElementById('cat-title');
     if(state.cat==='all') tEl.textContent='Todo el catálogo';
-    else tEl.textContent=CATEGORIES.find(c=>c.id===state.cat).name;
+    else tEl.textContent=catNameOf(state.cat)+(state.subcat!=='all'?(' › '+state.subcat):'');
   }
 
   function apply(){
     let list=PRODUCTS.slice();
     if(state.cat!=='all') list=list.filter(p=>p.cat===state.cat);
+    if(state.subcat!=='all') list=list.filter(p=>p.subcat===state.subcat);
     const col=COLLECTIONS.find(c=>c.id===state.collection); if(col&&col.test) list=list.filter(col.test);
     const pr=PRICE.find(p=>p.id===state.price); if(pr) list=list.filter(pr.test);
 
-    // Apply header search filter
     const searchInput = document.getElementById('nav-search-input');
     const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
     if(query){
-      list = list.filter(p => p.name.toLowerCase().includes(query) || p.catName.toLowerCase().includes(query));
+      list = list.filter(p => p.name.toLowerCase().includes(query) || p.catName.toLowerCase().includes(query) || (p.subcat||'').toLowerCase().includes(query));
     }
 
-    // Orden null-safe: sin precio van al final; sin rating cuentan como 0.
     switch(state.sort){
       case 'price-asc': list.sort((a,b)=>(a.price??Infinity)-(b.price??Infinity));break;
       case 'price-desc':list.sort((a,b)=>(b.price??-Infinity)-(a.price??-Infinity));break;
@@ -124,15 +159,13 @@
     }
   }
 
-  // Listen to search events from header
   window.addEventListener('luna-search', render);
 
-  // If there's a pre-selected collection/filter from URL (e.g. col=staff)
   const colParam = params.get('col');
   if (colParam && COLLECTIONS.some(c=>c.id===colParam)) {
     state.collection = colParam;
   }
 
   syncFilters(); render();
-  })(); // fin arranque async
+  })();
 })();

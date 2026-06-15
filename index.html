@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="luna3d-promo.css">
 
 <!-- Open Graph / Twitter (v1: base luna3d.cl = dominio de publicación; revisar rutas/imagen social al publicar, sesión 8) -->
 <meta property="og:type" content="website">
@@ -57,10 +58,33 @@
     </div>
   </section>
 
-  <!-- ===================== FEATURE STRIP ===================== -->
-  <section class="block reveal" style="padding-top:20px;">
-    <div class="wrap">
-      <div class="feature-strip" id="feature-strip"></div>
+  <!-- ===================== SECCIÓN PROMO ===================== -->
+  <section class="l3d-promo block reveal" style="padding-top:32px;padding-bottom:32px;">
+    <div class="l3d-wrap">
+      <div class="l3d-grid">
+
+        <article class="l3d-card">
+          <a class="l3d-poster" href="catalogo.html" aria-label="Lo más vendido de la semana">
+            <img src="assets/promo-best-poster.png" alt="Top ventas — lo más vendido de la semana">
+          </a>
+          <div class="l3d-mini" data-set="best"></div>
+        </article>
+
+        <article class="l3d-card">
+          <a class="l3d-poster" href="catalogo.html#categorias" aria-label="¿Buscas un regalo?">
+            <img src="assets/promo-gift-poster.png" alt="¿Buscas un regalo? Un detalle único impreso a pedido">
+          </a>
+          <div class="l3d-mini" data-set="gift"></div>
+        </article>
+
+        <article class="l3d-card">
+          <a class="l3d-poster" href="catalogo.html" aria-label="Oferta de la semana: 10% de descuento">
+            <img src="assets/promo-offer-poster.png" alt="Oferta de la semana — 10% de descuento">
+          </a>
+          <div class="l3d-mini" data-set="offer"></div>
+        </article>
+
+      </div>
     </div>
   </section>
 
@@ -203,5 +227,6 @@
 <script src="catalogData.js"></script>
 <script src="app.js"></script>
 <script src="home.js"></script>
+<script src="luna3d-promo.js"></script>
 </body>
 </html>

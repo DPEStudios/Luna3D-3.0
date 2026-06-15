@@ -104,27 +104,35 @@
   ];
   const fsEl = document.getElementById('feature-strip');
   if(fsEl) {
-    const hotProductsForMini = PRODUCTS.filter(p => p.featured).slice(0, 4);
+    const hotProductsForMini = PRODUCTS.filter(p => p.featured && p.img).slice(0, 5);
+
+    // Placeholders visuales (se usan cuando no hay imágenes de producto)
+    const PHOTO_PH = [
+      {bg:'linear-gradient(135deg,#1a0a2e 0%,#2d1269 100%)',lbl:'Foto 1'},
+      {bg:'linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%)',lbl:'Foto 2'},
+      {bg:'linear-gradient(135deg,#1e0a2e 0%,#4a0060 100%)',lbl:'Foto 3'},
+      {bg:'linear-gradient(135deg,#0d0a2e 0%,#1a2870 100%)',lbl:'Foto 4'},
+      {bg:'linear-gradient(135deg,#0a1e28 0%,#003a4a 100%)',lbl:'Foto 5'},
+    ];
+    const camSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+
+    const carouselSlides = hotProductsForMini.length
+      ? hotProductsForMini.map((p, idx) =>
+          `<a class="mini-slide${idx===0?' active':''}" href="producto.html?id=${p.id}"><img src="${p.img}" alt="${p.name}" loading="lazy"></a>`)
+      : PHOTO_PH.map((ph, idx) =>
+          `<div class="mini-slide${idx===0?' active':''}" style="background:${ph.bg}"><div class="mini-slide-ph">${camSvg}<span>${ph.lbl}</span></div></div>`);
+
+    const dotsHtml = carouselSlides.map((_,i) =>
+      `<span class="mini-dot${i===0?' active':''}"></span>`).join('');
+
     fsEl.innerHTML = FS.map((f, i) => {
-      let extraHtml = '';
-      if (i === 0 && hotProductsForMini.length) {
-        extraHtml = `
-          <div class="mini-carousel-wrapper">
-            <div class="mini-carousel">
-              ${hotProductsForMini.map((p, idx) => `
-                <a class="mini-slide ${idx === 0 ? 'active' : ''}" href="producto.html?id=${p.id}">
-                  <span class="mini-slide-img-placeholder">FOTO</span>
-                  <div class="mini-slide-info">
-                    <span class="mini-slide-name">${p.name}</span>
-                    <span class="mini-slide-price">${CLP(p.price)}</span>
-                  </div>
-                </a>
-              `).join('')}
-            </div>
-          </div>`;
-      }
+      const extraHtml = i === 0 ? `
+        <div class="mini-carousel-wrapper">
+          <div class="mini-carousel">${carouselSlides.join('')}</div>
+          <div class="mini-dots">${dotsHtml}</div>
+        </div>` : '';
       const clickAttr = f.wide ? " role='button' tabindex='0' onclick=\"document.getElementById('seccion-1').scrollIntoView({behavior:'smooth'})\" style='cursor:pointer'" : '';
-      return `<div class="fs${f.wide ? ' fs--wide' : ''}"${clickAttr}>
+      return `<div class="fs${f.wide?' fs--wide':''}"${clickAttr}>
         <div class="fs-ico">${LUNA.svg(f.ico)}</div>
         <b>${f.b}</b>
         <p>${f.p}</p>
@@ -132,16 +140,19 @@
       </div>`;
     }).join('');
 
-    // Mini carousel animation loop
+    // Photo carousel — ciclo 2 s con fade suave
     (function initMiniCarousel() {
       const slides = document.querySelectorAll('.mini-slide');
+      const dots   = document.querySelectorAll('.mini-dot');
       if (!slides.length) return;
-      let activeIdx = 0;
+      let cur = 0;
       setInterval(() => {
-        slides[activeIdx].classList.remove('active');
-        activeIdx = (activeIdx + 1) % slides.length;
-        slides[activeIdx].classList.add('active');
-      }, 3000);
+        slides[cur].classList.remove('active');
+        dots[cur]?.classList.remove('active');
+        cur = (cur + 1) % slides.length;
+        slides[cur].classList.add('active');
+        dots[cur]?.classList.add('active');
+      }, 2000);
     })();
   }
 

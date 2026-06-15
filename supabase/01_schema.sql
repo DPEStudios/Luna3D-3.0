@@ -39,6 +39,8 @@ create table if not exists public.products (
   colors      jsonb,                             -- null → paleta de marca por defecto (data.js)
   sizes       jsonb,                             -- null → ['Único']
   "desc"      text,                              -- null → descripción por defecto (data.js)
+  cat_nombre  text,                              -- etiqueta visible de la categoría (categorías libres/dinámicas)
+  subcat      text,                              -- subcategoría libre (ej. 'Pokémon'); null = sin subcategoría
 
   -- Campos internos del flujo automático (NO se exponen en la web)
   estado      text not null default 'borrador',  -- 'borrador' | 'publicado' | 'archivado'
@@ -93,10 +95,16 @@ create trigger trg_products_updated_at
 -- la vista corre con privilegios de su dueño y lee la tabla pese al RLS,
 -- aplicando ella misma el filtro estado='publicado'. Así anon jamás
 -- toca la tabla base ni los campos internos.
+-- Migración idempotente: si la tabla ya existía, agrega las columnas nuevas
+-- (categorías dinámicas). Seguro de correr varias veces.
+alter table public.products add column if not exists cat_nombre text;
+alter table public.products add column if not exists subcat     text;
+
 create or replace view public.products_public as
   select
     id, cat, name, price, img, gallery, tag,
-    featured, rating, reviews, colors, sizes, "desc"
+    featured, rating, reviews, colors, sizes, "desc",
+    cat_nombre, subcat
   from public.products
   where estado = 'publicado';
 
