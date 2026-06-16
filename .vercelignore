@@ -1,0 +1,3 @@
+# Función PHP solo para hosting cPanel — en Vercel se usa api/create-preference.js.
+# Se excluye para evitar el conflicto de ruta /api/create-preference (.js vs .php).
+api/create-preference.php
