@@ -15,9 +15,10 @@
   --magenta-bright:#F72FB8;
   --violet:#9B27E0;
   --violet-bright:#B12CD9;
-  --grad:linear-gradient(125deg,#E81F9D 0%,#B12CD9 55%,#8E2BE6 100%);
-  --grad-rev:linear-gradient(305deg,#E81F9D 0%,#B12CD9 55%,#8E2BE6 100%);
-  --grad-soft:linear-gradient(125deg,rgba(232,31,157,.16),rgba(142,43,230,.16));
+  /* Aurora Lunar oficial (Manual v1.1): 2 paradas E81F9D -> 9B27E0 */
+  --grad:linear-gradient(125deg,#E81F9D 0%,#9B27E0 100%);
+  --grad-rev:linear-gradient(305deg,#E81F9D 0%,#9B27E0 100%);
+  --grad-soft:linear-gradient(125deg,rgba(232,31,157,.16),rgba(155,39,224,.16));
 
   /* Neutros */
   --star:#F5F6FB;

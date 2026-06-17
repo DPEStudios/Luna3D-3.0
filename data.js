@@ -28,7 +28,7 @@ const CLP = n => (n == null || Number.isNaN(n))
    filamento en stock se definen producto por producto en la sesión 3
    (ver pauta). Un producto puede traer su propio `colors` y `sizes`. */
 const DEFAULT_COLORS = [
-  { name:'Aurora',   css:'linear-gradient(125deg,#E81F9D,#8E2BE6)' },
+  { name:'Aurora',   css:'linear-gradient(125deg,#E81F9D,#9B27E0)' },
   { name:'Magenta',  css:'#E81F9D' },
   { name:'Violeta',  css:'#9B27E0' },
   { name:'Estrella', css:'#F5F6FB' },
