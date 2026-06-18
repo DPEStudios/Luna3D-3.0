@@ -69,7 +69,7 @@
     </div>
   </section>
 
-  <!-- ===================== SECCIÓN PROMO ===================== -->
+  <!-- ===================== SECCIÓN PROMO (3 imágenes con mini-carrusel) ===================== -->
   <section class="l3d-promo block reveal" style="padding-top:32px;padding-bottom:32px;">
     <div class="l3d-wrap">
       <div class="l3d-grid">
@@ -99,135 +99,153 @@
     </div>
   </section>
 
-  <!-- ===================== SECCIÓN 1: MÁS VENDIDOS & NUEVOS LANZAMIENTOS ===================== -->
-  <section class="block reveal product-showcases" id="seccion-1">
-    <div class="wrap">
-      <div class="showcase-panel">
-        <div class="block-head">
-          <div class="bh-left">
-            <span class="kicker">Más vendidos</span>
-            <h2 class="section-title">Los favoritos de nuestra galaxia</h2>
-          </div>
-          <a class="link-all" href="catalogo.html">Ver todos <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        </div>
-        <div id="mas-vendidos-split"></div>
-      </div>
+  <!-- ===================== GALERÍA HOME (nuevo body) =====================
+       4 bloques: imagen llamativa (poster) + 6 productos al lado.
+       Encabezado ARRIBA → el poster solo depende del grid de 6, así los
+       tres bloques quedan con proporciones idénticas. Render en home.js. -->
 
-      <div class="showcase-panel">
-        <div class="block-head">
-          <div class="bh-left">
-            <span class="kicker">Nuevos lanzamientos</span>
-            <h2 class="section-title">Recién salidos de la órbita</h2>
-          </div>
-          <a class="link-all" href="catalogo.html">Ver todos <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        </div>
-        <div id="nuevos-split"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== SECCIÓN CAT: ENCUENTRA TU PRODUCTO ===================== -->
-  <section class="block reveal" id="seccion-cats">
+  <!-- BLOQUE 1: NUEVOS (poster izquierda) -->
+  <section class="block reveal gallery-block" id="gal-1">
     <div class="wrap">
-      <div class="cat-hero">
-        <div class="cat-hero-left">
-          <span class="kicker">Categorías</span>
-          <h2 class="section-title">Encuentra<br>tu producto</h2>
-          <p>Impresiones 3D en Chile. Elige la categoría que más te representa.</p>
-          <a class="btn primary" href="catalogo.html">Explorar catálogo</a>
+      <div class="gb-head">
+        <div class="bh-left">
+          <span class="kicker">Recién agregados</span>
+          <h2 class="section-title">Lo último que llegó a la galería</h2>
+          <p class="lead">Los productos más nuevos, recién salidos de la impresora. Míralos antes que nadie.</p>
         </div>
-        <div class="cat-grid" id="cat-grid"></div>
+        <a class="link-all" href="catalogo.html?col=nuevos">Ver todos <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="gb-split">
+        <a class="gb-poster poster-nuevos" href="catalogo.html?col=nuevos" aria-label="Productos nuevos">
+          <span class="p-kicker">Recién llegados</span>
+          <h3>Productos nuevos<br>que llegaron</h3>
+          <p>Lo último salido de la impresora, listo para tu espacio.</p>
+          <span class="btn primary">Ver novedades →</span>
+        </a>
+        <div class="prod6" id="gal-nuevos"></div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== SECCIÓN 2: REGALOS (GIFT FINDER) ===================== -->
-  <section class="block reveal" id="seccion-2">
+  <!-- BLOQUE 2: MÁS VENDIDOS (poster derecha) -->
+  <section class="block reveal gallery-block" id="gal-2">
     <div class="wrap">
-      <div class="block-head">
+      <div class="gb-head">
+        <div class="bh-left">
+          <span class="kicker">Más vendidos</span>
+          <h2 class="section-title">Lo que más se está imprimiendo</h2>
+        </div>
+        <a class="link-all" href="catalogo.html">Ver todos <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="gb-split reverse">
+        <a class="gb-poster poster-vendidos" href="catalogo.html" aria-label="Más vendidos">
+          <span class="p-kicker">Top ventas</span>
+          <h3>Los favoritos de<br>nuestra galaxia</h3>
+          <p>Las piezas que más aman nuestros clientes en todo Chile.</p>
+          <span class="btn primary">Ver más vendidos →</span>
+        </a>
+        <div class="prod6" id="gal-vendidos"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOQUE 3: REGALOS (poster izquierda) -->
+  <section class="block reveal gallery-block" id="gal-3">
+    <div class="wrap">
+      <div class="gb-head">
         <div class="bh-left">
           <span class="kicker">Regalos</span>
-          <h2 class="section-title">Encuentra el regalo perfecto</h2>
-          <p class="lead">Usa nuestro recomendador interactivo para encontrar ideas únicas según sus gustos y tu presupuesto.</p>
+          <h2 class="section-title">Ideas que sacan sonrisas</h2>
         </div>
+        <a class="link-all" href="catalogo.html">Ver todos <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
-      
-      <div class="gift-finder-container glass">
-        <div class="gift-finder-sidebar">
-          <div class="finder-group">
-            <h4>¿Para quién es?</h4>
-            <div class="finder-options" id="gift-recipient-opts">
-              <button class="finder-btn active" data-recipient="gamer">🎮 Gamer & Geek</button>
-              <button class="finder-btn" data-recipient="hogar">🏠 Decoración Hogar</button>
-              <button class="finder-btn" data-recipient="oficina">💼 Oficina & Orden</button>
-              <button class="finder-btn" data-recipient="especial">💎 Regalo Especial</button>
-            </div>
-          </div>
-          
-          <div class="finder-group">
-            <h4>Presupuesto</h4>
-            <div class="finder-options" id="gift-budget-opts">
-              <button class="finder-btn active" data-budget="all">Cualquier precio</button>
-              <button class="finder-btn" data-budget="low">Bajo $8.000</button>
-              <button class="finder-btn" data-budget="high">Sobre $8.000</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="gift-finder-results">
-          <div class="prod-grid" id="gift-results-grid"></div>
-        </div>
+      <div class="gb-split">
+        <a class="gb-poster poster-regalos" href="catalogo.html#categorias" aria-label="Regalos">
+          <span class="p-kicker">Para regalar</span>
+          <h3>El regalo perfecto<br>existe (y es único)</h3>
+          <p>Detalles impresos en 3D para sorprender sin gastar de más.</p>
+          <span class="btn primary">Ver ideas de regalo →</span>
+        </a>
+        <div class="prod6" id="gal-regalos"></div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== SECCIÓN 3: OFERTAS DESTACADAS ===================== -->
-  <section class="block reveal" id="seccion-3">
+  <!-- BLOQUE 4: OFERTAS (banner ancho + 6 abajo) -->
+  <section class="block reveal gallery-block" id="gal-4">
     <div class="wrap">
-      <div class="offer-hero-banner">
-        <div class="offer-hero-text">
-          <span class="kicker">Ofertas</span>
-          <h2 class="section-title">Promociones destacadas</h2>
-          <p class="lead">Descuentos especiales por tiempo limitado en piezas seleccionadas.</p>
+      <div class="gb-banner">
+        <div class="bh-left">
+          <span class="p-kicker">Ofertas</span>
+          <h2 class="section-title" style="color:#fff;margin:6px 0 0;">Promociones de la semana</h2>
         </div>
-        <div class="offer-hero-timer">
-          <span class="timer-label">Termina en</span>
-          <span class="timer-clock" id="timer-clock">00d : 00h : 00m : 00s</span>
-        </div>
+        <span class="gb-timer" id="timer-clock">00d : 00h : 00m : 00s</span>
       </div>
-      <div class="prod-grid" id="offers-grid" style="margin-top:24px;"></div>
-      <div style="display:flex;justify-content:center;margin-top:32px;">
-        <a class="btn primary" href="catalogo.html?col=limited">Ver catálogo de ofertas</a>
+      <div class="prod6 wide" id="gal-ofertas"></div>
+      <div style="display:flex;justify-content:center;margin-top:28px;">
+        <a class="btn primary" href="catalogo.html?col=limited">Ver más ofertas</a>
       </div>
     </div>
   </section>
 
-  <!-- ===================== SECCIÓN 4: PREGUNTAS FRECUENTES ===================== -->
-  <section class="block reveal faq-section" id="seccion-4">
+  <!-- ===================== PREGUNTAS FRECUENTES (oculta tras CTA "?") ===================== -->
+  <section class="block reveal faq-section" id="faq">
     <div class="wrap">
       <div class="block-head" style="justify-content:center;">
-        <div class="bh-left" style="text-align:center;align-items:center;">
+        <div class="bh-left" style="text-align:center;align-items:center;margin:0 auto;">
           <span class="kicker">Preguntas frecuentes</span>
-          <h2 class="section-title">Qué ocurre después de comprar</h2>
-          <p class="lead">Conoce el proceso completo de compra, fabricación, entrega y nuestras garantías.</p>
+          <h2 class="section-title">Resolvemos tus dudas</h2>
         </div>
       </div>
-      <div class="faq-list" id="faq-list"></div>
+
+      <div class="faq-cta-wrap">
+        <button class="faq-cta" id="faq-toggle" type="button" aria-expanded="false" aria-controls="faq-list">
+          <span class="faq-cta-mark" aria-hidden="true">?</span>
+          <span class="faq-cta-txt">
+            <b>¿Tienes alguna duda?</b>
+            <small>Toca aquí y resolvemos lo más preguntado</small>
+          </span>
+          <span class="faq-cta-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+      </div>
+
+      <div class="faq-list" id="faq-list">
+
+        <details class="faq-item">
+          <summary><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>¿Qué pasa cuando presiono "Comprar"?</summary>
+          <p>Recibimos tu pedido y lo confirmamos contigo. Como cada pieza se fabrica a pedido con impresión 3D, comenzamos a producirla una vez confirmada la compra y coordinamos el envío contigo.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>¿Mis productos tienen garantía?</summary>
+          <p>Sí. Si tu pieza llega con algún daño o defecto de fabricación, contáctanos con una foto y lo resolvemos: reimprimimos la pieza o te devolvemos tu dinero.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>¿Hacen envíos a todo Chile?</summary>
+          <p>Sí, despachamos a todo Chile. El costo y el tiempo de envío dependen de tu comuna y se confirman antes de cerrar el pedido.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>¿Cuánto demora en llegar mi pedido?</summary>
+          <p>Cada producto se fabrica a pedido, así que el plazo depende de la pieza y de tu ubicación. Te confirmamos el tiempo estimado al momento de coordinar la compra.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>¿Puedo pedir un diseño personalizado?</summary>
+          <p>Claro. Puedes enviarnos tu idea o tu propio modelo 3D y lo optimizamos para fabricarlo. Escríbenos por WhatsApp y lo cotizamos contigo.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>¿Con qué material imprimen?</summary>
+          <p>Trabajamos con filamentos PLA y PETG de alta calidad, con impresión de alta resolución. Para piezas con requerimientos especiales, conversamos la mejor opción según el uso.</p>
+        </details>
+
+      </div>
     </div>
   </section>
 
-  <!-- ===================== TESTIMONIOS ===================== -->
-  <section class="block reveal" id="opiniones">
-    <div class="wrap">
-      <div class="block-head">
-        <div class="bh-left">
-          <span class="kicker">Lo que opinan</span>
-          <h2 class="section-title">Clientes felices en todo Chile</h2>
-        </div>
-      </div>
-    </div>
-    <div class="tmarquee"><div class="tmarquee-track" id="tmarquee"></div></div>
-  </section>
+
 </main>
 
 

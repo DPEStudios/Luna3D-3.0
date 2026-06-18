@@ -2337,3 +2337,237 @@ body.light-mode .offer-hero-timer .timer-clock { color: #0B1437; }
 @media (max-width: 560px) {
   .whatsapp-float { --wa-y: 60px; }
 }
+
+/* ============================================================
+   GALERÍA HOME (nuevo body) — poster + 6 productos × 4 bloques
+   Añadido 2026-06-18. Reusa tokens de marca. El alto del poster
+   calza con el grid de 6 (align-items:stretch + sin min-height).
+   ============================================================ */
+.gallery-block{padding:46px 0;}
+.gb-split{display:grid;grid-template-columns:.85fr 1.15fr;gap:24px;align-items:stretch;}
+.gb-split.reverse{grid-template-columns:1.15fr .85fr;}
+.gb-split.reverse .gb-poster{order:2;}
+.gb-split.reverse .gb-products{order:1;}
+
+/* Poster = la "imagen llamativa". Para usar foto real:
+   añadir background-image en la clase poster-* correspondiente. */
+.gb-poster{position:relative;border-radius:22px;overflow:hidden;
+  border:1px solid var(--glass-line);display:flex;flex-direction:column;
+  justify-content:flex-end;padding:30px;text-decoration:none;
+  background-size:cover;background-position:center;isolation:isolate;
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease);}
+.gb-poster:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(0,0,0,.4);}
+.gb-poster::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(7,12,32,.05) 0%,rgba(7,12,32,.78) 100%);}
+.p-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:#fff;background:rgba(232,31,157,.85);
+  padding:6px 12px;border-radius:50px;align-self:flex-start;margin-bottom:14px;}
+.gb-poster h3{font-family:var(--font-display);color:#fff;font-size:clamp(22px,2.4vw,30px);
+  line-height:1.12;margin-bottom:8px;text-shadow:0 2px 18px rgba(0,0,0,.5);}
+.gb-poster p{color:rgba(255,255,255,.82);max-width:30ch;margin-bottom:18px;font-size:14px;}
+
+/* Fondos de poster (placeholders aurora; reemplazables por foto). */
+.poster-nuevos{background-image:radial-gradient(circle at 70% 20%,rgba(155,39,224,.55),transparent 55%),linear-gradient(140deg,#1a0a2e,#2d1269);}
+.poster-vendidos{background-image:radial-gradient(circle at 30% 25%,rgba(232,31,157,.5),transparent 55%),linear-gradient(140deg,#0a1628,#1a3a5c);}
+.poster-regalos{background-image:radial-gradient(circle at 60% 30%,rgba(247,47,184,.5),transparent 55%),linear-gradient(140deg,#1e0a2e,#4a0060);}
+
+/* Columna de productos */
+.gb-products{display:flex;flex-direction:column;}
+.gb-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px;flex-wrap:wrap;}
+.gb-head .kicker{margin-bottom:10px;}
+.gb-head .section-title{font-size:clamp(20px,2vw,26px);margin:0;}
+.prod6{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex:1;}
+
+/* Bloque 4: banner ancho + 6 abajo */
+.gb-banner{position:relative;border-radius:22px;overflow:hidden;padding:30px 32px;
+  border:1px solid var(--glass-line);margin-bottom:22px;display:flex;
+  justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
+  background:radial-gradient(circle at 80% 0%,rgba(232,31,157,.4),transparent 55%),linear-gradient(120deg,#16021f,#1a2870);}
+.gb-timer{font-family:var(--font-mono);color:#fff;background:rgba(0,0,0,.3);
+  padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.18);font-size:15px;white-space:nowrap;}
+.prod6.wide{grid-template-columns:repeat(6,1fr);}
+
+/* Modo día */
+body.light-mode .gb-poster::after{background:linear-gradient(180deg,rgba(11,20,55,.02) 0%,rgba(11,20,55,.55) 100%);}
+
+/* Responsive */
+@media(max-width:980px){
+  .gb-split,.gb-split.reverse{grid-template-columns:1fr;}
+  .gb-split.reverse .gb-poster{order:0;}
+  .gb-split.reverse .gb-products{order:0;}
+  .gb-poster{min-height:280px;}
+  .prod6.wide{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:560px){
+  .prod6,.prod6.wide{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ---- Galería: tarjetas placeholder inventadas ("FOTO" rayado) + descuento ---- */
+.prod6 .cc-img{position:relative;}
+.cc-placeholder{cursor:default;}
+.cc-placeholder:hover{transform:none;border-color:var(--line);box-shadow:none;}
+/* Fondo rayado tipo "sin foto aún" */
+.cc-ph-striped{
+  background:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,rgba(255,255,255,.015) 10px 20px),
+    linear-gradient(135deg,rgba(232,31,157,.10),rgba(155,39,224,.10));
+}
+.cc-foto{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  width:100%;height:100%;color:rgba(255,255,255,.32);
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;}
+.cc-foto svg{width:28px;height:28px;opacity:.5;}
+/* Badge de descuento (esquina superior derecha) */
+.cc-badge{position:absolute;top:8px;right:8px;z-index:2;
+  font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.04em;
+  color:#fff;background:var(--grad);padding:4px 9px;border-radius:50px;
+  box-shadow:0 4px 12px rgba(232,31,157,.45);}
+body.light-mode .cc-foto{color:rgba(11,20,55,.35);}
+body.light-mode .cc-ph-striped{
+  background:
+    repeating-linear-gradient(45deg,rgba(11,20,55,.05) 0 10px,rgba(11,20,55,.02) 10px 20px),
+    linear-gradient(135deg,rgba(232,31,157,.08),rgba(155,39,224,.06));
+}
+
+/* ============================================================
+   AJUSTES 2026-06-18 (#2): galería -20% + FAQ centrada/animada
+   ============================================================ */
+
+/* 1) Galería ~20% más pequeña: se reduce proporcionalmente el ancho
+      del contenedor (poster y tarjetas encogen juntos) + menos aire. */
+.gallery-block{padding:34px 0;}
+.gallery-block .wrap{max-width:1120px;}
+.gb-split{gap:22px;}
+.prod6{gap:14px;}
+
+/* 2) FAQ — centrada, con animación de despliegue y más vida */
+.faq-section .block-head{margin-bottom:26px;}
+.faq-section .faq-list{max-width:720px;margin-left:auto;margin-right:auto;width:100%;}
+
+.faq-item{
+  border:1px solid var(--line);border-radius:16px;background:var(--glass);overflow:hidden;
+  transition:border-color .22s var(--ease),background .22s var(--ease),
+             box-shadow .22s var(--ease),transform .22s var(--ease);
+}
+.faq-item:hover{border-color:rgba(232,31,157,.45);background:var(--glass-2);transform:translateY(-1px);}
+
+.faq-item summary{
+  list-style:none;display:flex;align-items:center;gap:14px;cursor:pointer;
+  padding:18px 22px;font-family:var(--font-display);font-weight:600;font-size:15px;
+  color:var(--star);transition:color .2s var(--ease);
+}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary span{
+  width:30px;height:30px;border-radius:9px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;background:var(--grad);transition:transform .28s var(--ease);
+}
+.faq-item summary svg{width:15px;height:15px;}
+
+/* Estado abierto: acento de marca + ícono que gira de + a × */
+.faq-item[open]{border-color:transparent;background:var(--grad-soft);
+  box-shadow:0 12px 32px rgba(232,31,157,.12);}
+.faq-item[open] summary{color:var(--magenta-bright);}
+.faq-item[open] summary span{transform:rotate(45deg);}
+.faq-item[open] summary svg{transform:none;}
+
+/* Respuesta: aparece con un slide + fade suave */
+.faq-item p{
+  margin:0;padding:0 22px 20px 66px;color:var(--silver);max-width:none;line-height:1.65;
+  animation:faqReveal .3s var(--ease);
+}
+@keyframes faqReveal{
+  from{opacity:0;transform:translateY(-8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+body.light-mode .faq-item[open]{box-shadow:0 8px 24px rgba(232,31,157,.14);}
+
+/* Galería responsive: en pantallas chicas vuelve a ancho completo */
+@media(max-width:1180px){ .gallery-block .wrap{max-width:100%;} }
+
+/* ============================================================
+   AJUSTES 2026-06-18 (#3)
+   - Galería al MISMO ancho que las 3 imágenes de arriba (1280)
+   - Bloques invertidos: el grid de 6 va al lado correcto
+   - Poster un poco más ancho; encabezado arriba (proporciones iguales)
+   - FAQ: pregunta centrada + apertura más lenta
+   ============================================================ */
+
+/* Ancho idéntico a .l3d-wrap (1280 / padding 24) */
+.gallery-block .wrap{max-width:1280px;padding-left:24px;padding-right:24px;}
+@media(max-width:1180px){ .gallery-block .wrap{max-width:100%;} }
+
+/* Poster un poco más ancho; el alto sale del grid de 6 (iguales entre sí) */
+.gb-split{grid-template-columns:1fr 1.3fr;gap:22px;align-items:stretch;}
+.gb-split.reverse{grid-template-columns:1.3fr 1fr;}
+.gb-split.reverse .gb-poster{order:2;}
+.gb-split.reverse .prod6{order:1;}
+
+/* ----- FAQ: texto centrado (el ícono +/× flota a la derecha) ----- */
+.faq-item summary{
+  justify-content:center;text-align:center;position:relative;
+  gap:0;padding:18px 56px;
+}
+.faq-item summary span{
+  position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  transition:transform .3s var(--ease);
+}
+.faq-item[open] summary span{transform:translateY(-50%) rotate(45deg);}
+
+/* Respuesta centrada y con apertura MÁS LENTA (slide + fade) */
+.faq-item p{
+  text-align:center;max-width:600px;margin:0 auto;
+  padding:0 40px 22px;overflow:hidden;
+  animation:faqReveal .55s var(--ease);
+}
+@keyframes faqReveal{
+  0%{opacity:0;max-height:0;transform:translateY(-6px);}
+  100%{opacity:1;max-height:600px;transform:translateY(0);}
+}
+
+/* ============================================================
+   AJUSTES 2026-06-18 (#4)
+   - Footer al mismo ancho que la galería (1280)
+   - FAQ: oculta tras un botón "?"; cajas más angostas y centradas
+   ============================================================ */
+
+/* Footer al mismo ancho del contenido (1280 / padding 24) */
+.footer .wrap{max-width:1280px;padding-left:24px;padding-right:24px;}
+
+/* ----- FAQ: botón "?" que despliega las preguntas ----- */
+.faq-cta-wrap{display:flex;justify-content:center;}
+.faq-cta{
+  display:inline-flex;align-items:center;gap:16px;cursor:pointer;
+  padding:12px 24px 12px 12px;border-radius:60px;
+  background:var(--glass);border:1px solid var(--glass-line);
+  transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease);
+}
+.faq-cta:hover{transform:translateY(-2px);border-color:var(--magenta);
+  background:var(--glass-2);box-shadow:0 16px 38px rgba(232,31,157,.22);}
+.faq-cta-mark{
+  width:48px;height:48px;border-radius:50%;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;font-size:25px;line-height:1;color:#fff;
+  background:var(--grad);box-shadow:0 0 0 6px rgba(232,31,157,.14);
+  animation:faqPulse 2.6s var(--ease) infinite;
+}
+@keyframes faqPulse{
+  0%,100%{box-shadow:0 0 0 6px rgba(232,31,157,.14);}
+  50%{box-shadow:0 0 0 13px rgba(232,31,157,.03);}
+}
+.faq-cta-txt{display:flex;flex-direction:column;text-align:left;gap:2px;}
+.faq-cta-txt b{font-family:var(--font-display);color:var(--star);font-size:16px;font-weight:600;}
+.faq-cta-txt small{color:var(--muted);font-size:12.5px;}
+.faq-cta-chev{margin-left:4px;color:var(--magenta-bright);display:flex;
+  transition:transform .3s var(--ease);}
+.faq-cta-chev svg{width:18px;height:18px;display:block;}
+.faq-cta.active .faq-cta-chev{transform:rotate(180deg);}
+.faq-cta.active .faq-cta-mark{animation:none;box-shadow:0 0 0 5px rgba(232,31,157,.20);}
+
+/* Lista oculta por defecto; aparece al abrir, más angosta y centrada */
+.faq-section .faq-list{display:none;max-width:560px;margin:24px auto 0;}
+.faq-section.faq-open .faq-list{display:grid;animation:faqListIn .45s var(--ease);}
+@keyframes faqListIn{
+  from{opacity:0;transform:translateY(-10px);}
+  to{opacity:1;transform:translateY(0);}
+}
