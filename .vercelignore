@@ -1,3 +1,28 @@
+# === Higiene de despliegue Vercel (Web Luna 3D v3) ===
+
+# CRÍTICO: secretos — nunca deben subir al hosting.
+.claude-secrets/
+.env
+.env.*
+
 # Función PHP solo para hosting cPanel — en Vercel se usa api/create-preference.js.
 # Se excluye para evitar el conflicto de ruta /api/create-preference (.js vs .php).
 api/create-preference.php
+
+# Backups automáticos de sesión
+*.bak
+*.bak_*
+
+# Carpetas de trabajo / borradores (no son parte del sitio)
+_editor/
+preview/
+graphify-out/
+_fabrica_skills/
+_Borradores_Productos/
+_Futuros_Productos/
+_Papelera/
+Respaldo_Git/
+supabase/
+
+# Documentación interna (el sitio no sirve markdown)
+*.md

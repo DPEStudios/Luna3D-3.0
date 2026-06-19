@@ -31,15 +31,16 @@
   const COLORS = p.colors || DEFAULT_COLORS;
   const SIZES  = p.sizes  || DEFAULT_SIZES;
   const hasPrice = p.price != null;
-  const was = hasPrice ? Math.round(p.price * 1.25 / 100) * 100 : null;
-  const off = hasPrice ? Math.round((1 - p.price / was) * 100) : null;
+  // Descuento REAL solo si el producto trae un precio de comparación propio (p.compareAt) mayor al actual.
+  const compareAt = (hasPrice && p.compareAt != null && p.compareAt > p.price) ? p.compareAt : null;
+  const off = compareAt ? Math.round((1 - p.price / compareAt) * 100) : null;
 
   let qty = 1, color = 0, size = 0, thumb = 0;
 
   // breadcrumb
   document.getElementById('breadcrumb').innerHTML=
     `<a href="index.html">Inicio</a><span class="sep">/</span>`+
-    `<a href="index.html?cat=${p.cat}#catalogo">${p.catName}</a><span class="sep">/</span>`+
+    `<a href="catalogo.html?cat=${p.cat}">${p.catName}</a><span class="sep">/</span>`+
     `<span style="color:var(--silver);">${p.name}</span>`;
 
   const stars5=`<div class="stars">${LUNA.svg('star').repeat(5)}</div>`;
@@ -52,7 +53,7 @@
     ? `<div class="pd-rating">${stars5}<span><b style="color:var(--star);">${p.rating.toFixed(1)}</b> · ${p.reviews} reseñas</span></div>`
     : `<div class="pd-rating">${stars5}<span>Sé el primero en opinar</span></div>`;
   const priceHtml = hasPrice
-    ? `<div class="pd-price"><span class="now">${CLP(p.price)}</span><span class="was">${CLP(was)}</span><span class="off">-${off}%</span></div>`
+    ? `<div class="pd-price"><span class="now">${CLP(p.price)}</span>${compareAt ? `<span class="was">${CLP(compareAt)}</span><span class="off">-${off}%</span>` : ''}</div>`
     : `<div class="pd-price"><span class="now">${CLP(p.price)}</span></div>`;
   // Mostrar selector de tamaño solo si hay más de una opción real.
   const sizeOptHtml = (SIZES.length > 1)

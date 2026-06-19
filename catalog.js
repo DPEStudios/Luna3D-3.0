@@ -47,6 +47,10 @@
   const params=new URLSearchParams(location.search);
   if(params.get('cat')&&CATLIST.some(c=>c.id===params.get('cat'))) state.cat=params.get('cat');
   if(params.get('subcat')) state.subcat=params.get('subcat');
+  // read ?col= (colección/curación): acepta ids EN y alias ES usados en la home.
+  const COL_ALIAS={featured:'featured',destacados:'featured',new:'new',nuevo:'new',nuevos:'new'};
+  const _colId=COL_ALIAS[(params.get('col')||'').toLowerCase()];
+  if(_colId&&COLLECTIONS.some(c=>c.id===_colId)) state.collection=_colId;
 
   // ----- category filter -----
   const fc=document.getElementById('filter-cats');

@@ -20,3 +20,16 @@ _Borradores_Productos/
 
 # Fotos crudas pendientes de procesar (regenerables / pesadas)
 _Futuros_Productos/
+
+# Papelera (archivos descartados — no van al repo)
+_Papelera/
+
+# Backups automáticos de sesión
+*.bak
+*.bak_*
+
+# Archivos solo para desarrollo local
+Abrir_Web_Luna3D.bat
+_editor/
+_fabrica_skills/
+graphify-out/

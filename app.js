@@ -763,12 +763,10 @@ function buildNav(active){
     searchInput.onkeydown = e => {
       if (e.key === 'Enter') {
         const query = searchInput.value.trim();
-        const onHome = !!document.getElementById('filter-cats');
-        if (onHome) {
-          const catEl = document.getElementById('catalogo');
-          if (catEl) catEl.scrollIntoView();
-        } else {
-          location.href = `index.html?search=${encodeURIComponent(query)}#catalogo`;
+        // En catalogo.html (existe #filter-cats) la búsqueda en vivo ya filtra vía el evento luna-search.
+        const onCatalog = !!document.getElementById('filter-cats');
+        if (!onCatalog) {
+          location.href = `catalogo.html?search=${encodeURIComponent(query)}`;
         }
       }
     };
@@ -868,10 +866,10 @@ function buildFooter(){
         <div class="footer-col">
           <h4>Catálogo</h4>
           <ul>
-            <li><a href="index.html#catalogo">Todos los productos</a></li>
-            <li><a href="index.html#catalogo">Categorías</a></li>
-            <li><a href="index.html#catalogo">Más vendidos</a></li>
-            <li><a href="index.html#catalogo">Nuevos lanzamientos</a></li>
+            <li><a href="catalogo.html">Todos los productos</a></li>
+            <li><a href="catalogo.html">Categorías</a></li>
+            <li><a href="catalogo.html?col=featured">Más vendidos</a></li>
+            <li><a href="catalogo.html?col=new">Nuevos lanzamientos</a></li>
           </ul>
         </div>
       </div>
@@ -899,7 +897,7 @@ function buildFooter(){
         <div class="fb-legal">
           <a href="#">Términos</a><span class="dot">·</span>
           <a href="#">Privacidad</a><span class="dot">·</span>
-          <span>v2.0.0 — Hecho en Chile 🇨🇱</span>
+          <span>v3.0.0 — Hecho en Chile 🇨🇱</span>
         </div>
       </div>
     </div>
@@ -956,7 +954,7 @@ function renderDrawer(){
   if(!body)return;
   const c=getCart();
   if(!c.length){
-    body.innerHTML=`<div class="drawer-empty"><div class="de-ico">${svg('cart')}</div><div><b style="display:block;color:var(--star);font-family:var(--font-display);font-size:17px;margin-bottom:6px;">Tu carrito está vacío</b>Explora el catálogo y suma piezas únicas.</div><a class="btn primary" href="index.html#catalogo">Ir al catálogo ${svg('arrow')}</a></div>`;
+    body.innerHTML=`<div class="drawer-empty"><div class="de-ico">${svg('cart')}</div><div><b style="display:block;color:var(--star);font-family:var(--font-display);font-size:17px;margin-bottom:6px;">Tu carrito está vacío</b>Explora el catálogo y suma piezas únicas.</div><a class="btn primary" href="catalogo.html">Ir al catálogo ${svg('arrow')}</a></div>`;
     foot.innerHTML=''; return;
   }
   body.innerHTML=c.map(it=>`
