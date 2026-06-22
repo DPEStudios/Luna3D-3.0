@@ -30,6 +30,7 @@
   // Variantes desde el producto, con fallback a los valores por defecto de marca.
   const COLORS = p.colors || DEFAULT_COLORS;
   const SIZES  = p.sizes  || DEFAULT_SIZES;
+  const SPECS  = (Array.isArray(p.specs) && p.specs.length) ? p.specs : DEFAULT_SPECS;
   const hasPrice = p.price != null;
   // Descuento REAL solo si el producto trae un precio de comparación propio (p.compareAt) mayor al actual.
   const compareAt = (hasPrice && p.compareAt != null && p.compareAt > p.price) ? p.compareAt : null;
@@ -103,10 +104,7 @@
       </div>
 
       <div class="pd-specs">
-        <div class="sp"><div class="spk">Material</div><div class="spv">PLA+ premium</div></div>
-        <div class="sp"><div class="spk">Resolución</div><div class="spv">0.12 mm</div></div>
-        <div class="sp"><div class="spk">Fabricación</div><div class="spv">A pedido · Chile</div></div>
-        <div class="sp"><div class="spk">Despacho</div><div class="spv">48 h hábiles</div></div>
+        ${SPECS.map(s=>`<div class="sp"><div class="spk">${s.k}</div><div class="spv">${s.v}</div></div>`).join('')}
       </div>
 
       <div class="pd-trust">

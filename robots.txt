@@ -1,0 +1,5 @@
+# Luna 3D — https://luna3d.cl
+User-agent: *
+Allow: /
+
+Sitemap: https://luna3d.cl/sitemap.xml

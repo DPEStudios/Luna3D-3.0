@@ -26,3 +26,13 @@ supabase/
 
 # Documentación interna (el sitio no sirve markdown)
 *.md
+
+# === Fase 4 (optimización): originales reemplazados por WebP — no desplegar el PNG pesado ===
+Imágenes/banner_maseteros.png
+Imágenes/banner_impresiones_utiles.png
+assets/promo-best-poster.png
+assets/promo-gift-poster.png
+assets/promo-offer-poster.png
+# Activos pesados no referenciados por el sitio (solo los usa preview/, que no se despliega)
+Imágenes/boceto.png
+assets/logo_color - simbolo luna.png

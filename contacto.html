@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contacto — Luna 3D</title>
+<meta name="description" content="Contáctanos en Luna 3D: escríbenos por el formulario, por correo a contacto@luna3d.cl o por WhatsApp. Impresión 3D a pedido con despacho a todo Chile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260622e">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="/assets/favicon/site.webmanifest">
+<meta name="theme-color" content="#0B1437">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Luna 3D">
+<meta property="og:locale" content="es_CL">
+<meta property="og:title" content="Contacto — Luna 3D">
+<meta property="og:description" content="Escríbenos: formulario de contacto, correo y WhatsApp. Despacho a todo Chile.">
+<meta property="og:url" content="https://luna3d.cl/contacto.html">
+<meta property="og:image" content="https://luna3d.cl/assets/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://luna3d.cl/contacto.html">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+
+<div id="nav-mount"></div>
+
+<main class="page contact-page">
+  <section class="block reveal">
+    <div class="wrap">
+
+      <div class="block-head" style="justify-content:center;">
+        <div class="bh-left" style="text-align:center;align-items:center;margin:0 auto;max-width:760px;">
+          <span class="kicker">Contacto</span>
+          <h1 class="section-title">Hablemos</h1>
+          <p class="lead">¿Tienes una duda, un pedido especial o una idea que quieres imprimir? Escríbenos por el medio que prefieras. Respondemos lo antes posible.</p>
+        </div>
+      </div>
+
+      <div class="contact-layout">
+
+        <!-- INFO DE CONTACTO -->
+        <aside class="contact-info">
+          <a class="contact-card" href="mailto:contacto@luna3d.cl">
+            <span class="cc-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+            <span class="cc-body">
+              <span class="cc-label">Correo</span>
+              <span class="cc-value">contacto@luna3d.cl</span>
+            </span>
+          </a>
+
+          <a class="contact-card" href="https://wa.me/56983357145" target="_blank" rel="noopener">
+            <span class="cc-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 01-12.6 7.4L3 20l1.2-5.2A8.5 8.5 0 1121 11.5z"/><path d="M8.5 9c0 3.5 3 6.5 6.5 6.5"/></svg></span>
+            <span class="cc-body">
+              <span class="cc-label">Teléfono / WhatsApp</span>
+              <span class="cc-value">+56 9 8335 7145</span>
+            </span>
+          </a>
+
+          <div class="contact-card contact-card-static">
+            <span class="cc-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.2-7-11a7 7 0 0114 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+            <span class="cc-body">
+              <span class="cc-label">Ubicación</span>
+              <span class="cc-value">Renca, Región Metropolitana</span>
+              <span class="cc-sub">Despacho a todo Chile</span>
+            </span>
+          </div>
+
+          <div class="contact-card contact-card-static">
+            <span class="cc-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="cc-body">
+              <span class="cc-label">Horario de atención</span>
+              <span class="cc-value">Lunes a sábado</span>
+              <span class="cc-sub">Respondemos mensajes durante el día</span>
+            </span>
+          </div>
+        </aside>
+
+        <!-- FORMULARIO -->
+        <div class="contact-form-wrap">
+          <h2 class="cf-title">Envíanos un mensaje</h2>
+          <p class="cf-sub">Completa el formulario y tu mensaje llegará directo a nuestro correo.</p>
+
+          <form id="contact-form" novalidate>
+            <!-- Honeypot anti-spam (no tocar: debe quedar oculto y vacío) -->
+            <input type="checkbox" name="botcheck" class="cf-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+            <div class="cf-row">
+              <label class="cf-field">
+                <span>Nombre</span>
+                <input type="text" name="name" required autocomplete="name" placeholder="Tu nombre">
+              </label>
+              <label class="cf-field">
+                <span>Correo</span>
+                <input type="email" name="email" required autocomplete="email" placeholder="tucorreo@ejemplo.cl">
+              </label>
+            </div>
+
+            <div class="cf-row">
+              <label class="cf-field">
+                <span>Teléfono <small>(opcional)</small></span>
+                <input type="tel" name="phone" autocomplete="tel" placeholder="+56 9 ...">
+              </label>
+              <label class="cf-field">
+                <span>Asunto</span>
+                <select name="subject_topic">
+                  <option value="Consulta general">Consulta general</option>
+                  <option value="Pedido o cotización">Pedido o cotización</option>
+                  <option value="Diseño personalizado">Diseño personalizado</option>
+                  <option value="Postventa o garantía">Postventa o garantía</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="cf-field">
+              <span>Mensaje</span>
+              <textarea name="message" required rows="5" placeholder="Cuéntanos en qué te podemos ayudar..."></textarea>
+            </label>
+
+            <button type="submit" class="btn primary cf-submit" id="cf-submit">
+              <span class="cf-submit-txt">Enviar mensaje</span>
+            </button>
+
+            <p class="cf-msg" id="cf-msg" role="status" aria-live="polite"></p>
+            <p class="cf-fallback">¿Prefieres un canal directo? Escríbenos por
+              <a href="https://wa.me/56983357145" target="_blank" rel="noopener">WhatsApp</a> o a
+              <a href="mailto:contacto@luna3d.cl">contacto@luna3d.cl</a>.</p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-mount"></div>
+
+<script src="data.js"></script>
+<script src="catalogData.js"></script>
+<script src="authGateway.js"></script>
+<script src="app.js?v=20260622c"></script>
+<script>
+/* contacto.html — envío del formulario por Web3Forms (AJAX).
+   - Sin secretos del servidor: Web3Forms usa una "access key" PÚBLICA por diseño (va en el cliente).
+   - Los mensajes llegan al correo con que se generó la access key en web3forms.com.
+   - Degradación elegante: si la key no está configurada, no rompe; ofrece WhatsApp/correo.
+   - Null-safe y sin silenciar errores (se reportan en consola y al usuario).
+*/
+(function(){
+  // [POR DEFINIR] Pega aquí la access key gratuita de https://web3forms.com (creada con el correo que quieras recibir los mensajes).
+  var WEB3FORMS_KEY = "POR_DEFINIR_WEB3FORMS_ACCESS_KEY";
+
+  var form = document.getElementById('contact-form');
+  if(!form){ console.error('contacto.html: no se encontró #contact-form'); return; }
+
+  var msg    = document.getElementById('cf-msg');
+  var btn    = document.getElementById('cf-submit');
+  var btnTxt = btn ? btn.querySelector('.cf-submit-txt') : null;
+
+  function setMsg(text, type){
+    if(!msg) return;
+    msg.textContent = text || '';
+    msg.className = 'cf-msg' + (type ? ' ' + type : '');
+  }
+  function isEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    var name    = (form.name && form.name.value || '').trim();
+    var email   = (form.email && form.email.value || '').trim();
+    var message = (form.message && form.message.value || '').trim();
+    var topic   = (form.subject_topic && form.subject_topic.value) || 'Consulta general';
+
+    if(!name || !email || !message){ setMsg('Completa nombre, correo y mensaje.', 'err'); return; }
+    if(!isEmail(email)){ setMsg('Ese correo no parece válido. Revísalo e inténtalo de nuevo.', 'err'); return; }
+
+    // Si aún no se configuró la access key, no enviamos a ciegas: avisamos y ofrecemos canal directo.
+    if(!WEB3FORMS_KEY || WEB3FORMS_KEY.indexOf('POR_DEFINIR') === 0){
+      console.warn('contacto.html: WEB3FORMS_KEY sin configurar. El formulario no enviará hasta pegar la access key.');
+      setMsg('El formulario aún no está habilitado. Escríbenos por WhatsApp o a contacto@luna3d.cl mientras tanto.', 'err');
+      return;
+    }
+
+    var payload = {
+      access_key: WEB3FORMS_KEY,
+      subject: 'Luna 3D · ' + topic + ' — ' + name,
+      from_name: 'Formulario web Luna 3D',
+      name: name,
+      email: email,
+      phone: (form.phone && form.phone.value || '').trim(),
+      asunto: topic,
+      message: message,
+      botcheck: (form.botcheck && form.botcheck.checked) || false
+    };
+
+    if(btn) btn.disabled = true;
+    if(btnTxt) btnTxt.textContent = 'Enviando…';
+    setMsg('Enviando tu mensaje…', '');
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res){
+      if(res.ok && res.data && res.data.success){
+        form.reset();
+        setMsg('¡Listo! Recibimos tu mensaje y te responderemos pronto. ✨', 'ok');
+        if(window.LUNA && LUNA.toast){ LUNA.toast('Mensaje enviado. ¡Gracias por escribirnos!'); }
+      } else {
+        var detail = (res.data && res.data.message) ? res.data.message : 'Inténtalo de nuevo en unos minutos.';
+        console.error('contacto.html: Web3Forms respondió error:', res.data);
+        setMsg('No pudimos enviar tu mensaje. ' + detail + ' También puedes escribirnos por WhatsApp.', 'err');
+      }
+    })
+    .catch(function(err){
+      console.error('contacto.html: fallo de red al enviar el formulario:', err);
+      setMsg('Hubo un problema de conexión. Revisa tu internet o escríbenos por WhatsApp.', 'err');
+    })
+    .then(function(){
+      if(btn) btn.disabled = false;
+      if(btnTxt) btnTxt.textContent = 'Enviar mensaje';
+    });
+  });
+})();
+
+/* nav + footer compartidos */
+(function(){
+  try {
+    if (window.LUNA) { LUNA.buildNav(""); LUNA.buildFooter(); }
+    else { console.error("contacto.html: window.LUNA no disponible; no se armó nav/footer."); }
+  } catch (e) { console.error("contacto.html: error al armar nav/footer:", e); }
+})();
+</script>
+</body>
+</html>

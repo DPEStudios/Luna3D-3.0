@@ -37,6 +37,17 @@ const DEFAULT_COLORS = [
 /* Sin tallas inventadas: un único tamaño hasta que Daniel defina variantes */
 const DEFAULT_SIZES = ['Único'];
 
+/* ---------- Specs por defecto (verdad de marca; sobrescribibles por producto) ----------
+   Son ciertas para TODA la producción Luna 3D (no son datos inventados por
+   producto). Un producto puede traer su propio `specs` (array de {k,v}) desde
+   la DB; si no, se usan estas. */
+const DEFAULT_SPECS = [
+  { k:'Material',    v:'PLA+ premium' },
+  { k:'Resolución',  v:'0.12 mm' },
+  { k:'Fabricación', v:'A pedido · Chile' },
+  { k:'Despacho',    v:'48 h hábiles' },
+];
+
 /* ---------- CATEGORÍAS REALES (Set 5) ----------
    `personas` mapea cada categoría a los perfiles del buscador de regalos
    de la Home (gamer / hogar / oficina / especial). Así el gift finder
@@ -80,6 +91,7 @@ CATALOG_SEED.forEach(([cat, label, count, featured, nuevo]) => {
       colors:   null,                    // null → DEFAULT_COLORS
       sizes:    null,                    // null → DEFAULT_SIZES
       desc:     null,                    // null → PROD_DESC
+      specs:    null,                    // null → DEFAULT_SPECS (verdad de marca)
     });
   }
 });

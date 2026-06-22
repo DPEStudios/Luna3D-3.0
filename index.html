@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20260622e">
 <link rel="stylesheet" href="luna3d-promo.css">
 
 <!-- Favicon Luna 3D (isotipo luna) -->
@@ -34,6 +34,7 @@
 <meta name="twitter:title" content="Luna 3D — Tu tienda de impresión 3D">
 <meta name="twitter:description" content="Piezas impresas en 3D en Chile: decoración, regalos, maceteros y coleccionables con acabado premium.">
 <meta name="twitter:image" content="https://luna3d.cl/assets/og-card.png">
+<link rel="canonical" href="https://luna3d.cl/">
 </head>
 <body>
 <canvas id="stars"></canvas>
@@ -49,13 +50,13 @@
     <div class="hero-slider" id="hero-slider">
       <div class="hero-slide">
         <a href="catalogo.html">
-          <img src="Imágenes/banner_impresiones_utiles.png"
+          <img src="Imágenes/banner_impresiones_utiles.webp"
                alt="Impresiones 3D Útiles — 20% OFF" draggable="false">
         </a>
       </div>
       <div class="hero-slide">
         <a href="catalogo.html">
-          <img src="Imágenes/banner_maseteros.png"
+          <img src="Imágenes/banner_maseteros.webp"
                alt="Diseños que dan vida a tu espacio — 20% OFF" draggable="false">
         </a>
       </div>
@@ -76,21 +77,21 @@
 
         <article class="l3d-card">
           <a class="l3d-poster" href="catalogo.html" aria-label="Lo más vendido de la semana">
-            <img src="assets/promo-best-poster.png" alt="Top ventas — lo más vendido de la semana">
+            <img src="assets/promo-best-poster.webp" loading="lazy" alt="Top ventas — lo más vendido de la semana">
           </a>
           <div class="l3d-mini" data-set="best"></div>
         </article>
 
         <article class="l3d-card">
           <a class="l3d-poster" href="catalogo.html#categorias" aria-label="¿Buscas un regalo?">
-            <img src="assets/promo-gift-poster.png" alt="¿Buscas un regalo? Un detalle único impreso">
+            <img src="assets/promo-gift-poster.webp" loading="lazy" alt="¿Buscas un regalo? Un detalle único impreso">
           </a>
           <div class="l3d-mini" data-set="gift"></div>
         </article>
 
         <article class="l3d-card">
           <a class="l3d-poster" href="catalogo.html" aria-label="Oferta de la semana: 10% de descuento">
-            <img src="assets/promo-offer-poster.png" alt="Oferta de la semana — 10% de descuento">
+            <img src="assets/promo-offer-poster.webp" loading="lazy" alt="Oferta de la semana — 10% de descuento">
           </a>
           <div class="l3d-mini" data-set="offer"></div>
         </article>
@@ -174,15 +175,39 @@
   <!-- BLOQUE 4: OFERTAS (banner ancho + 6 abajo) -->
   <section class="block reveal gallery-block" id="gal-4">
     <div class="wrap">
-      <div class="gb-banner">
-        <div class="bh-left">
-          <span class="p-kicker">Ofertas</span>
-          <h2 class="section-title" style="color:#fff;margin:6px 0 0;">Promociones de la semana</h2>
+      <div class="promo-unified reveal">
+        <div class="promo-bar">
+          <div class="pb-text">
+            <span class="pb-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.8-.5z"/></svg> Comunidad Luna 3D</span>
+            <h2 class="pb-title">Promociones de la semana</h2>
+            <p class="pb-lead">Cada semana lanzamos nuevas promociones exclusivas para nuestra comunidad. Suscríbete para recibir descuentos, novedades y lanzamientos antes que nadie.</p>
+            <div class="pb-perks"><span>Descuentos exclusivos</span><span>Lanzamientos primero</span><span>Novedades y tendencias</span></div>
+          </div>
+          <div class="pb-action">
+            <div class="pb-timer-row">
+              <span class="pb-timer-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg> Termina en</span>
+              <span class="pb-timer" id="timer-clock">00d : 00h : 00m : 00s</span>
+            </div>
+            <form class="newsletter-form" id="newsletter-form" novalidate>
+              <div class="nf-field">
+                <input type="email" id="newsletter-email" placeholder="tu@email.cl" aria-label="Correo electrónico" aria-describedby="newsletter-msg" autocomplete="email">
+                <button class="btn primary nf-btn" type="submit">Suscribirme <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+              </div>
+              <p class="nf-msg" id="newsletter-msg" role="status" aria-live="polite"></p>
+            </form>
+          </div>
         </div>
-        <span class="gb-timer" id="timer-clock">00d : 00h : 00m : 00s</span>
+
+        <div class="po-carousel-wrap">
+          <button class="po-nav po-prev" type="button" aria-label="Ver ofertas anteriores" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <div class="prod-carousel" id="gal-ofertas"></div>
+          <button class="po-nav po-next" type="button" aria-label="Ver más ofertas" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+
+        <div class="po-dots" id="ofertas-dots"></div>
       </div>
-      <div class="prod6 wide" id="gal-ofertas"></div>
-      <div style="display:flex;justify-content:center;margin-top:28px;">
+
+      <div class="po-more">
         <a class="btn primary" href="catalogo.html?col=limited">Ver más ofertas</a>
       </div>
     </div>
@@ -268,8 +293,10 @@
 
 <script src="data.js"></script>
 <script src="catalogData.js"></script>
-<script src="app.js"></script>
-<script src="home.js"></script>
+<script src="authGateway.js"></script>
+<script src="app.js?v=20260622c"></script>
+<script src="home.js?v=20260622d"></script>
 <script src="luna3d-promo.js"></script>
 </body>
 </html>
+

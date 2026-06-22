@@ -88,7 +88,7 @@
   // SVG de cámara para las tarjetas placeholder ("FOTO", fondo rayado).
   const PH_CAM = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
   // Descuentos de muestra para los placeholders de Ofertas (visual, no precios reales).
-  const PH_DISCOUNTS = [50, 40, 30, 35, 25, 45];
+  const PH_DISCOUNTS = [50, 40, 30, 35, 25, 45, 20, 55, 15, 30, 40, 25];
 
   /* ---------- catálogo async: Supabase (o fallback data.js) → render ---------- */
   (async function renderGallery(){
@@ -132,10 +132,11 @@
       const el = document.getElementById(id);
       if (!el) return;
       opts = opts || {};
-      const real = PRODUCTS.filter(filterFn).slice(0, 6);
+      const total = opts.count || 6;
+      const real = PRODUCTS.filter(filterFn).slice(0, total);
       const out = real.map(realCard);
       let k = real.length;
-      while (out.length < 6) {
+      while (out.length < total) {
         const disc = opts.discounts ? PH_DISCOUNTS[k % PH_DISCOUNTS.length] : null;
         out.push(phCard(disc));
         k++;
@@ -151,7 +152,55 @@
     buildGrid('gal-nuevos',   p => p.tag === 'Nuevo');
     buildGrid('gal-vendidos', p => p.featured);
     buildGrid('gal-regalos',  p => giftCats.includes(p.cat));
-    buildGrid('gal-ofertas',  p => p.tag === 'Oferta', { discounts: true });
+    buildGrid('gal-ofertas',  p => p.tag === 'Oferta', { discounts: true, count: 6 });
+
+    /* ---------- carrusel de ofertas (flechas + deslizar + indicador tipo hero) ---------- */
+    (function initOffersCarousel(){
+      const track  = document.getElementById('gal-ofertas');
+      const wrap   = track && track.closest('.po-carousel-wrap');
+      const panel  = track && track.closest('.promo-unified');
+      if (!track || !wrap) return;
+      const prev   = wrap.querySelector('.po-prev');
+      const next   = wrap.querySelector('.po-next');
+      const dotsEl = panel ? panel.querySelector('#ofertas-dots') : null;
+      const cards  = () => Array.from(track.children).filter(el => !el.classList.contains('empty-state'));
+      const step   = () => Math.max(track.clientWidth * 0.8, 200);
+      function toCard(i){ const c = cards()[i]; if (c) track.scrollTo({ left: c.offsetLeft - track.offsetLeft, behavior:'smooth' }); }
+      function buildDots(){
+        if (!dotsEl) return;
+        dotsEl.innerHTML = '';
+        cards().forEach((_, i) => {
+          const b = document.createElement('button');
+          b.type = 'button'; b.className = 'po-dot'; b.setAttribute('aria-label', 'Ir al producto ' + (i + 1));
+          b.addEventListener('click', () => toCard(i));
+          dotsEl.appendChild(b);
+        });
+      }
+      function currentIndex(){
+        const cs = cards(); if (!cs.length) return 0;
+        const center = track.scrollLeft + track.clientWidth / 2;
+        let best = 0, bd = Infinity;
+        cs.forEach((c, i) => { const mid = (c.offsetLeft - track.offsetLeft) + c.clientWidth / 2; const d = Math.abs(mid - center); if (d < bd){ bd = d; best = i; } });
+        return best;
+      }
+      function update(){
+        const overflow = (track.scrollWidth - track.clientWidth) > 4;
+        track.classList.toggle('is-centered', !overflow);
+        if (prev) prev.hidden = !overflow;
+        if (next) next.hidden = !overflow;
+        if (dotsEl) dotsEl.style.display = overflow ? '' : 'none';
+        if (overflow){
+          if (prev) prev.disabled = track.scrollLeft <= 2;
+          if (next) next.disabled = track.scrollLeft >= (track.scrollWidth - track.clientWidth - 2);
+          if (dotsEl){ const ci = currentIndex(); Array.from(dotsEl.children).forEach((d, i) => d.classList.toggle('active', i === ci)); }
+        }
+      }
+      if (prev) prev.addEventListener('click', () => track.scrollBy({ left:-step(), behavior:'smooth' }));
+      if (next) next.addEventListener('click', () => track.scrollBy({ left: step(), behavior:'smooth' }));
+      track.addEventListener('scroll', update, { passive:true });
+      addEventListener('resize', update);
+      buildDots(); update();
+    })();
   })();
 
   /* ---------- contador de ofertas (Bloque 4) ---------- */

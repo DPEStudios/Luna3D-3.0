@@ -46,6 +46,7 @@ const I = {
   moon_minimal: '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M11 7.5a4.5 4.5 0 0 0 0 9 3 3 0 0 1 0-9z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   sun_minimal: '<circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
   chevronRight:'<path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 const svg = (n,cls)=>`<svg viewBox="0 0 24 24" class="${cls||''}" aria-hidden="true">${I[n]||''}</svg>`;
 window.LUNA_I = I; window.LUNA_svg = svg;
@@ -234,7 +235,7 @@ function addToCart(id){
   const p = PROD_BY_ID[id]; if(!p) return;
   if(p.price==null){ toast(`${p.name}: disponible próximamente`); return; }  // sin precio aún → no se vende
   const c=getCart(); const ex=c.find(i=>i.id===id);
-  if(ex) ex.qty++; else c.push({id:p.id,name:p.name,price:p.price,qty:1});
+  if(ex) ex.qty++; else c.push({id:p.id,name:p.name,price:p.price,img:(p.img||null),qty:1});
   saveCart(c); toast(`${p.name} añadido al carrito`);
 }
 function changeQty(id,d){ const c=getCart(); const it=c.find(i=>i.id===id); if(!it)return;
@@ -286,7 +287,17 @@ function buildWhatsappOrder(cart, total){
 function checkoutWhatsapp(){
   const vendibles = getCart().filter(it => it && it.price != null && !Number.isNaN(it.price));
   if(!vendibles.length){ toast('Tu carrito está vacío'); return; }
-  window.open(buildWhatsappOrder(vendibles, cartTotal()), '_blank', 'noopener');
+  const total = cartTotal();
+  // Registro del pedido si hay sesion iniciada. Fire-and-forget: NUNCA bloquea
+  // ni interrumpe la venta por WhatsApp aunque falle o no haya red.
+  try{
+    const a=window.LUNA_AUTH;
+    if(a && a.getSession()){
+      a.recordOrder({ total: total, items: vendibles.map(it=>({ id: it.id, name: it.name, qty: it.qty, price: it.price })) });
+    }
+  }catch(e){ /* no romper el checkout */ }
+  try{ addNotif({ icon:'whatsapp', title:'Pedido enviado por WhatsApp', text:'Te contactaremos para coordinar la entrega y el pago.' }); }catch(e){}
+  window.open(buildWhatsappOrder(vendibles, total), '_blank', 'noopener');
 }
 
 /* ---------- FAVORITOS (localStorage) ---------- */
@@ -309,6 +320,82 @@ function syncFavs(){
   renderFavPopover();
 }
 
+/* ---------- NOTIFICACIONES (localStorage; eventos reales del propio uso) ----------
+   Sin backend: las notificaciones nacen de acciones reales del usuario en la
+   tienda (bienvenida, despacho, pedido por WhatsApp) y se guardan en localStorage.
+   No se inventan datos de negocio. Para la demo se siembran ejemplos la 1a vez. */
+const NKEY='luna3d_notifs';
+const NSEED='luna3d_notifs_seeded';
+function getNotifs(){ try{return JSON.parse(localStorage.getItem(NKEY))||[];}catch(e){return[];} }
+function saveNotifs(list){ try{localStorage.setItem(NKEY,JSON.stringify(list.slice(0,30)));}catch(e){} syncNotifs(); }
+function unreadCount(){ return getNotifs().filter(n=>!n.read).length; }
+function addNotif(n){
+  const list=getNotifs();
+  if(n.key && list.some(x=>x.key===n.key)) return;   // de-dup por clave opcional
+  list.unshift({ id:'n'+Date.now()+Math.random().toString(36).slice(2,6),
+    icon:n.icon||'spark', title:n.title||'', text:n.text||'', href:n.href||null,
+    ts:Date.now(), read:false, key:n.key||null });
+  saveNotifs(list);
+}
+function markAllRead(){ saveNotifs(getNotifs().map(n=>({...n,read:true}))); }
+function seedNotifsOnce(){
+  if(localStorage.getItem(NSEED)) return;
+  localStorage.setItem(NSEED,'1');
+  const now=Date.now(), H=3600000, D=86400000;
+  saveNotifs([
+    { id:'seed1', icon:'spark', title:'Bienvenido a Luna3D', text:'Explora el catálogo y guarda tus piezas favoritas.', href:'catalogo.html', ts:now-2*60000, read:false, key:'welcome' },
+    { id:'seed2', icon:'truck', title:'Despacho a todo Chile', text:'Coordina tu entrega fácilmente por WhatsApp.', href:null, ts:now-5*H, read:false, key:'ship' },
+    { id:'seed3', icon:'cube', title:'Nuevos productos en el catálogo', text:'Sumamos piezas nuevas esta semana. ¡Échales un ojo!', href:'catalogo.html?col=new', ts:now-2*D, read:true, key:'newprods' },
+  ]);
+}
+function timeAgo(ts){
+  const sgs=Math.max(1,Math.round((Date.now()-ts)/1000));
+  if(sgs<60) return 'hace un momento';
+  const m=Math.round(sgs/60); if(m<60) return 'hace '+m+' min';
+  const h=Math.round(m/60); if(h<24) return 'hace '+h+' h';
+  const d=Math.round(h/24); return d===1?'ayer':'hace '+d+' días';
+}
+function syncNotifs(){
+  const n=unreadCount(), label=n>9?'9+':String(n);
+  document.querySelectorAll('.notif-count,.sb-notif-count').forEach(el=>{ el.textContent=label; el.classList.toggle('show',n>0); });
+  renderNotifList();
+}
+function renderNotifList(){
+  const box=document.getElementById('notif-list'); if(!box) return;
+  const list=getNotifs();
+  const readBtn=document.getElementById('notif-readall');
+  if(readBtn) readBtn.style.display = unreadCount()>0 ? '' : 'none';
+  if(!list.length){
+    box.innerHTML=`<div class="notif-empty"><div class="notif-empty-ico">${svg('bell')}</div><b>No tienes notificaciones</b><p>Te avisaremos aquí apenas haya novedades.</p></div>`;
+    return;
+  }
+  box.innerHTML=list.map(n=>{
+    const inner=`<span class="ni-ico">${svg(n.icon||'spark')}</span><span class="ni-body"><b>${escapeHTML(n.title||'')}</b><span>${escapeHTML(n.text||'')}</span><time>${timeAgo(n.ts)}</time></span>${n.read?'':'<span class="ni-dot" aria-label="No leída"></span>'}`;
+    return n.href ? `<a class="notif-item${n.read?'':' unread'}" href="${n.href}">${inner}</a>`
+                  : `<div class="notif-item${n.read?'':' unread'}">${inner}</div>`;
+  }).join('');
+}
+
+/* ---------- FX: feedback táctil (ripple) en superficies grandes ----------
+   No se aplica a .icon-btn para no recortar los badges (overflow visible). */
+function initFXOnce(){
+  if(window.__lunaFX) return; window.__lunaFX=true;
+  try{ if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
+  document.addEventListener('pointerdown', function(e){
+    var host = (e.target && e.target.closest) ? e.target.closest('.btn,.btn-catalog,.btn-fav,.pop-cta,.notif-readall') : null;
+    if(!host || host.hasAttribute('disabled')) return;
+    var r = host.getBoundingClientRect();
+    var d = Math.max(r.width, r.height) * 1.05;
+    var s = document.createElement('span');
+    s.className = 'fx-ripple';
+    s.style.width = s.style.height = d + 'px';
+    s.style.left = (e.clientX - r.left - d/2) + 'px';
+    s.style.top  = (e.clientY - r.top  - d/2) + 'px';
+    host.appendChild(s);
+    s.addEventListener('animationend', function(){ if(s.parentNode) s.parentNode.removeChild(s); });
+  }, true);
+}
+
 /* ---------- CHROME: NAV ---------- */
 const escapeHTML = str => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
@@ -317,6 +404,58 @@ const MEGA_COLLECTIONS = [
   {id:'featured', label:'Destacados', test:p=>p.featured},
   {id:'new',      label:'Novedades',  test:p=>p.tag==='Nuevo'},
 ];
+
+/* ---------- CUENTA: estado de sesion en el chrome (Sesion 6) ----------
+   syncAccountUI() re-cablea el boton de perfil, el de pedidos y los enlaces
+   de cuenta del sidebar segun haya o no sesion. Null-safe: si el nav aun no
+   esta montado, no hace nada. Se llama al final de buildNav y on session change. */
+function _authW(){ return window.LUNA_AUTH || null; }
+function currentUser(){ const a=_authW(); const s=a&&a.getSession(); return s?s.user:null; }
+function closeSidebarDOM(){
+  ['sidebar-menu','sidebar-scrim'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('open'); });
+  const b=document.getElementById('burger'); if(b) b.classList.remove('active');
+}
+function syncAccountUI(){
+  const u=currentUser();
+  const pb=document.getElementById('profile-btn'), pp=document.getElementById('profile-popover');
+  if(pb){ pb.onclick = u ? (()=>{ location.href='cuenta.html'; }) : (()=>openAuth('login')); pb.setAttribute('aria-label', u?'Mi cuenta':'Iniciar sesión'); }
+  if(pp){ pp.innerHTML = u
+    ? `<div class="pop-mini"><span class="pop-mini-ico">${svg('user')}</span><div class="pop-mini-tx"><b>Hola${u.nombre?(', '+escapeHTML(u.nombre)):''}</b><span>Ver mi cuenta</span></div></div><a class="pop-cta" href="cuenta.html">Mi cuenta ${svg('arrow')}</a>`
+    : `<div class="pop-empty"><div class="pop-empty-ico">${svg('user')}</div><b>Tu cuenta</b><p>Inicia sesión o crea tu cuenta para guardar pedidos y favoritos.</p><button class="pop-cta" type="button" onclick="LUNA.openAuth('login')">Iniciar sesión ${svg('arrow')}</button></div>`; }
+  const ob=document.getElementById('orders-btn');
+  if(ob){ ob.onclick = u ? (()=>{ location.href='cuenta.html#pedidos'; }) : (()=>openAuth('login')); }
+  renderOrdersPopover(u);
+  const login=document.getElementById('sb-login-link'); if(login){ const sp=login.querySelector('span');
+    if(u){ if(sp) sp.textContent='Mi cuenta'; login.onclick=e=>{e.preventDefault(); location.href='cuenta.html';}; }
+    else { if(sp) sp.textContent='Iniciar sesion'; login.onclick=e=>{e.preventDefault(); closeSidebarDOM(); openAuth('login');}; } }
+  const reg=document.getElementById('sb-register-link'); if(reg){ const sp=reg.querySelector('span');
+    if(u){ if(sp) sp.textContent='Cerrar sesion'; reg.onclick=e=>{e.preventDefault(); closeSidebarDOM(); const a=_authW(); if(a) a.signOut().then(()=>toast('Sesion cerrada')); }; }
+    else { if(sp) sp.textContent='Crear cuenta'; reg.onclick=e=>{e.preventDefault(); closeSidebarDOM(); openAuth('register');}; } }
+  const ordersSb=document.getElementById('sb-orders-link'); if(ordersSb){ ordersSb.onclick=e=>{ e.preventDefault(); if(u){ location.href='cuenta.html#pedidos'; } else { closeSidebarDOM(); openAuth('login'); } }; }
+}
+
+/* Popover de "Mis compras": estado vacio real (sin sesion / sin pedidos) o
+   resumen con la cuenta de pedidos reales del usuario. No inventa datos. */
+function renderOrdersPopover(u){
+  const body=document.getElementById('orders-popover-body'); if(!body) return;
+  if(!u){
+    body.innerHTML=`<div class="pop-empty"><div class="pop-empty-ico">${svg('bag')}</div><b>Sigue tus compras</b><p>Inicia sesión para ver el estado de tus pedidos.</p><button class="pop-cta" type="button" onclick="LUNA.openAuth('login')">Iniciar sesión ${svg('arrow')}</button></div>`;
+    return;
+  }
+  body.innerHTML=`<div class="pop-empty pop-loading"><p>Cargando tus compras…</p></div>`;
+  const a=_authW();
+  if(a && a.listOrders){
+    a.listOrders().then(rows=>{
+      const b=document.getElementById('orders-popover-body'); if(!b) return;
+      if(!rows || !rows.length){
+        b.innerHTML=`<div class="pop-empty"><div class="pop-empty-ico">${svg('bag')}</div><b>Aún no tienes compras</b><p>Cuando hagas tu primer pedido, aparecerá aquí.</p><a class="pop-cta" href="catalogo.html">Ir al catálogo ${svg('arrow')}</a></div>`;
+      } else {
+        const n=rows.length;
+        b.innerHTML=`<div class="pop-mini"><span class="pop-mini-ico">${svg('bag')}</span><div class="pop-mini-tx"><b>Tienes ${n} compra${n>1?'s':''}</b><span>Revisa el detalle de tus pedidos</span></div></div><a class="pop-cta" href="cuenta.html#pedidos">Ver mis pedidos ${svg('arrow')}</a>`;
+      }
+    }).catch(()=>{});
+  }
+}
 
 function buildNav(active){
   const mount=document.getElementById('nav-mount'); if(!mount)return;
@@ -355,7 +494,7 @@ function buildNav(active){
       </div>
 
       <div class="nav-actions">
-        <button id="theme-switch-toggle" class="theme-switch-toggle" aria-label="Cambiar tema" aria-pressed="false">
+        <button id="theme-switch-toggle" class="theme-switch-toggle" aria-label="Cambiar apariencia (claro u oscuro)" aria-pressed="false" data-tooltip="Apariencia">
           <span class="tst-knob">
             <span class="tst-icon tst-icon-moon">${svg('moon_minimal')}</span>
             <span class="tst-icon tst-icon-sun">${svg('sun_minimal')}</span>
@@ -363,29 +502,41 @@ function buildNav(active){
         </button>
 
         <div class="nav-pop-wrap">
-          <button class="icon-btn" id="profile-btn" aria-label="Mi Perfil">
+          <button class="icon-btn" id="profile-btn" aria-label="Mi cuenta" aria-haspopup="true">
             ${svg('user')}
           </button>
-          <div class="nav-popover compact" id="profile-popover">
-            <button data-auth-action="login">Iniciar sesión</button>
-            <button data-auth-action="register">Crear cuenta</button>
-          </div>
+          <div class="nav-popover" id="profile-popover" role="menu"></div>
         </div>
+
         <div class="nav-pop-wrap">
-          <button class="icon-btn" id="orders-btn" aria-label="Mis Compras">
+          <button class="icon-btn" id="orders-btn" aria-label="Mis compras" aria-haspopup="true">
             ${svg('bag')}
           </button>
-          <div class="nav-popover compact" id="orders-popover">Debes iniciar sesión para ver tus compras</div>
+          <div class="nav-popover" id="orders-popover" role="status">
+            <b>Mis compras</b>
+            <div id="orders-popover-body"></div>
+          </div>
         </div>
-        <button class="icon-btn" id="notif-btn" aria-label="Notificaciones">
-          ${svg('bell')}
-          <span class="action-dot"></span>
-        </button>
-        <button class="icon-btn" id="cart-btn" aria-label="Carrito">
+
+        <div class="notif-wrap">
+          <button class="icon-btn" id="notif-btn" data-tooltip="Notificaciones" aria-label="Notificaciones" aria-haspopup="true" aria-expanded="false">
+            ${svg('bell')}
+            <span class="action-badge notif-count" aria-hidden="true">0</span>
+          </button>
+          <div class="nav-popover notif-panel" id="notif-panel" role="dialog" aria-label="Notificaciones">
+            <div class="notif-head">
+              <b>Notificaciones</b>
+              <button class="notif-readall" id="notif-readall" type="button">Marcar como leídas</button>
+            </div>
+            <div class="notif-list" id="notif-list"></div>
+          </div>
+        </div>
+
+        <button class="icon-btn" id="cart-btn" data-tooltip="Carrito" aria-label="Carrito">
           ${svg('cart')}
           <span class="cart-count">0</span>
         </button>
-        <button class="burger" id="burger" aria-label="Menú">
+        <button class="burger" id="burger" aria-label="Menú" aria-expanded="false">
           <span></span>
           <span></span>
           <span></span>
@@ -412,29 +563,31 @@ function buildNav(active){
   <!-- FLOATING SIDEBAR MENU -->
   <div id="sidebar-scrim" class="sidebar-scrim"></div>
   <aside id="sidebar-menu" class="sidebar-menu" aria-label="Menú de navegación">
-    <!-- Acciones de cuenta: solo visibles en tablet/celular, donde los íconos del header se ocultan -->
+    <!-- Acciones de cuenta: visibles en tablet/celular, donde los íconos del header se ocultan -->
     <div class="sidebar-account">
       <span class="sidebar-section-title">Cuenta</span>
       <a href="#" class="sb-account-item" id="sb-login-link">${svg('user')} <span>Iniciar sesión</span></a>
       <a href="#" class="sb-account-item" id="sb-register-link">${svg('spark')} <span>Crear cuenta</span></a>
       <a href="#" class="sb-account-item" id="sb-fav-link">${svg('heart')} <span>Favoritos</span><span class="sb-badge fav-count">0</span></a>
       <a href="#" class="sb-account-item" id="sb-orders-link">${svg('bag')} <span>Mis compras</span></a>
-      <a href="#" class="sb-account-item" id="sb-notif-link">${svg('bell')} <span>Notificaciones</span><span class="sb-dot"></span></a>
+      <a href="#" class="sb-account-item" id="sb-notif-link">${svg('bell')} <span>Notificaciones</span><span class="sb-badge sb-notif-count">0</span></a>
     </div>
 
     <nav class="sidebar-links">
-      <a href="#" id="sidebar-history-link">${svg('shield')} Historial</a>
-      <a href="index.html#nosotros" id="sidebar-about-link">Sobre Nosotros</a>
-      <a href="index.html#faq">Preguntas Frecuentes</a>
-      <a href="mailto:contacto@luna3d.cl">Contacto</a>
-      <a href="#">Cambios y Garantía</a>
-      <a href="#">Términos y Condiciones</a>
+      <span class="sidebar-section-title">Explorar</span>
+      <a href="index.html">${svg('home')} <span>Inicio</span></a>
+      <a href="catalogo.html">${svg('cube')} <span>Catálogo</span></a>
+      <a href="nosotros.html">${svg('spark')} <span>Sobre nosotros</span></a>
+      <a href="index.html#faq">${svg('help')} <span>Preguntas frecuentes</span></a>
+      <a href="contacto.html">${svg('mail')} <span>Contacto</span></a>
+      <a href="legal.html#devoluciones">${svg('refresh')} <span>Cambios y garantías</span></a>
+      <a href="legal.html#terminos">${svg('shield')} <span>Términos y condiciones</span></a>
     </nav>
-    
+
     <div class="sidebar-theme-section">
-      <span class="sidebar-section-title">Tema</span>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:0 4px;">
-        <span class="muted" id="sidebar-theme-label" style="font-size:14px;font-weight:500;">Oscuro</span>
+      <span class="sidebar-section-title">Apariencia</span>
+      <div class="sidebar-theme-row">
+        <span class="muted" id="sidebar-theme-label">Oscuro</span>
         <button id="sidebar-theme-toggle" class="theme-switch-toggle" aria-label="Cambiar tema" aria-pressed="false">
           <span class="tst-knob">
             <span class="tst-icon tst-icon-moon">${svg('moon_minimal')}</span>
@@ -442,18 +595,6 @@ function buildNav(active){
           </span>
         </button>
       </div>
-    </div>
-
-    <div class="sidebar-secondary">
-      <a href="#" class="sec-link" id="sidebar-settings-link">
-        ${svg('gear')} Ajustes
-      </a>
-      <a href="#" class="sec-link" id="sidebar-help-link">
-        ${svg('help')} Centro de ayuda
-      </a>
-      <a href="#" class="sec-link" id="sidebar-lang-link">
-        ${svg('globe')} Idioma · ES
-      </a>
     </div>
   </aside>
   `;
@@ -466,13 +607,9 @@ function buildNav(active){
   // --- Cart Trigger ---
   document.getElementById('cart-btn').onclick=openDrawer;
   
-  // --- Profile / quick account triggers ---
-  document.getElementById('profile-btn').onclick=()=>openAuth('login');
-  document.querySelectorAll('[data-auth-action]').forEach(btn=>{
-    btn.onclick=e=>{ e.preventDefault(); openAuth(btn.dataset.authAction); };
-  });
-  const ordersBtn=document.getElementById('orders-btn');
-  if(ordersBtn) ordersBtn.onclick=()=>toast('Debes iniciar sesión para ver tus compras');
+  // --- Profile / quick account triggers (cableado real segun sesion) ---
+  // Los handlers de cuenta (perfil, pedidos, login/logout) se asignan en
+  // syncAccountUI(), invocada al final de este setup y on session change.
 
   // --- Sidebar Logic ---
   const burger = document.getElementById('burger');
@@ -484,7 +621,7 @@ function buildNav(active){
     sidebar.classList.add('open');
     scrim.classList.add('open');
     burger.classList.add('active');
-    // Close megamenu if open
+    burger.setAttribute('aria-expanded','true');
     closeMega();
   }
 
@@ -492,6 +629,7 @@ function buildNav(active){
     sidebar.classList.remove('open');
     scrim.classList.remove('open');
     burger.classList.remove('active');
+    burger.setAttribute('aria-expanded','false');
   }
 
   if (burger && sidebar && scrim) {
@@ -512,35 +650,21 @@ function buildNav(active){
   if (sidebarCatLink) {
     sidebarCatLink.onclick = () => closeSidebar();
   }
-  const sidebarAboutLink = document.getElementById('sidebar-about-link');
-  if (sidebarAboutLink) {
-    sidebarAboutLink.onclick = () => {
-      closeSidebar();
-      const aboutEl = document.getElementById('nosotros');
-      if (aboutEl) aboutEl.scrollIntoView();
-    };
-  }
+  // 'Sobre nosotros' ahora es página propia (nosotros.html); el cierre del sidebar
+  // lo cubre el listener general de '.sidebar-links a'. (Sin handler de scroll.)
 
-  // Secondary sidebar links toasts
-  const setLinkToast = (id, msg) => {
-    const el = document.getElementById(id);
-    if (el) el.onclick = e => { e.preventDefault(); toast(msg); };
-  };
-  setLinkToast('sidebar-settings-link', 'Ajustes de cuenta próximamente');
-  setLinkToast('sidebar-help-link', 'Centro de ayuda próximamente');
-  setLinkToast('sidebar-lang-link', 'Idioma: Español (ES)');
-  setLinkToast('sidebar-history-link', 'Inicia sesión para acceder a tu historial');
+  // Cierra el menú al navegar por cualquier enlace de la sección "Explorar".
+  document.querySelectorAll('.sidebar-links a').forEach(a => a.addEventListener('click', closeSidebar));
 
   // --- Acciones de cuenta del sidebar (espejo de los íconos ocultos en móvil/tablet) ---
   const bindSidebarAction = (id, fn) => {
     const el = document.getElementById(id);
     if (el) el.onclick = e => { e.preventDefault(); closeSidebar(); fn(); };
   };
-  bindSidebarAction('sb-login-link',    () => openAuth('login'));
-  bindSidebarAction('sb-register-link', () => openAuth('register'));
   bindSidebarAction('sb-fav-link',      () => { const n=getFavs().length; toast(n>0 ? ('Tienes '+n+' favorito'+(n>1?'s':'')) : 'No tienes favoritos guardados'); });
-  bindSidebarAction('sb-orders-link',   () => toast('Debes iniciar sesión para ver tus compras'));
-  bindSidebarAction('sb-notif-link',    () => toast('No tienes notificaciones nuevas'));
+  // sb-login-link / sb-register-link / sb-orders-link: cableados en syncAccountUI() segun sesion.
+  syncAccountUI();
+  bindSidebarAction('sb-notif-link',    () => { const n=unreadCount(); toast(n>0 ? ('Tienes '+n+' notificación'+(n>1?'es':'')+' sin leer') : 'Estás al día, no hay notificaciones nuevas'); });
 
   // --- Theme Switcher Logic ---
   const headerToggle = document.getElementById('theme-switch-toggle');
@@ -772,6 +896,23 @@ function buildNav(active){
     };
   }
 
+  // --- Notificaciones (badge numérico + panel desplegable, clic para abrir) ---
+  seedNotifsOnce();
+  initFXOnce();
+  const notifBtn = document.getElementById('notif-btn');
+  const notifPanel = document.getElementById('notif-panel');
+  const notifWrap = notifBtn ? notifBtn.closest('.notif-wrap') : null;
+  function openNotif(){ if(!notifPanel) return; closeMega(); closeSidebar(); renderNotifList(); notifPanel.classList.add('open'); notifBtn.setAttribute('aria-expanded','true'); }
+  function closeNotif(){ if(!notifPanel) return; notifPanel.classList.remove('open'); notifBtn.setAttribute('aria-expanded','false'); }
+  if (notifBtn && notifPanel) {
+    notifBtn.onclick = e => { e.stopPropagation(); notifPanel.classList.contains('open') ? closeNotif() : openNotif(); };
+    notifPanel.addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', e => { if (notifWrap && !notifWrap.contains(e.target)) closeNotif(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNotif(); });
+    const readall = document.getElementById('notif-readall');
+    if (readall) readall.onclick = () => { markAllRead(); renderNotifList(); };
+  }
+
   // --- Favorites Button — re-renderizar al abrir el popover (hover o click) ---
   const favBtn = document.getElementById('fav-btn');
   if (favBtn) {
@@ -791,6 +932,7 @@ function buildNav(active){
     syncCart();
     syncFavs();
     renderFavPopover();
+    syncNotifs();
   }, 10);
 }
 
@@ -815,7 +957,7 @@ function initSearchTyping(input){
 function renderFavPopover(){
   const body=document.getElementById('fav-popover-body'); if(!body)return;
   const favs=getFavs().map(id=>PROD_BY_ID[id]).filter(Boolean).slice(0,4);
-  if(!favs.length){ body.innerHTML='No tienes favoritos guardados'; return; }
+  if(!favs.length){ body.innerHTML=`<div class="pop-empty"><div class="pop-empty-ico">${svg('heart')}</div><b>Aún no tienes favoritos</b><p>Toca el corazón en cualquier producto para guardarlo aquí.</p><a class="pop-cta" href="catalogo.html">Explorar catálogo ${svg('arrow')}</a></div>`; return; }
   body.innerHTML=favs.map(p=>
     `<a class="fav-pop-item" href="producto.html?id=${p.id}">`+
     (p.img ? `<img class="fav-pop-thumb" src="${p.img}" alt="${escapeHTML(p.name)}" loading="lazy">` : `<div class="fav-pop-thumb fav-pop-thumb--ph">${svg('cube')}</div>`)+
@@ -832,21 +974,7 @@ function buildFooter(){
   <footer class="footer">
     <div class="wrap">
 
-      <!-- NEWSLETTER (sección destacada) -->
-      <section class="footer-newsletter" aria-labelledby="nf-title">
-        <div class="fn-text">
-          <span class="fn-kicker">${svg('spark')} Comunidad Luna3D</span>
-          <h3 class="fn-title" id="nf-title">Suscríbete a nuestro newsletter</h3>
-          <p class="fn-sub">Recibe novedades, ofertas exclusivas, lanzamientos y tendencias del mundo de la impresión 3D.</p>
-        </div>
-        <form class="newsletter-form" id="newsletter-form" novalidate>
-          <div class="nf-field">
-            <input type="email" id="newsletter-email" placeholder="tu@email.cl" aria-label="Correo electrónico" aria-describedby="newsletter-msg" autocomplete="email">
-            <button class="btn primary nf-btn" type="submit">Suscribirme ${svg('arrow')}</button>
-          </div>
-          <p class="nf-msg" id="newsletter-msg" role="status" aria-live="polite"></p>
-        </form>
-      </section>
+      <!-- NEWSLETTER: movido al Home (sección "Promociones de la semana") para evitar duplicidad. El cableado de validación de más abajo engancha #newsletter-form donde exista. -->
 
       <!-- GRID PRINCIPAL -->
       <div class="footer-top">
@@ -857,10 +985,12 @@ function buildFooter(){
         <div class="footer-col">
           <h4>Enlaces Útiles</h4>
           <ul>
-            <li><a href="index.html#nosotros">Sobre Nosotros</a></li>
-            <li><a href="#">Términos y Condiciones</a></li>
-            <li><a href="#">Política de Devolución</a></li>
-            <li><a href="#">Seguimiento de Envío</a></li>
+            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="legal.html#terminos">Términos y Condiciones</a></li>
+            <li><a href="legal.html#devoluciones">Cambios y Garantía</a></li>
+            <li><a href="legal.html#despacho">Despacho y Envíos</a></li>
+            <li><a href="legal.html#privacidad">Política de Privacidad</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -895,9 +1025,9 @@ function buildFooter(){
           <span>© 2026 Estrella 3D SpA. Todos los derechos reservados.</span>
         </div>
         <div class="fb-legal">
-          <a href="#">Términos</a><span class="dot">·</span>
-          <a href="#">Privacidad</a><span class="dot">·</span>
-          <span>v3.0.0 — Hecho en Chile 🇨🇱</span>
+          <a href="legal.html#terminos">Términos</a><span class="dot">·</span>
+          <a href="legal.html#privacidad">Privacidad</a><span class="dot">·</span>
+          <span>v3.0.0 — Hecho en Chile 🌙</span>
         </div>
       </div>
     </div>
@@ -911,15 +1041,24 @@ function buildFooter(){
     const isValid=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
     const setMsg=(text,type)=>{ msg.textContent=text||''; msg.className='nf-msg'+(type?' '+type:''); };
     email.addEventListener('input',()=>{ if(email.classList.contains('invalid') && isValid(email.value.trim())){ email.classList.remove('invalid'); setMsg('',''); } });
+    const submitBtn=form.querySelector('button[type="submit"]');
     form.onsubmit=e=>{
       e.preventDefault();
       const v=email.value.trim();
       if(!v){ email.classList.add('invalid'); setMsg('Ingresa tu correo para suscribirte.','err'); email.focus(); return; }
       if(!isValid(v)){ email.classList.add('invalid'); setMsg('Ese correo no parece válido. Revísalo e inténtalo de nuevo.','err'); email.focus(); return; }
       email.classList.remove('invalid');
-      setMsg('¡Listo! Te sumaste al universo Luna3D. ✨','ok');
-      toast('Gracias por suscribirte al universo Luna3D');
-      form.reset();
+      // Persistencia REAL: la guarda LUNA_DATA (único punto que conoce Supabase).
+      if(!(window.LUNA_DATA && LUNA_DATA.subscribeNewsletter)){ setMsg('No pudimos conectar ahora. Inténtalo más tarde.','err'); return; }
+      setMsg('Suscribiendo…','');
+      if(submitBtn) submitBtn.disabled=true;
+      LUNA_DATA.subscribeNewsletter(v).then(function(){
+        setMsg('¡Listo! Te sumaste al universo Luna3D. ✨','ok');
+        toast('Gracias por suscribirte al universo Luna3D');
+        form.reset();
+      }).catch(function(){
+        setMsg('No pudimos guardar tu correo. Revisa tu conexión e inténtalo de nuevo.','err');
+      }).then(function(){ if(submitBtn) submitBtn.disabled=false; });
     };
   }
 }
@@ -957,9 +1096,12 @@ function renderDrawer(){
     body.innerHTML=`<div class="drawer-empty"><div class="de-ico">${svg('cart')}</div><div><b style="display:block;color:var(--star);font-family:var(--font-display);font-size:17px;margin-bottom:6px;">Tu carrito está vacío</b>Explora el catálogo y suma piezas únicas.</div><a class="btn primary" href="catalogo.html">Ir al catálogo ${svg('arrow')}</a></div>`;
     foot.innerHTML=''; return;
   }
-  body.innerHTML=c.map(it=>`
+  body.innerHTML=c.map(it=>{
+    const _p=(typeof PROD_BY_ID!=='undefined'&&PROD_BY_ID[it.id])?PROD_BY_ID[it.id]:null;
+    const _img=it.img||(_p&&_p.img)||null;
+    return `
     <div class="cart-item">
-      <div class="ci-img"></div>
+      <div class="ci-img">${_img?`<img src="${_img}" alt="" loading="lazy">`:''}</div>
       <div class="ci-info">
         <b>${it.name}</b>
         <div class="ci-price">${CLP(it.price)}</div>
@@ -970,7 +1112,7 @@ function renderDrawer(){
         </div>
       </div>
       <button class="ci-remove" onclick="LUNA.removeItem('${it.id}')" aria-label="Quitar">${svg('trash')}</button>
-    </div>`).join('');
+    </div>`;}).join('');
   foot.innerHTML=`
     <div class="dtotal"><span>Total</span><b>${CLP(cartTotal())}</b></div>
     <button class="btn primary block" onclick="LUNA.checkoutWhatsapp()">Pedir por WhatsApp ${svg('whatsapp')}</button>
@@ -1000,6 +1142,7 @@ function buildAuth(){
       <label class="af-name"><span>Nombre</span><input type="text" name="name" autocomplete="name" placeholder="Tu nombre"></label>
       <label><span>Correo</span><input type="email" name="email" required autocomplete="email" placeholder="tucorreo@ejemplo.cl"></label>
       <label><span>Contraseña</span><input type="password" name="password" required autocomplete="current-password" placeholder="••••••••"></label>
+      <p class="auth-error" id="auth-error" role="alert" hidden></p>
       <button type="submit" class="btn primary block" id="auth-submit">Ingresar</button>
     </form>
     <p class="auth-note">Pronto podrás guardar tus favoritos, direcciones y pedidos en tu cuenta.</p>
@@ -1008,9 +1151,44 @@ function buildAuth(){
   document.getElementById('auth-scrim').onclick=closeAuth;
   document.getElementById('auth-close').onclick=closeAuth;
   w.querySelectorAll('.auth-tabs button').forEach(b=>b.onclick=()=>switchAuth(b.dataset.tab));
-  w.querySelectorAll('[data-provider]').forEach(b=>b.onclick=()=>toast(`${b.dataset.provider}: conexión próximamente`));
-  document.getElementById('auth-form').onsubmit=e=>{e.preventDefault();closeAuth();
-    toast(authMode==='login'?'Inicio de sesión en camino — pronto lo activamos':'Registro en camino — pronto lo activamos');};
+  w.querySelectorAll('[data-provider]').forEach(b=>b.onclick=()=>{
+    const prov=b.dataset.provider;
+    if(prov==='Google'){ const a=window.LUNA_AUTH; if(a && a.googleEnabled && a.googleEnabled()){ a.signInWithGoogle(); } else { toast('Login con Google: muy pronto'); } return; }
+    if(prov==='Correo'){ const em=document.querySelector('#auth-form input[name=email]'); if(em) em.focus(); return; }
+    toast(`${prov}: conexion proximamente`);
+  });
+  document.getElementById('auth-form').onsubmit=e=>{
+    e.preventDefault();
+    const a=window.LUNA_AUTH;
+    const form=e.target;
+    const errEl=document.getElementById('auth-error');
+    const sub=document.getElementById('auth-submit');
+    const showErr=msg=>{ if(errEl){ errEl.textContent=msg; errEl.hidden=false; } };
+    if(errEl){ errEl.hidden=true; errEl.textContent=''; }
+    if(!a){ showErr('El sistema de cuentas no esta disponible. Intenta mas tarde.'); return; }
+    const nombre=(form.name&&form.name.value)||'';
+    const email=(form.email&&form.email.value)||'';
+    const password=(form.password&&form.password.value)||'';
+    const reLabel=()=>authMode==='register'?'Crear cuenta':'Ingresar';
+    const restoreBtn=()=>{ if(sub){ sub.disabled=false; sub.textContent=reLabel(); } };
+    if(sub){ sub.disabled=true; sub.textContent=authMode==='register'?'Creando cuenta...':'Ingresando...'; }
+    const op=authMode==='register'
+      ? a.signUp({nombre:nombre,email:email,password:password})
+      : a.signIn({email:email,password:password});
+    op.then(res=>{
+      if(authMode==='register' && res && res.needsConfirm){
+        restoreBtn(); closeAuth();
+        toast('Te enviamos un correo para confirmar tu cuenta.');
+        return;
+      }
+      restoreBtn(); closeAuth();
+      try{ syncAccountUI(); }catch(_){}
+      toast(authMode==='register' ? 'Cuenta creada. Bienvenido/a a Luna 3D' : 'Hola de nuevo!');
+    }).catch(err=>{
+      restoreBtn();
+      showErr((err&&err.message)||'No se pudo completar. Intenta de nuevo.');
+    });
+  };
 }
 function switchAuth(mode){
   authMode=mode; buildAuth();
@@ -1127,6 +1305,15 @@ window.LUNA={ addToCart, add:addFromCard, changeQty, removeItem, openDrawer, clo
 
 function boot(){
   buildLoader(); initStars(); buildDaySky(); buildShootingStars(); buildFloatingActions(); buildDrawer(); buildAuth(); syncCart(); syncFavs(); initReveal();
+  // --- Cuentas (Sesion 6): restaura sesion, maneja regreso de OAuth (Google)
+  //     y re-pinta el chrome de cuenta cuando la sesion cambia. Null-safe. ---
+  if(window.LUNA_AUTH){
+    try{
+      LUNA_AUTH.onChange(()=>{ try{ syncAccountUI(); }catch(e){} });
+      Promise.resolve(LUNA_AUTH.init()).then(()=>{ try{ syncAccountUI(); }catch(e){} }).catch(()=>{});
+    }catch(e){}
+    syncAccountUI();
+  }
 }
 if(document.readyState!=='loading') boot(); else addEventListener('DOMContentLoaded',boot);
 })();

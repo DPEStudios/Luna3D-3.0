@@ -49,6 +49,7 @@
       colors:   (row.colors && row.colors.length ? row.colors : null),
       sizes:    (row.sizes  && row.sizes.length  ? row.sizes  : null),
       desc:     (row.desc != null && row.desc !== '' ? row.desc : null),
+      specs:    (Array.isArray(row.specs) && row.specs.length ? row.specs : null),
     };
   }
 
@@ -110,11 +111,42 @@
     });
   }
 
+  // ---- Newsletter: alta de suscriptor vía RPC (SECURITY DEFINER) -----------
+  // SoC: este wrapper es el único cliente que conoce Supabase. Llama a la
+  // función pública subscribe_newsletter(p_email,p_source): la web NUNCA toca
+  // la tabla directamente (anon no tiene permisos sobre newsletter_subscribers).
+  // La función valida el formato, normaliza y hace ON CONFLICT DO NOTHING del
+  // lado del servidor → reintentar el mismo correo NO falla ni revela si ya
+  // existía. Devuelve Promise<{ok:true}> o rechaza (red / error de servidor).
+  var ENDPOINT_NEWS = SUPABASE.url + '/rest/v1/rpc/subscribe_newsletter';
+  function subscribeNewsletter(email) {
+    var clean = String(email == null ? '' : email).trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) {
+      return Promise.reject(new Error('correo inválido'));
+    }
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS) : null;
+    return fetch(ENDPOINT_NEWS, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE.publishable,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ p_email: clean, p_source: 'web_footer' }),
+      signal: ctrl ? ctrl.signal : undefined,
+    }).then(function (resp) {
+      if (timer) clearTimeout(timer);
+      if (!resp.ok) throw new Error('Supabase respondió ' + resp.status);
+      return { ok: true };
+    });
+  }
+
   window.LUNA_DATA = {
     config: SUPABASE,
     mapRow: mapRow,
     getCatalog: getCatalog,
     bootstrap: bootstrap,
+    subscribeNewsletter: subscribeNewsletter,
     state: function () { return _state; },
   };
 })();
