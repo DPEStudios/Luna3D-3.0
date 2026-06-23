@@ -34,3 +34,7 @@ _editor/
 _fabrica_skills/
 graphify-out/
 .vercel
+
+# Handoff y preview del footer (no son parte del sitio)
+footer-handoff/
+footer-preview.html

@@ -53,6 +53,8 @@ window.LUNA_I = I; window.LUNA_svg = svg;
 
 /* logo src — uses inlined blob (standalone) or relative path (multipage) */
 const LOGO = k => (window.__resources && window.__resources['logo_'+k]) || ('assets/logo_'+k+'.png');
+/* marca circular (favicon del footer) — blob inlined (standalone) o ruta relativa */
+const MARK = () => (window.__resources && window.__resources['luna_mark']) || 'assets/luna-mark.png';
 /* en modo día el logo usa la variante con "Luna" apagada (luna diurna) */
 const themeLogoKey = () => (localStorage.getItem('luna_theme')||'dark')==='light' ? 'color_day' : 'color';
 function updateBrandLogos(){
@@ -970,68 +972,75 @@ function renderFavPopover(){
 /* ---------- CHROME: FOOTER ---------- */
 function buildFooter(){
   const mount=document.getElementById('footer-mount'); if(!mount)return;
+  const wa=(typeof waChatURL==='function')?waChatURL():'#';
   mount.innerHTML=`
   <footer class="footer">
+    <div class="footer-aura" aria-hidden="true"></div>
+    <div class="footer-stars" aria-hidden="true"></div>
     <div class="wrap">
-
-      <!-- NEWSLETTER: movido al Home (sección "Promociones de la semana") para evitar duplicidad. El cableado de validación de más abajo engancha #newsletter-form donde exista. -->
-
-      <!-- GRID PRINCIPAL -->
       <div class="footer-top">
         <div class="footer-brand">
-          <img class="brand-logo" src="${LOGO(themeLogoKey())}" alt="Luna3D">
-          <p>La revolución de la impresión 3D mediante optimización radical de modelos y un ecosistema completamente autónomo.</p>
+          <img src="${LOGO('color')}" alt="Luna 3D">
+          <p>Impresión 3D diseñada y fabricada en Chile, optimizada hasta el último gramo. Cada pieza se imprime cuando la pides.</p>
         </div>
-        <div class="footer-col">
+        <nav class="footer-col" aria-label="Enlaces útiles">
           <h4>Enlaces Útiles</h4>
           <ul>
-            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="nosotros.html">Sobre nosotros</a></li>
             <li><a href="contacto.html">Contacto</a></li>
-            <li><a href="legal.html#terminos">Términos y Condiciones</a></li>
-            <li><a href="legal.html#devoluciones">Cambios y Garantía</a></li>
-            <li><a href="legal.html#despacho">Despacho y Envíos</a></li>
-            <li><a href="legal.html#privacidad">Política de Privacidad</a></li>
+            <li><a href="legal.html#terminos">Términos y condiciones</a></li>
+            <li><a href="legal.html#devoluciones">Cambios y garantía</a></li>
+            <li><a href="legal.html#despacho">Despacho y envíos</a></li>
+            <li><a href="legal.html#privacidad">Política de privacidad</a></li>
           </ul>
-        </div>
-        <div class="footer-col">
+        </nav>
+        <nav class="footer-col" aria-label="Catálogo">
           <h4>Catálogo</h4>
           <ul>
             <li><a href="catalogo.html">Todos los productos</a></li>
-            <li><a href="catalogo.html">Categorías</a></li>
             <li><a href="catalogo.html?col=featured">Más vendidos</a></li>
             <li><a href="catalogo.html?col=new">Nuevos lanzamientos</a></li>
+            <li><a href="catalogo.html?col=limited">Ofertas</a></li>
           </ul>
+        </nav>
+      </div>
+
+      <div class="footer-divider"></div>
+
+      <div class="footer-social-section">
+        <div class="fss-head">
+          <h4>Síguenos en redes</h4>
+          <p>Inspiración, lanzamientos y el detrás de cámara de cada impresión.</p>
+        </div>
+        <div class="footer-social-cards">
+          <a class="fsc" data-net="instagram" href="https://instagram.com/luna3d" target="_blank" rel="noopener" aria-label="Instagram"><span class="fsc-ico">${svg('instagram')}</span><span class="fsc-txt"><b>Instagram</b><i>@luna3d</i></span></a>
+          <a class="fsc" data-net="facebook" href="https://facebook.com/luna3d" target="_blank" rel="noopener" aria-label="Facebook"><span class="fsc-ico">${svg('facebook')}</span><span class="fsc-txt"><b>Facebook</b><i>/luna3d</i></span></a>
+          <a class="fsc" data-net="tiktok" href="https://tiktok.com/@luna3d" target="_blank" rel="noopener" aria-label="TikTok"><span class="fsc-ico">${svg('tiktok')}</span><span class="fsc-txt"><b>TikTok</b><i>@luna3d</i></span></a>
+          <a class="fsc" data-net="youtube" href="https://youtube.com/@luna3d" target="_blank" rel="noopener" aria-label="YouTube"><span class="fsc-ico">${svg('youtube')}</span><span class="fsc-txt"><b>YouTube</b><i>@luna3d</i></span></a>
+          <a class="fsc" data-net="whatsapp" href="${wa}" target="_blank" rel="noopener" aria-label="WhatsApp"><span class="fsc-ico">${svg('whatsapp')}</span><span class="fsc-txt"><b>WhatsApp</b><i>+56 9 8335 7145</i></span></a>
         </div>
       </div>
 
-      <!-- REDES SOCIALES (protagonismo) -->
-      <section class="footer-social-band" aria-labelledby="fsb-title">
-        <div class="fsb-head">
-          <h4 class="fsb-title" id="fsb-title">Síguenos en redes</h4>
-          <p class="fsb-sub">Inspiración, lanzamientos y el detrás de cámara de cada impresión.</p>
-        </div>
-        <div class="footer-social">
-          <a class="soc soc-ig" href="https://instagram.com/luna3d" target="_blank" rel="noopener" aria-label="Instagram"><span class="soc-ico">${svg('instagram')}</span><span class="soc-txt"><span class="soc-name">Instagram</span><span class="soc-handle">@luna3d</span></span></a>
-          <a class="soc soc-fb" href="https://facebook.com/luna3d" target="_blank" rel="noopener" aria-label="Facebook"><span class="soc-ico">${svg('facebook')}</span><span class="soc-txt"><span class="soc-name">Facebook</span><span class="soc-handle">/luna3d</span></span></a>
-          <a class="soc soc-tt" href="https://tiktok.com/@luna3d" target="_blank" rel="noopener" aria-label="TikTok"><span class="soc-ico">${svg('tiktok')}</span><span class="soc-txt"><span class="soc-name">TikTok</span><span class="soc-handle">@luna3d</span></span></a>
-          <a class="soc soc-yt" href="https://youtube.com/@luna3d" target="_blank" rel="noopener" aria-label="YouTube"><span class="soc-ico">${svg('youtube')}</span><span class="soc-txt"><span class="soc-name">YouTube</span><span class="soc-handle">@luna3d</span></span></a>
-          <a class="soc soc-wa" href="${waChatURL()}" target="_blank" rel="noopener" aria-label="WhatsApp"><span class="soc-ico">${svg('whatsapp')}</span><span class="soc-txt"><span class="soc-name">WhatsApp</span><span class="soc-handle">Contáctanos por WhatsApp</span></span></a>
-        </div>
-      </section>
-
-      <!-- INFORMACIÓN LEGAL -->
       <div class="footer-bottom">
-        <div class="fb-left">
-          <span>© 2026 Estrella 3D SpA. Todos los derechos reservados.</span>
-        </div>
-        <div class="fb-legal">
-          <a href="legal.html#terminos">Términos</a><span class="dot">·</span>
-          <a href="legal.html#privacidad">Privacidad</a><span class="dot">·</span>
-          <span>v3.0.0 — Hecho en Chile 🌙</span>
-        </div>
+        <span>© 2026 Estrella 3D SpA · Luna 3D. Todos los derechos reservados.</span>
+        <span class="fb-meta"><a href="legal.html#terminos">Términos</a> · <a href="legal.html#privacidad">Privacidad</a> · Hecho en Renca, Chile <img class="fb-mark" src="${MARK()}" alt="Luna 3D"></span>
       </div>
     </div>
   </footer>`;
+
+  // --- Auto-ocultar el header al llegar al footer (modo claro y oscuro) ---
+  // Al entrar el footer en viewport (afinado con rootMargin para gatillar cuando
+  // ya ocupa parte de la pantalla), el header se desliza hacia arriba (.nav-hide).
+  const navEl=document.getElementById('nav');
+  const footEl=mount.querySelector('.footer');
+  if(navEl && footEl && 'IntersectionObserver' in window){
+    if(buildFooter._io) buildFooter._io.disconnect();
+    const navH=(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')||'74px').trim();
+    buildFooter._io=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>navEl.classList.toggle('nav-hide', e.isIntersecting));
+    },{rootMargin:`-${navH} 0px -55% 0px`, threshold:0});
+    buildFooter._io.observe(footEl);
+  }
 
   // --- Newsletter: validación elegante en vivo ---
   const form=document.getElementById('newsletter-form');
@@ -1305,15 +1314,6 @@ window.LUNA={ addToCart, add:addFromCard, changeQty, removeItem, openDrawer, clo
 
 function boot(){
   buildLoader(); initStars(); buildDaySky(); buildShootingStars(); buildFloatingActions(); buildDrawer(); buildAuth(); syncCart(); syncFavs(); initReveal();
-  // --- Cuentas (Sesion 6): restaura sesion, maneja regreso de OAuth (Google)
-  //     y re-pinta el chrome de cuenta cuando la sesion cambia. Null-safe. ---
-  if(window.LUNA_AUTH){
-    try{
-      LUNA_AUTH.onChange(()=>{ try{ syncAccountUI(); }catch(e){} });
-      Promise.resolve(LUNA_AUTH.init()).then(()=>{ try{ syncAccountUI(); }catch(e){} }).catch(()=>{});
-    }catch(e){}
-    syncAccountUI();
-  }
 }
 if(document.readyState!=='loading') boot(); else addEventListener('DOMContentLoaded',boot);
 })();
