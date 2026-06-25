@@ -3085,7 +3085,7 @@ body.light-mode .po-dot:hover:not(.active){background:rgba(11,20,55,.42);}
     repeating-linear-gradient(135deg,var(--navy-700) 0 13px,var(--navy-800) 13px 26px);
   color:var(--muted);
 }
-.media-ph-portrait{min-height:380px;height:100%;}
+.media-ph-portrait{min-height:420px;height:100%;}
 .media-ph-video{aspect-ratio:16/9;width:100%;}
 .media-ph-step{min-height:150px;margin-top:16px;padding:16px;}
 .media-ph-ico{color:var(--violet-bright);opacity:.9;}
@@ -3098,7 +3098,7 @@ body.light-mode .po-dot:hover:not(.active){background:rgba(11,20,55,.42);}
 .media-ph-sub{font-size:13px;color:var(--muted-2);max-width:320px;}
 
 /* ---------- HERO Sobre Nosotros ---------- */
-.about-hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;}
+.about-hero{display:grid;grid-template-columns:1fr 1.05fr;gap:44px;align-items:center;}
 .about-hero-text .section-title{margin:10px 0 18px;}
 .about-cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;}
 
@@ -3179,3 +3179,63 @@ a.contact-card:hover{transform:translateY(-3px);border-color:rgba(232,31,157,.45
   outline:none;border-color:var(--magenta);box-shadow:0 0 0 3px rgba(232,31,157,.18);
 }
 .cf-hp{position:absolute !important;left:-9999px;width:1px;height:1px;opacity:0;overflow:hi
+/* ════════════════════════════════════════════════════════════
+   SOBRE NOSOTROS — Reposicionamiento a tienda/catálogo (2026-06-25)
+   Aire bajo header · bloque visual +10% (video) · pilares · banda de
+   confianza · responsive del about (faltaba). Solo tokens de marca.
+   ════════════════════════════════════════════════════════════ */
+
+/* (1) Aire bajo el header: el primer bloque respeta el nav fijo. */
+.about-page > .block:first-of-type{ padding-top:calc(var(--nav-h) + 48px); }
+
+/* (2) Bloque visual del Hero en video (loop). */
+.about-hero-media video{
+  width:100%; height:100%; min-height:420px; object-fit:cover;
+  display:block; border-radius:16px; border:1px solid var(--glass-line);
+}
+
+/* Cinta de atributos bajo el Hero. */
+.hero-attrs{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;}
+.hero-attrs span{
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--silver);padding:7px 13px;border:1px solid var(--glass-line);border-radius:999px;
+  background:var(--glass);
+}
+
+/* (3) Pilares "Qué encuentras en Luna 3D". */
+.about-pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:8px;}
+.pillar-card{
+  display:flex;flex-direction:column;gap:8px;color:inherit;text-decoration:none;
+  background:var(--glass);border:1px solid var(--glass-line);border-radius:16px;padding:22px;
+  transition:transform .2s var(--ease),border-color .2s var(--ease);
+}
+.pillar-card:hover{transform:translateY(-4px);border-color:rgba(232,31,157,.45);}
+.pillar-ico{display:inline-flex;color:var(--magenta-bright);}
+.pillar-ico svg{width:30px;height:30px;}
+.pillar-card h3{font-family:var(--font-display);color:var(--star);font-size:17.5px;}
+.pillar-card p{color:var(--muted);font-size:14px;line-height:1.6;}
+
+/* (4) Banda "Compra con confianza". */
+.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:8px;}
+.trust-item{
+  display:flex;flex-direction:column;gap:10px;align-items:flex-start;
+  background:var(--glass);border:1px solid var(--glass-line);border-radius:16px;padding:22px;
+}
+.trust-ico{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:12px;
+  background:var(--grad-soft);color:var(--magenta-bright);border:1px solid var(--glass-line);}
+.trust-ico svg{width:24px;height:24px;}
+.trust-item h3{font-family:var(--font-display);color:var(--star);font-size:16px;}
+.trust-item p{color:var(--muted);font-size:13.5px;line-height:1.55;}
+
+/* (5) RESPONSIVE del about. */
+@media (max-width:900px){
+  .about-hero{grid-template-columns:1fr;gap:30px;}
+  .about-pillars,.trust-grid{grid-template-columns:repeat(2,1fr);}
+  .process-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:600px){
+  .about-page > .block:first-of-type{ padding-top:calc(var(--nav-h) + 24px); }
+  .about-pillars,.trust-grid,.process-grid{grid-template-columns:1fr;}
+  .hero-attrs span{font-size:10.5px;padding:6px 11px;}
+}
+/* ═══════════ fin SOBRE NOSOTROS 2026-06-25 ═══════════ */
