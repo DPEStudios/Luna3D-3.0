@@ -16,6 +16,12 @@
     catch (e) { return '$' + n; }
   }
 
+  var ESTADO_LABEL = {
+    pendiente: 'En validación', recibido: 'Pedido recibido', en_revision: 'En revisión',
+    en_produccion: 'En producción', listo_despacho: 'Listo para despacho',
+    enviado: 'Enviado', entregado: 'Entregado', cancelado: 'Cancelado',
+  };
+
   function gateHTML() {
     return '<div class="account-gate">'
       + '<h1 class="section-title">Mi cuenta</h1>'
@@ -63,10 +69,14 @@
       var fecha = isNaN(d.getTime()) ? '' : d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
       var items = Array.isArray(o.items) ? o.items : [];
       var resumen = items.map(function (it) { return (it.qty || 1) + '× ' + esc(it.name || 'producto'); }).join(', ');
+      var estado = ESTADO_LABEL[o.estado] || '';
+      var codigo = o.codigo ? ('<a class="oi-code" href="seguimiento.html?codigo=' + encodeURIComponent(o.codigo) + '">' + esc(o.codigo) + '</a>') : '';
       html += '<div class="order-item"><div class="oi-top">'
         + '<span class="oi-total">' + CLP(o.total) + '</span>'
         + '<span class="oi-date">' + fecha + '</span></div>'
-        + '<div class="oi-items">' + (resumen || '—') + '</div></div>';
+        + '<div class="oi-items">' + (resumen || '—') + '</div>'
+        + ((estado || codigo) ? ('<div class="oi-foot">' + (estado ? '<span class="oi-estado">' + esc(estado) + '</span>' : '<span></span>') + codigo + '</div>') : '')
+        + '</div>';
     });
     html += '</div>';
     body.innerHTML = html;

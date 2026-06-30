@@ -38,6 +38,7 @@
       cat:      row.cat,
       catName:  catName,
       subcat:   (row.subcat != null && row.subcat !== '' ? row.subcat : null),
+      sku:      (row.sku != null ? row.sku : null),
       name:     row.name,
       price:    (row.price == null ? null : Number(row.price)),
       img:      (row.img != null ? row.img : null),
@@ -141,12 +142,76 @@
     });
   }
 
+  // ---- Pedidos: alta del pedido vía RPC create_order (SECURITY DEFINER) ----
+  // SoC idéntico al newsletter: la web NUNCA toca la tabla orders; llama a la
+  // función pública create_order, que crea el pedido OCULTO ('pendiente') y
+  // devuelve el código de seguimiento. Si el cliente tiene sesión iniciada se
+  // pasa su token para ligar el pedido a su cuenta (auth.uid()). Devuelve
+  // Promise<{codigo, estado}> o rechaza (red / servidor).
+  var ENDPOINT_ORDER = SUPABASE.url + '/rest/v1/rpc/create_order';
+  function createOrder(order, accessToken) {
+    order = order || {};
+    var items = Array.isArray(order.items) ? order.items.map(function (it) {
+      return {
+        id:    it && it.id,
+        sku:   it && it.sku,
+        name:  it && it.name,
+        qty:   Math.max(1, Number(it && it.qty) || 1),
+        price: Math.max(0, Math.round(Number(it && it.price) || 0)),
+      };
+    }) : [];
+    var payload = {
+      p_items:  items,
+      p_total:  Math.max(0, Math.round(Number(order.total) || 0)),
+      p_nombre: (order.nombre != null ? String(order.nombre) : null),
+      p_comuna: (order.comuna != null ? String(order.comuna) : null),
+    };
+    var headers = { apikey: SUPABASE.publishable, 'Content-Type': 'application/json' };
+    if (accessToken) headers.Authorization = 'Bearer ' + accessToken;
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS) : null;
+    return fetch(ENDPOINT_ORDER, {
+      method: 'POST', headers: headers, body: JSON.stringify(payload),
+      signal: ctrl ? ctrl.signal : undefined,
+    }).then(function (resp) {
+      if (timer) clearTimeout(timer);
+      if (!resp.ok) throw new Error('Supabase respondió ' + resp.status);
+      return resp.json();
+    }).then(function (data) {
+      if (!data || !data.codigo) throw new Error('Respuesta inesperada de create_order');
+      return { codigo: data.codigo, estado: data.estado || 'pendiente' };
+    });
+  }
+
+  // ---- Seguimiento: consulta pública por código vía RPC track_order --------
+  // Devuelve Promise<{found, confirmado, estado, eventos, items, total, creado}>.
+  // La función del servidor garantiza que NO se exponen datos personales.
+  var ENDPOINT_TRACK = SUPABASE.url + '/rest/v1/rpc/track_order';
+  function trackOrder(codigo) {
+    var clean = String(codigo == null ? '' : codigo).trim();
+    if (!clean) return Promise.reject(new Error('Ingresa tu código de seguimiento.'));
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS) : null;
+    return fetch(ENDPOINT_TRACK, {
+      method: 'POST',
+      headers: { apikey: SUPABASE.publishable, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_codigo: clean }),
+      signal: ctrl ? ctrl.signal : undefined,
+    }).then(function (resp) {
+      if (timer) clearTimeout(timer);
+      if (!resp.ok) throw new Error('Supabase respondió ' + resp.status);
+      return resp.json();
+    }).then(function (data) { return data || { found: false }; });
+  }
+
   window.LUNA_DATA = {
     config: SUPABASE,
     mapRow: mapRow,
     getCatalog: getCatalog,
     bootstrap: bootstrap,
     subscribeNewsletter: subscribeNewsletter,
+    createOrder: createOrder,
+    trackOrder: trackOrder,
     state: function () { return _state; },
   };
 })();

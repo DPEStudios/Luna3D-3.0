@@ -27,11 +27,11 @@ const I = {
   truck:'<path d="M3 6h11v9H3zM14 9h4l3 3v3h-7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><circle cx="7" cy="18" r="1.7" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="17" cy="18" r="1.7" stroke="currentColor" stroke-width="1.6" fill="none"/>',
   spark:'<path d="M12 3l1.8 6.2L20 11l-6.2 1.8L12 19l-1.8-6.2L4 11l6.2-1.8z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>',
   cube:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M12 21V12M12 12l8-4.5M12 12L4 7.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/>',
-  instagram:'<rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor"/>',
-  facebook:'<path d="M14 8h3V4h-3c-3 0-5 2-5 5v3H6v4h3v6h4v-6h3l1-4h-4V9c0-.6.4-1 1-1z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>',
-  whatsapp:'<path d="M4 20l1.4-4.2A7.5 7.5 0 1 1 8.2 18.6L4 20z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M9.2 9c-.2 1 .3 2.3 1.3 3.3s2.3 1.5 3.3 1.3c.5-.1.8-.7.6-1.2l-.9-1.1-1.3.5-1.4-1.4.5-1.3-1.1-.9c-.5-.2-1.1.1-1.2.6z" fill="currentColor"/>',
-  tiktok:'<path d="M14 4c.4 2.2 1.8 3.6 4 3.9v2.8c-1.5 0-2.9-.5-4-1.3v5.4a5.2 5.2 0 1 1-5.2-5.2c.3 0 .6 0 .9.1v2.9a2.4 2.4 0 1 0 1.7 2.3V4z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>',
-  youtube:'<path d="M22 12s0-3.4-.4-5c-.2-.8-.8-1.4-1.6-1.6C18.4 5 12 5 12 5s-6.4 0-8 .4c-.8.2-1.4.8-1.6 1.6C2 8.6 2 12 2 12s0 3.4.4 5c.2.8.8 1.4 1.6 1.6 1.6.4 8 .4 8 .4s6.4 0 8-.4c.8-.2 1.4-.8 1.6-1.6.4-1.6.4-5 .4-5z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M10 9l5 3-5 3z" fill="currentColor"/>',
+  instagram:'<rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4" stroke="currentColor" stroke-width="2.1" fill="none"/><circle cx="12" cy="12" r="4.9" stroke="currentColor" stroke-width="2.1" fill="none"/><circle cx="17.9" cy="6.1" r="1.5" fill="currentColor"/>',
+  facebook:'<path d="M13.9 21.7v-8.3h2.8l.45-3.3h-3.25V8c0-.95.27-1.6 1.65-1.6h1.7V3.4c-.3-.05-1.3-.14-2.5-.14-2.5 0-4.2 1.55-4.2 4.35v2.45H7.6v3.3h2.95v8.3z" fill="currentColor"/>',
+  whatsapp:'<g transform="translate(2.5,2.5) scale(0.792)"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="currentColor"/></g>',
+  tiktok:'<g><path d="M16.9 2.9c.5 2.85 2.1 4.5 4.9 4.74v3.55c-1.76 0-3.42-.6-4.9-1.64v6.7a6.25 6.25 0 1 1-6.25-6.25c.33 0 .65.02.97.07v3.62a2.87 2.87 0 1 0 2.01 2.74V2.9z" fill="#25F4EE" transform="translate(-1.15,.9)"/><path d="M16.9 2.9c.5 2.85 2.1 4.5 4.9 4.74v3.55c-1.76 0-3.42-.6-4.9-1.64v6.7a6.25 6.25 0 1 1-6.25-6.25c.33 0 .65.02.97.07v3.62a2.87 2.87 0 1 0 2.01 2.74V2.9z" fill="#FE2C55" transform="translate(1.15,-.7)"/><path d="M16.9 2.9c.5 2.85 2.1 4.5 4.9 4.74v3.55c-1.76 0-3.42-.6-4.9-1.64v6.7a6.25 6.25 0 1 1-6.25-6.25c.33 0 .65.02.97.07v3.62a2.87 2.87 0 1 0 2.01 2.74V2.9z" fill="#fff"/></g>',
+  youtube:'<path d="M22.2 8.05c-.24-1.8-1-2.52-2.74-2.72C17.3 5.05 12 5.05 12 5.05s-5.3 0-7.46.28C2.8 5.53 2.04 6.25 1.8 8.05 1.55 9.85 1.55 12 1.55 12s0 2.15.25 3.95c.24 1.8 1 2.52 2.74 2.72 2.16.28 7.46.28 7.46.28s5.3 0 7.46-.28c1.74-.2 2.5-.92 2.74-2.72.25-1.8.25-3.95.25-3.95s0-2.15-.25-3.95z" fill="currentColor"/><path d="M9.75 15.7V8.3l6.5 3.7z" fill="#FF0000"/>',
   arrowUp:'<path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   filter:'<path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
   refresh:'<path d="M4 9a8 8 0 0 1 13.7-3.7L20 7M20 7V3M20 7h-4M20 15a8 8 0 0 1-13.7 3.7L4 17M4 17v4M4 17h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -266,21 +266,20 @@ function waChatURL(){ return `https://wa.me/${WHATSAPP_NUMERO}`; }
 
 /* PURE: arma la URL wa.me del pedido desde el carrito y total. No toca el DOM.
    Salta ítems sin precio (defensa: no deberían existir en el carrito). */
-function buildWhatsappOrder(cart, total){
+function buildWhatsappOrder(cart, total, codigo){
   const lineas = (cart || [])
     .filter(it => it && it.price != null && !Number.isNaN(it.price))
     .map(it => `• ${it.qty}× ${it.name} — ${CLP(it.price * it.qty)}`);
-  const texto = [
+  const filas = [
     '¡Hola Luna 3D! Quiero hacer este pedido:',
     '',
     ...lineas,
     '',
     `Total: ${CLP(total)}`,
-    '',
-    'Para coordinar la entrega te dejo mis datos:',
-    'Nombre: ',
-    'Comuna: ',
-  ].join('\n');
+  ];
+  if(codigo){ filas.push('', `Código de seguimiento: ${codigo}`); }
+  filas.push('', 'Para coordinar la entrega te dejo mis datos:', 'Nombre: ', 'Comuna: ');
+  const texto = filas.join('\n');
   return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`;
 }
 
@@ -290,16 +289,36 @@ function checkoutWhatsapp(){
   const vendibles = getCart().filter(it => it && it.price != null && !Number.isNaN(it.price));
   if(!vendibles.length){ toast('Tu carrito está vacío'); return; }
   const total = cartTotal();
-  // Registro del pedido si hay sesion iniciada. Fire-and-forget: NUNCA bloquea
-  // ni interrumpe la venta por WhatsApp aunque falle o no haya red.
-  try{
-    const a=window.LUNA_AUTH;
-    if(a && a.getSession()){
-      a.recordOrder({ total: total, items: vendibles.map(it=>({ id: it.id, name: it.name, qty: it.qty, price: it.price })) });
-    }
-  }catch(e){ /* no romper el checkout */ }
-  try{ addNotif({ icon:'whatsapp', title:'Pedido enviado por WhatsApp', text:'Te contactaremos para coordinar la entrega y el pago.' }); }catch(e){}
-  window.open(buildWhatsappOrder(vendibles, total), '_blank', 'noopener');
+  const items = vendibles.map(it=>({ id: it.id, sku: it.sku, name: it.name, qty: it.qty, price: it.price }));
+
+  // Abrimos la pestaña de WhatsApp YA (dentro del gesto del clic) para que el
+  // bloqueador de pop-ups no la frene; luego la redirigimos con el código.
+  let win = null;
+  try{ win = window.open('', '_blank'); }catch(e){ win = null; }
+  const abrir = (codigo)=>{
+    const url = buildWhatsappOrder(vendibles, total, codigo);
+    if(win && !win.closed){ try{ win.location.href = url; return; }catch(e){} }
+    window.open(url, '_blank', 'noopener');
+  };
+  const avisar = (codigo)=>{
+    try{ addNotif({ icon:'whatsapp', title:'Pedido enviado por WhatsApp',
+      text: codigo ? ('Tu código de seguimiento: '+codigo+'. Guárdalo para ver el avance en "Seguimiento".')
+                   : 'Te contactaremos para coordinar la entrega y el pago.' }); }catch(e){}
+    if(codigo){ try{ toast('Tu código de seguimiento: '+codigo); }catch(e){} }
+  };
+
+  // Modelo HÍBRIDO: la web crea el pedido OCULTO ('pendiente'); Daniel lo
+  // confirma para que aparezca en el seguimiento. Tolerante a fallos: si la
+  // creación falla, igual abre WhatsApp (NUNCA bloquea la venta).
+  let token = null;
+  try{ const a=window.LUNA_AUTH, sx=a&&a.getSession&&a.getSession(); token=(sx&&sx.access_token)||null; }catch(e){}
+  if(window.LUNA_DATA && LUNA_DATA.createOrder){
+    LUNA_DATA.createOrder({ items: items, total: total }, token)
+      .then(res=>{ const c=res&&res.codigo; abrir(c); avisar(c); })
+      .catch(()=>{ abrir(null); avisar(null); });
+  }else{
+    abrir(null); avisar(null);
+  }
 }
 
 /* ---------- FAVORITOS (localStorage) ---------- */
@@ -520,6 +539,11 @@ function buildNav(active){
           </div>
         </div>
 
+        <button class="icon-btn" id="cart-btn" data-tooltip="Carrito" aria-label="Carrito">
+          ${svg('cart')}
+          <span class="cart-count">0</span>
+        </button>
+
         <div class="notif-wrap">
           <button class="icon-btn" id="notif-btn" data-tooltip="Notificaciones" aria-label="Notificaciones" aria-haspopup="true" aria-expanded="false">
             ${svg('bell')}
@@ -533,11 +557,6 @@ function buildNav(active){
             <div class="notif-list" id="notif-list"></div>
           </div>
         </div>
-
-        <button class="icon-btn" id="cart-btn" data-tooltip="Carrito" aria-label="Carrito">
-          ${svg('cart')}
-          <span class="cart-count">0</span>
-        </button>
         <button class="burger" id="burger" aria-label="Menú" aria-expanded="false">
           <span></span>
           <span></span>
@@ -980,7 +999,19 @@ function buildFooter(){
     <div class="wrap">
       <div class="footer-top">
         <div class="footer-brand">
-          <img src="${LOGO('color')}" alt="Luna 3D">
+          <div class="footer-brands">
+            <span class="fbrand fbrand--luna">
+              <img class="brand-logo footer-logo" src="${LOGO(themeLogoKey())}" alt="Luna 3D">
+            </span>
+            <span class="fbrand-sep" aria-hidden="true"></span>
+            <!-- Solar 3D · marca hermana B2B (próximamente). Logo real con swap de tema:
+                 solar_color.png (modo oscuro) / solar_color_day.png (modo claro). -->
+            <span class="fbrand fbrand--solar" aria-label="Solar 3D, próximamente">
+              <img class="footer-logo solar-logo solar-logo--night" src="assets/solar_color.png?v=20260625b" alt="Solar 3D">
+              <img class="footer-logo solar-logo solar-logo--day" src="assets/solar_color_day.png?v=20260625b" alt="Solar 3D">
+              <span class="fbrand-soon">Próximamente</span>
+            </span>
+          </div>
           <p>Impresión 3D diseñada y fabricada en Chile, optimizada hasta el último gramo. Cada pieza se imprime cuando la pides.</p>
         </div>
         <nav class="footer-col" aria-label="Enlaces útiles">
@@ -991,6 +1022,7 @@ function buildFooter(){
             <li><a href="legal.html#terminos">Términos y condiciones</a></li>
             <li><a href="legal.html#devoluciones">Cambios y garantía</a></li>
             <li><a href="legal.html#despacho">Despacho y envíos</a></li>
+            <li><a href="seguimiento.html">Seguimiento de pedido</a></li>
             <li><a href="legal.html#privacidad">Política de privacidad</a></li>
           </ul>
         </nav>
@@ -1250,10 +1282,17 @@ function buildFloatingActions(){
 }
 
 function buildLoader(){
+  // El loader (diseño orbital original) solo se muestra en la CARGA INICIAL real
+  // de la sesión. En navegaciones internas posteriores los assets ya están en
+  // caché → NO se muestra (evita el parpadeo en cada cambio de página). Sin el
+  // retardo forzado de 520 ms anterior: se oculta apenas la página queda lista.
+  try{ if(sessionStorage.getItem('luna_booted')) return; }catch(e){}
   if(document.getElementById('luna-loader'))return;
   const d=document.createElement('div');
   d.id='luna-loader';
   d.className='luna-loader';
+  d.setAttribute('role','status');
+  d.setAttribute('aria-label','Cargando Luna 3D');
   d.innerHTML=`
     <div class="loader-orbit">
       <span class="loader-ring"></span>
@@ -1262,8 +1301,13 @@ function buildLoader(){
     </div>
     <p class="loader-tag">Cargando el universo</p>`;
   document.body.appendChild(d);
-  const hide=()=>setTimeout(()=>d.classList.add('hide'),520);
-  if(document.readyState==='complete') hide(); else addEventListener('load',hide,{once:true});
+  const start=performance.now();
+  const done=()=>{
+    try{ sessionStorage.setItem('luna_booted','1'); }catch(e){}
+    const wait=Math.max(0,300-(performance.now()-start));
+    setTimeout(()=>{ d.classList.add('hide'); setTimeout(()=>{ if(d.parentNode) d.remove(); },650); },wait);
+  };
+  if(document.readyState==='complete') done(); else addEventListener('load',done,{once:true});
 }
 
 /* ---------- PRODUCT CARD ---------- */
