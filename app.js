@@ -557,8 +557,6 @@ function buildNav(active){
             <div class="notif-list" id="notif-list"></div>
           </div>
         </div>
-        <button class="icon-btn" id="cowork-test-btn" data-tooltip="Prueba Cowork" aria-label="Prueba Cowork" title="Prueba Cowork — quitar tras verificar deploy">🧪</button>
-
         <button class="burger" id="burger" aria-label="Menú" aria-expanded="false">
           <span></span>
           <span></span>
