@@ -7,10 +7,11 @@
 ## ⚠ Migración en curso (2026-07-01): el repo está saliendo de Google Drive
 
 Se está moviendo la copia de trabajo a una carpeta **local fuera de Drive**
-(`C:\Users\danie\Dev\Luna3D-3.0`). Antes de aplicar las reglas de abajo, fíjate
-DÓNDE estás trabajando:
+(`C:\Daniel Pardo\Estrella 3D SpA\dev\Luna3D-3.0`). Antes de aplicar las reglas
+de abajo, fíjate DÓNDE estás trabajando:
 
-- **Carpeta local `C:\Users\danie\Dev\Luna3D-3.0` (fuera de Drive):** git
+- **Carpeta local `C:\Daniel Pardo\Estrella 3D SpA\dev\Luna3D-3.0` (fuera de
+  Drive):** git
   funciona normal y no hay corrupción de mount. Las dos "Reglas no negociables"
   de más abajo (que son específicas de Google Drive) **ya no aplican**; trabaja
   con git estándar: editar → commit → push a GitHub → Vercel despliega. El guard
@@ -77,5 +78,4 @@ víctima más frecuente).
 Dejar esta carpeta y el `main` de GitHub con contenido idéntico en los
 archivos tocados. Si quedan diferencias pendientes de reconciliar (por
 ejemplo, algo que el usuario pidió pero no se alcanzó a subir), decírselo
-explícitamente a Daniel — no asumir que "ya quedó" sin haberlo verificado en
-`https://luna3d.cl`.
+explícitamente a Daniel — no asumir que "ya quedó" sin haberlo
