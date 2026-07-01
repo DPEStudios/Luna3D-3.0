@@ -1755,14 +1755,15 @@ body.light-mode .theme-switch-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(0);
+  --knob-x: 0px;
+  transform: translateX(var(--knob-x));
   transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color 1.8s, box-shadow 1.8s;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
 }
 body.light-mode .tst-knob {
   background: #FFFDF4;
-  transform: translateX(38px);
+  --knob-x: 38px;
   box-shadow: 0 3px 8px rgba(11, 20, 55, 0.15);
   transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color 2.6s, box-shadow 2.6s;
 }
@@ -1817,7 +1818,7 @@ body.light-mode .tst-icon-sun {
     height: 24px;
   }
   body.light-mode .tst-knob {
-    transform: translateX(32px);
+    --knob-x: 32px;
   }
   .tst-icon {
     width: 13px;
@@ -2998,19 +2999,21 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
 .btn-fav svg path{fill:currentColor;fill-opacity:0;transition:fill-opacity .3s var(--ease);}
 .btn-fav:hover svg path{fill-opacity:1;}
 
-/* --- Cambiar apariencia: aro de color animado (magenta/púrpura de marca) al pasar el mouse --- */
-@keyframes fx-theme-glow{
-  0%,100%{box-shadow:0 0 0 3px rgba(232,31,157,.18),0 0 16px rgba(232,31,157,.35);}
-  50%{box-shadow:0 0 0 3px rgba(155,39,224,.18),0 0 16px rgba(155,39,224,.35);}
+/* --- Cambiar apariencia: la bola (luna/sol) se ilumina en rosado y insinúa que se desliza --- */
+@keyframes fx-knob-slide{
+  0%,100%{transform:translateX(var(--knob-x));}
+  50%{transform:translateX(calc(var(--knob-x) + 4px));}
 }
-.theme-switch-toggle:hover{border-color:var(--magenta);animation:fx-theme-glow 1.6s var(--ease) infinite;}
-.theme-switch-toggle:hover .tst-knob{box-shadow:0 3px 8px rgba(0,0,0,.35),0 0 10px rgba(232,31,157,.55);}
+.theme-switch-toggle:hover .tst-knob{
+  background:var(--magenta-bright);
+  box-shadow:0 3px 8px rgba(0,0,0,.35),0 0 12px rgba(247,47,184,.7);
+  animation:fx-knob-slide 1.1s var(--ease) infinite;
+}
 
-/* --- Hamburguesa: onda de apilado (distinta a la elevación de los demás botones) --- */
+/* --- Hamburguesa: despliegue sutil de las 3 líneas hacia arriba/abajo + color rosado --- */
 .burger:hover:not(.active) span{background:var(--magenta-bright);}
-.burger:hover:not(.active) span:nth-child(1){transform:translateX(-3px);}
-.burger:hover:not(.active) span:nth-child(2){transform:translateX(3px);}
-.burger:hover:not(.active) span:nth-child(3){transform:translateX(-3px);}
+.burger:hover:not(.active) span:nth-child(1){transform:translateY(-3px);}
+.burger:hover:not(.active) span:nth-child(3){transform:translateY(3px);}
 
 /* --- Movimiento reducido: desactiva los efectos de esta capa --- */
 @media (prefers-reduced-motion: reduce){
@@ -3022,7 +3025,7 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
   .pop-loading::before,.is-loading::after{animation:none !important;}
   [data-tooltip]::after,[data-tooltip]::before{transition:none !important;}
   .btn-fav:hover svg path{transition:none !important;}
-  .theme-switch-toggle:hover{animation:none !important;box-shadow:none !important;}
+  .theme-switch-toggle:hover .tst-knob{animation:none !important;box-shadow:0 3px 8px rgba(0,0,0,.35) !important;}
   .burger:hover:not(.active) span{transform:none !important;}
 }
 
