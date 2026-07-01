@@ -11,11 +11,46 @@ Se está moviendo la copia de trabajo a una carpeta **local fuera de Drive**
 de abajo, fíjate DÓNDE estás trabajando:
 
 - **Carpeta local `C:\Daniel_Pardo\Estrella_3D_SpA\dev\Luna3D-3.0` (fuera de
-  Drive):** git
-  funciona normal y no hay corrupción de mount. Las dos "Reglas no negociables"
-  de más abajo (que son específicas de Google Drive) **ya no aplican**; trabaja
-  con git estándar: editar → commit → push a GitHub → Vercel despliega. El guard
-  `_tools/verificar_integridad.py` queda como red de seguridad opcional.
+  Drive):** git funciona normal en general (el `origin` sí es el repo real de
+  GitHub). Las dos "Reglas no negociables" de más abajo, que se escribieron
+  pensando solo en Google Drive, **siguen aplicando igual acá** — ver el
+  aviso `⚠ 2026-07-01 (sesión Cowork)` justo abajo: se confirmó que la
+  corrupción de archivos y los locks de git pegados también ocurren en esta
+  carpeta cuando se opera desde el puente bash de Cowork, aunque no cuando
+  Daniel corre git directo en su PowerShell. El guard
+  `_tools/verificar_integridad.py` sigue siendo obligatorio, no opcional.
+
+### ⚠ 2026-07-01 (sesión Cowork): la corrupción NO era exclusiva de Google Drive
+
+Se probó el flujo completo (editar `app.js`, commit, push, verificar en
+luna3d.cl, revertir) desde esta carpeta ya migrada, operando vía el puente
+bash de una sesión de Cowork. Resultado: **la misma corrupción documentada
+para el mount de Drive ocurrió acá también, dos veces en una sesión**:
+
+1. Un `sed -i` sobre `app.js` (para normalizar CRLF→LF) lo truncó a mitad de
+   archivo — mismo patrón de "prefijo cortado" ya descrito abajo.
+2. Un `Edit` que achicaba el archivo (quitar el botón de prueba) dejó el
+   contenido correcto pero con una cola de bytes `\x00` rellenando hasta el
+   tamaño anterior — mismo patrón de "cola de nulos" ya descrito abajo.
+
+Además, `git add`/`commit`/`push` desde ese mismo puente bash chocan
+repetidamente con locks pegados (`.git/index.lock`, `.git/HEAD.lock`,
+`.git/refs/remotes/origin/*.lock`) que no se pueden borrar con `rm`
+("Operation not permitted") — se destraban renombrándolos (`mv` a otro
+nombre, no `rm`) y con `GIT_INDEX_FILE` apuntando fuera del mount para el
+`add`. Se confirmó con Daniel, en paralelo, que el mismo `git add` corriendo
+en su PowerShell nativo (sin pasar por Cowork) funciona sin ningún problema
+— o sea, el origen del problema es el puente de la sesión de Cowork hacia
+esta carpeta, no el repo ni la carpeta en sí.
+
+**Conclusión operativa:** sacar el repo de Google Drive NO elimina el riesgo
+de corrupción mientras se edite vía una sesión de Cowork/agente. Toda sesión
+futura que edite archivos en esta carpeta (venga o no de Drive) debe:
+verificar tamaño/hash del archivo contra el blob de git ANTES de hacer
+`git add`, evitar `sed -i`/reescrituras in-place de archivos grandes vía
+bash, y correr `git fsck --full` + revisar bytes nulos antes de cualquier
+`push`. Si algo falla o se ve raro, es más seguro pedirle a Daniel que corra
+el `git add`/`commit`/`push` final desde su propia terminal.
 - **Carpeta dentro de Google Drive (`...\AI\...\Web_Luna3D_v3`):** la migración
   no se ha completado o estás en la copia vieja. Aplican TODAS las reglas de
   abajo. Corre `MIGRAR_Luna3D_fuera_de_Drive.bat` y pásate a la carpeta local.
