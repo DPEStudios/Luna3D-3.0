@@ -80,8 +80,13 @@
       </div>
     </div>
     <div class="pd-info">
-      <span class="pd-cat">${p.catName}</span>
-      <h1>${p.name}</h1>
+      <div class="pd-title-row">
+        <div class="pd-title-col">
+          <span class="pd-cat">${p.catName}</span>
+          <h1>${p.name}</h1>
+        </div>
+        <button class="pd-fav ${LUNA.isFav(p.id)?'on':''}" id="pd-fav-btn" type="button" aria-label="Favorito" aria-pressed="${LUNA.isFav(p.id)}">${LUNA.svg(LUNA.isFav(p.id)?'heartFill':'heart')}</button>
+      </div>
       ${ratingHtml}
       ${priceHtml}
       <p class="pd-desc">${p.desc || PROD_DESC}</p>
@@ -131,6 +136,9 @@
 
   const addBtn=document.getElementById('add-btn');
   if(addBtn && hasPrice) addBtn.onclick=()=>{ LUNA.addToCart(p.id); if(qty>1) LUNA.changeQty(p.id,qty-1); LUNA.openDrawer(); };
+
+  const favBtn=document.getElementById('pd-fav-btn');
+  if(favBtn) favBtn.onclick=()=>LUNA.toggleFav(p.id,favBtn);
 
   // related
   const rel=PRODUCTS.filter(x=>x.cat===p.cat&&x.id!==p.id).concat(PRODUCTS.filter(x=>x.cat!==p.cat)).slice(0,10);

@@ -28,6 +28,44 @@ dispara un despliegue de producción automático.** No hay que tocar el panel.
 > y empujar desde ahí; la historia completa también se respalda en
 > `Respaldo_Git/luna3d_main.bundle`. Ver la sección "Control de versiones" del `README.md`.
 
+### Protocolo obligatorio antes de subir cualquier cambio (desde 2026-07-01)
+
+**Motivo:** el 2026-07-01 un despliegue revirtió el fix del tamaño del badge del
+carrito porque se clonó GitHub como base y esa corrección solo existía en la
+carpeta `Web_Luna3D_v3` montada, nunca se había subido. Carpeta local y GitHub
+pueden desincronizarse en cualquier dirección sin avisar, porque cada sesión
+de Claude edita la carpeta montada directamente y el `git` de esa carpeta
+apunta a un bundle local, no al repo real. Para que no vuelva a pasar, **toda
+sesión que vaya a desplegar a producción debe seguir estos pasos, sin
+excepción:**
+
+1. **Clonar limpio** el repo real (`https://github.com/DPEStudios/Luna3D-3.0`,
+   usando el token en `.claude-secrets/github-pat`) en un disco temporal de la
+   sesión (no en la carpeta montada).
+2. **Diferenciar** ese clon contra la carpeta `Web_Luna3D_v3` montada
+   (`diff -rq`, excluyendo `.git`, `.vercel`, `.claude-secrets`, backups
+   `*.bak*`, carpetas de borradores/papelera). Esto muestra TODO lo que
+   difiere en las dos direcciones, no solo lo que se planea cambiar.
+3. Si aparecen diferencias que no son del cambio actual (como pasó con el
+   badge del carrito o el CSS de Nosotros), **no ignorarlas**: hay que
+   entender de qué se trata cada una (¿es un fix pendiente de subir? ¿es
+   contenido que la carpeta local perdió?) y decidir explícitamente cómo se
+   fusionan, en vez de simplemente sobrescribir un lado con el otro.
+4. Aplicar el cambio nuevo sobre esa base ya reconciliada.
+5. Commit + push a `main`.
+6. **Verificar en la URL real** (`https://luna3d.cl`, no solo el estado de
+   Vercel) que el cambio esperado esté presente y que nada se haya perdido.
+7. **Copiar el resultado final de producción de vuelta a la carpeta montada**
+   (styles.css, .html afectados, etc.), respaldando antes la versión anterior
+   en `_Papelera/` (skill `papelera-segura`), para que ambas copias queden
+   idénticas al cerrar la sesión.
+
+Saltarse el paso 2 (diferenciar antes de tocar nada) es la causa raíz del
+incidente del 2026-07-01. Este protocolo es manual — no hay CI/CD que lo haga
+solo — porque git no puede vivir de forma confiable dentro de la carpeta
+montada en Google Drive. Si en el futuro se resuelve esa limitación técnica,
+este protocolo debería reemplazarse por un pipeline automático.
+
 ## Configuración relevante
 
 - **`vercel.json`**: `framework: null`, `buildCommand: ""`, `outputDirectory: "."`,
