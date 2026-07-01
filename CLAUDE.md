@@ -7,10 +7,10 @@
 ## ⚠ Migración en curso (2026-07-01): el repo está saliendo de Google Drive
 
 Se está moviendo la copia de trabajo a una carpeta **local fuera de Drive**
-(`C:\Daniel Pardo\Estrella 3D SpA\dev\Luna3D-3.0`). Antes de aplicar las reglas
+(`C:\Daniel_Pardo\Estrella_3D_SpA\dev\Luna3D-3.0`). Antes de aplicar las reglas
 de abajo, fíjate DÓNDE estás trabajando:
 
-- **Carpeta local `C:\Daniel Pardo\Estrella 3D SpA\dev\Luna3D-3.0` (fuera de
+- **Carpeta local `C:\Daniel_Pardo\Estrella_3D_SpA\dev\Luna3D-3.0` (fuera de
   Drive):** git
   funciona normal y no hay corrupción de mount. Las dos "Reglas no negociables"
   de más abajo (que son específicas de Google Drive) **ya no aplican**; trabaja
