@@ -1769,9 +1769,7 @@ body.light-mode .theme-switch-toggle {
   align-items: center;
   justify-content: center;
   --knob-x: 0px;
-  --knob-hover: 0px;
-  transform: translateX(calc(var(--knob-x) + var(--knob-hover)));
-  /* Misma velocidad que el cambio de color de la página (1.8s al oscurecer) */
+  transform: translateX(var(--knob-x));
   transition: transform 1.8s var(--ease-theme), background-color .35s ease, box-shadow .35s ease;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
@@ -1780,8 +1778,17 @@ body.light-mode .tst-knob {
   background: #FFFDF4;
   --knob-x: 38px;
   box-shadow: 0 3px 8px rgba(11, 20, 55, 0.15);
-  /* Misma velocidad que el cambio de color de la página (2.6s al aclarar) */
   transition: transform 2.6s var(--ease-theme), background-color .35s ease, box-shadow .35s ease;
+}
+/* Durante el toggle de tema, la regla global de abajo (.theme-transitioning *)
+   fuerza transition-property con !important y NO incluye "transform" — sin
+   esto el círculo se "teletransporta" en vez de deslizarse. Esta regla,
+   por ser más específica, gana y deja pasar el deslizamiento a la misma
+   velocidad (1s) que el resto de los colores de la página durante el toggle. */
+body.theme-transitioning .tst-knob{
+  transition-property: transform, background-color, box-shadow !important;
+  transition-duration: 1s !important;
+  transition-timing-function: var(--ease-theme) !important;
 }
 .tst-icon {
   position: absolute;
@@ -3022,14 +3029,24 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
 .theme-switch-toggle:hover .tst-icon-sun{
   color:var(--magenta-bright);
 }
+@keyframes tst-knob-peek-right{
+  0%{transform:translateX(var(--knob-x));}
+  40%{transform:translateX(calc(var(--knob-x) + 6px));}
+  100%{transform:translateX(var(--knob-x));}
+}
+@keyframes tst-knob-peek-left{
+  0%{transform:translateX(var(--knob-x));}
+  40%{transform:translateX(calc(var(--knob-x) - 6px));}
+  100%{transform:translateX(var(--knob-x));}
+}
 .theme-switch-toggle:hover .tst-knob{
-  --knob-hover: 6px;
+  animation: tst-knob-peek-right .7s var(--ease-theme);
 }
 body.light-mode .theme-switch-toggle:hover .tst-knob{
-  --knob-hover: -6px;
+  animation: tst-knob-peek-left .7s var(--ease-theme);
 }
 @media (prefers-reduced-motion: reduce){
-  .theme-switch-toggle:hover .tst-knob{ --knob-hover: 0px; }
+  .theme-switch-toggle:hover .tst-knob{ animation:none; }
 }
 
 /* --- Hamburguesa: despliegue sutil de las 3 líneas hacia arriba/abajo + color rosado --- */
