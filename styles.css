@@ -1769,8 +1769,10 @@ body.light-mode .theme-switch-toggle {
   align-items: center;
   justify-content: center;
   --knob-x: 0px;
-  transform: translateX(var(--knob-x));
-  transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color .35s ease, box-shadow .35s ease;
+  --knob-hover: 0px;
+  transform: translateX(calc(var(--knob-x) + var(--knob-hover)));
+  /* Misma velocidad que el cambio de color de la página (1.8s al oscurecer) */
+  transition: transform 1.8s var(--ease-theme), background-color .35s ease, box-shadow .35s ease;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
 }
@@ -1778,7 +1780,8 @@ body.light-mode .tst-knob {
   background: #FFFDF4;
   --knob-x: 38px;
   box-shadow: 0 3px 8px rgba(11, 20, 55, 0.15);
-  transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color .35s ease, box-shadow .35s ease;
+  /* Misma velocidad que el cambio de color de la página (2.6s al aclarar) */
+  transition: transform 2.6s var(--ease-theme), background-color .35s ease, box-shadow .35s ease;
 }
 .tst-icon {
   position: absolute;
@@ -3012,11 +3015,21 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
 .btn-fav svg path{fill:currentColor;fill-opacity:0;transition:fill-opacity .3s var(--ease);}
 .btn-fav:hover svg path{fill-opacity:1;}
 
-/* --- Cambiar apariencia: sin movimiento, solo el ícono luna/sol (no el
-   círculo) cambia a rosado al pasar el mouse --- */
+/* --- Cambiar apariencia: al pasar el mouse el círculo se desliza un poco
+   (de noche hacia la derecha, de día hacia la izquierda) y vuelve, siempre
+   lento y suave; y el ícono luna/sol cambia a rosado --- */
 .theme-switch-toggle:hover .tst-icon-moon,
 .theme-switch-toggle:hover .tst-icon-sun{
   color:var(--magenta-bright);
+}
+.theme-switch-toggle:hover .tst-knob{
+  --knob-hover: 6px;
+}
+body.light-mode .theme-switch-toggle:hover .tst-knob{
+  --knob-hover: -6px;
+}
+@media (prefers-reduced-motion: reduce){
+  .theme-switch-toggle:hover .tst-knob{ --knob-hover: 0px; }
 }
 
 /* --- Hamburguesa: despliegue sutil de las 3 líneas hacia arriba/abajo + color rosado --- */
