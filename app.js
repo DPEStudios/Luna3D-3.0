@@ -728,18 +728,31 @@ function buildNav(active){
     }
   }
 
+  // Activa una transición de color suave en toda la página solo durante el
+  // instante del cambio de tema (evita el "salto" de color), y la retira después
+  // para no afectar el resto de las transiciones/hover del sitio.
+  let themeTransitionTimeout = null;
+  function setThemeAnimated(theme) {
+    document.body.classList.add('theme-transitioning');
+    clearTimeout(themeTransitionTimeout);
+    themeTransitionTimeout = setTimeout(() => {
+      document.body.classList.remove('theme-transitioning');
+    }, 1050);
+    setTheme(theme);
+  }
+
   // Bind click event for both switches
   if (headerToggle) {
     headerToggle.onclick = () => {
       const activeTheme = localStorage.getItem('luna_theme') || 'dark';
-      setTheme(activeTheme === 'light' ? 'dark' : 'light');
+      setThemeAnimated(activeTheme === 'light' ? 'dark' : 'light');
     };
   }
 
   if (sidebarToggle) {
     sidebarToggle.onclick = () => {
       const activeTheme = localStorage.getItem('luna_theme') || 'dark';
-      setTheme(activeTheme === 'light' ? 'dark' : 'light');
+      setThemeAnimated(activeTheme === 'light' ? 'dark' : 'light');
     };
   }
 
