@@ -733,6 +733,15 @@ function buildNav(active){
   // para no afectar el resto de las transiciones/hover del sitio.
   let themeTransitionTimeout = null;
   function setThemeAnimated(theme) {
+    // El hover del botón dispara una animación CSS (el "peek" del círculo).
+    // Si el clic ocurre mientras esa animación sigue corriendo (lo normal,
+    // porque hay que estar encima del botón para hacer clic), la animación
+    // sigue controlando el transform y bloquea la transición de deslizamiento,
+    // haciendo que el círculo "teletransporte" en vez de deslizarse. Se cancela
+    // acá para devolverle el control al transition antes de cambiar de clase.
+    document.querySelectorAll('.tst-knob').forEach(knob => {
+      knob.getAnimations().forEach(anim => anim.cancel());
+    });
     document.body.classList.add('theme-transitioning');
     clearTimeout(themeTransitionTimeout);
     themeTransitionTimeout = setTimeout(() => {
