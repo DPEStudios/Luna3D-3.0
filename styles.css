@@ -3012,12 +3012,8 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
 .btn-fav svg path{fill:currentColor;fill-opacity:0;transition:fill-opacity .3s var(--ease);}
 .btn-fav:hover svg path{fill-opacity:1;}
 
-/* --- Cambiar apariencia: sin movimiento, solo resalte de color en rosado
-   (la bola y el ícono luna/sol) al pasar el mouse --- */
-.theme-switch-toggle:hover .tst-knob{
-  background:var(--magenta-bright);
-  box-shadow:0 3px 8px rgba(0,0,0,.35),0 0 10px rgba(247,47,184,.55);
-}
+/* --- Cambiar apariencia: sin movimiento, solo el ícono luna/sol (no el
+   círculo) cambia a rosado al pasar el mouse --- */
 .theme-switch-toggle:hover .tst-icon-moon,
 .theme-switch-toggle:hover .tst-icon-sun{
   color:var(--magenta-bright);
@@ -3038,7 +3034,6 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
   .pop-loading::before,.is-loading::after{animation:none !important;}
   [data-tooltip]::after,[data-tooltip]::before{transition:none !important;}
   .btn-fav:hover svg path{transition:none !important;}
-  .theme-switch-toggle:hover .tst-knob{box-shadow:0 3px 8px rgba(0,0,0,.35) !important;}
   .burger:hover:not(.active) span{transform:none !important;}
 }
 
