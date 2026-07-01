@@ -3047,10 +3047,14 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
   40%{transform:translateX(calc(var(--knob-x) - 6px));}
   100%{transform:translateX(var(--knob-x));}
 }
-.theme-switch-toggle:hover .tst-knob{
+/* :where() para que estas dos reglas tengan especificidad casi nula: así la
+   regla body.theme-transitioning .tst-knob (más abajo) siempre puede
+   desactivar esta animación durante el cambio de tema, sin importar el
+   orden en el archivo. */
+:where(.theme-switch-toggle:hover) .tst-knob{
   animation: tst-knob-peek-right .7s var(--ease-theme);
 }
-body.light-mode .theme-switch-toggle:hover .tst-knob{
+:where(body.light-mode .theme-switch-toggle:hover) .tst-knob{
   animation: tst-knob-peek-left .7s var(--ease-theme);
 }
 @media (prefers-reduced-motion: reduce){
