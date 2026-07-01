@@ -13,6 +13,7 @@
   /* Aurora Lunar */
   --magenta:#E81F9D;
   --magenta-bright:#F72FB8;
+  --magenta-deep:#C4179E; /* rosado sólido más saturado: contraste AA con blanco en badges pequeños */
   --violet:#9B27E0;
   --violet-bright:#B12CD9;
   /* Aurora Lunar oficial (Manual v1.1): 2 paradas E81F9D -> 9B27E0 */
@@ -157,9 +158,9 @@ input,textarea,select{font-family:inherit;}
 .fav-pop-all{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--star);font-weight:700;}
 .fav-pop-all svg{width:15px;height:15px;}
 .cart-count{
-  position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
-  background:var(--grad);color:#fff;font-family:var(--font-mono);font-size:10px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;line-height:1;
+  position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:var(--magenta-deep);color:#fff;font-family:var(--font-mono);font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;line-height:1;border:2px solid var(--navy-900);
   transform:scale(0);transition:transform .25s var(--ease);
 }
 .cart-count.show{transform:scale(1);}
@@ -2867,10 +2868,11 @@ body.light-mode .notif-readall{color:#B81E86;}
 body.light-mode .notif-readall:hover{background:rgba(232,31,157,.12);}
 /* Badges y CTAs: degradado saturado (no pastel) para asegurar contraste sobre claro */
 body.light-mode .pop-cta,
-body.light-mode .action-badge,body.light-mode .cart-count,body.light-mode .sb-badge{
+body.light-mode .action-badge,body.light-mode .sb-badge{
   background:linear-gradient(125deg,#E81F9D 0%,#9B27E0 100%);color:#fff;
 }
 body.light-mode .action-badge{border-color:#EAF2FA;}
+body.light-mode .cart-count{background:var(--magenta-deep);border-color:#EAF2FA;}
 
 /* ============================================================
    MICROINTERACCIONES PREMIUM — capa de pulido (2026-06-22)
