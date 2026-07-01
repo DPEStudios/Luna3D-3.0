@@ -1786,6 +1786,14 @@ body.light-mode .tst-knob {
    por ser más específica, gana y deja pasar el deslizamiento a la misma
    velocidad (1s) que el resto de los colores de la página durante el toggle. */
 body.theme-transitioning .tst-knob{
+  /* Bloquea la animación de "peek" del hover mientras dura el cambio de
+     tema — si no, al seguir con el mouse encima del botón (lo normal, hay
+     que estar encima para hacer clic) el :hover vuelve a disparar la
+     animación apenas se cancela la anterior, y esa animación nueva arranca
+     directo en la posición final en vez de interpolar, viéndose igual de
+     "teletransportada". Con animation:none la transición de abajo queda
+     como única dueña del transform durante todo el cambio de tema. */
+  animation: none !important;
   transition-property: transform, background-color, box-shadow !important;
   transition-duration: 1s !important;
   transition-timing-function: var(--ease-theme) !important;
