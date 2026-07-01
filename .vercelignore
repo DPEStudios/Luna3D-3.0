@@ -39,3 +39,6 @@ assets/promo-offer-poster.png
 # Activos pesados no referenciados por el sitio (solo los usa preview/, que no se despliega)
 Imágenes/boceto.png
 assets/logo_color - simbolo luna.png
+
+# Guard de integridad (script interno, no es parte del sitio)
+_tools/

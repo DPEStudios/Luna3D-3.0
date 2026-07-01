@@ -66,6 +66,100 @@ solo — porque git no puede vivir de forma confiable dentro de la carpeta
 montada en Google Drive. Si en el futuro se resuelve esa limitación técnica,
 este protocolo debería reemplazarse por un pipeline automático.
 
+## Corrupción binaria de archivos en el mount (Google Drive) — 2026-07-01
+
+> Esto es DISTINTO de la desincronización de contenido de la sección anterior.
+> Acá el archivo queda **dañado en el disco** (bytes), no solo desactualizado.
+
+### Qué pasa
+
+Editar un archivo directamente sobre la carpeta montada en Google Drive con las
+herramientas de edición (Read/Edit/Write reescriben el archivo completo, no un
+parche) puede dañarlo. Se documentaron dos firmas reales, confirmadas byte a
+byte contra las copias guardadas en `_Papelera/2026-07-01_*`:
+
+1. **Truncamiento.** El archivo corrupto es un **prefijo exacto** del bueno,
+   cortado a mitad de token, con **cero bytes nulos**. La escritura produjo un
+   comienzo correcto y se detuvo. Ej. (incidente 11:17): `styles.css` terminó en
+   `…repeat(2,1fr);}\n  .pr` y `app.js` en `…els.forEac`; ambos prefijos exactos
+   de la versión buena.
+2. **Cola de bytes nulos.** El contenido correcto queda **completo** (byte
+   idéntico al bueno) y se le agrega un bloque contiguo de `\x00` al final,
+   inflando el tamaño por encima del contenido real. Ej. (11:45 y 12:10):
+   `styles.css` real = 163 559 B (idéntico al bueno) + 578 y 241 nulos de cola.
+
+### Dos aclaraciones importantes (correcciones al diagnóstico previo)
+
+- El "punto de corte de siempre" que las sesiones citaban
+  (`fin SOBRE NOSOTROS 2026-06-25`) **NO es un truncamiento: es el final normal
+  de `styles.css`.** Se leyó el fin natural del archivo como si fuera daño.
+- El lote de las 10:40 (`product.js`, `producto.html`, `DEPLOY_Vercel.md`) **no
+  estaba truncado** en las copias guardadas — están completos (`DEPLOY_Vercel.md`
+  es idéntico al bueno). Eso fue en realidad **desincronización local-vs-GitHub**
+  (el problema de la sección anterior) mal leída como corrupción binaria.
+
+### Causa raíz
+
+Carrera entre la escritura del archivo y el **cliente de sincronización de
+Google Drive para Escritorio**, que presenta los archivos a través de un sistema
+de archivos virtual. La herramienta reescribe el archivo entero (≈160 KB =
+muchos bloques) mientras Drive intercepta el mismo archivo para subirlo. Si Drive
+gana la carrera antes de que termine la escritura → **truncamiento**; si el
+tamaño y los datos se desincronizan → **cola de nulos**. A mayor tamaño de
+archivo, mayor ventana de carrera: `styles.css` (el más grande) es 4 de 5
+incidentes. **No** depende del contenido, **no** es GitHub/Vercel, **no** es
+(principalmente) el antivirus. El workaround de editar en `/tmp` (disco local
+real, sin cliente de sync compitiendo) nunca se corrompió — esa es la prueba.
+
+### Guard de integridad (automático): `_tools/verificar_integridad.py`
+
+Herramienta sin dependencias que detecta y previene ambas firmas:
+
+```bash
+# Escanear TODO el repo en busca de bytes nulos (corrupción tipo 2).
+python3 _tools/verificar_integridad.py scan .
+
+# Copiar al mount con verificación sha256 + reintento (usar en vez de cp).
+python3 _tools/verificar_integridad.py safecopy <origen_fuera_del_mount> <destino_en_mount>
+
+# Verificar que un destino ya copiado sea byte-idéntico al origen.
+python3 _tools/verificar_integridad.py verify <origen> <destino>
+```
+
+Cualquiera de los tres sale con **código 1** si detecta corrupción. Regla:
+**si `scan`/`verify`/`safecopy` fallan, NO hacer `git push` ni desplegar.**
+
+### Protocolo de escritura blindado (mientras el repo siga en Drive)
+
+1. Nunca editar archivos grandes (`styles.css`, `app.js`, HTML) in-place sobre
+   el mount. Editar sobre un clon FUERA del mount (`/tmp` del sandbox u
+   `outputs/`).
+2. Traer cada archivo de vuelta con `safecopy` (verifica e reintenta).
+3. Al terminar, correr `scan .` y confirmar **0 corruptos** antes de cerrar.
+4. Este guard es complementario al "Protocolo obligatorio antes de subir" de
+   arriba (que resuelve la desincronización de contenido); ambos se aplican.
+
+### Solución de fondo recomendada: sacar el repo de Google Drive
+
+Aprobada por Daniel el 2026-07-01. GitHub + Vercel ya son la fuente de la
+verdad, así que el mount de Drive agrega riesgo de corrupción sin aportar
+respaldo. Migración de una sola vez, en el PC de Daniel:
+
+1. Clonar el repo real en una ruta local **fuera** de Google Drive, p. ej.
+   `C:\Users\danie\Dev\Luna3D-3.0` (NO bajo `…\AI\01_Estrella3D\…` si esa raíz
+   está sincronizada por Drive):
+   `git clone https://github.com/DPEStudios/Luna3D-3.0.git`
+2. En Cowork, **seleccionar esa carpeta local** como carpeta de trabajo (en vez
+   de `Web_Luna3D_v3` de Drive).
+3. Trabajar ahí con git normal (`origin` = GitHub real, push directo dispara el
+   deploy de Vercel). Desaparece la corrupción y también la desincronización.
+4. La carpeta `Web_Luna3D_v3` de Drive queda solo como archivo/referencia
+   histórico (no volver a editar código en ella).
+
+Hasta que se complete esa migración, el guard y el protocolo blindado de arriba
+son obligatorios en cada sesión.
+
+
 ## Configuración relevante
 
 - **`vercel.json`**: `framework: null`, `buildCommand: ""`, `outputDirectory: "."`,
