@@ -1769,18 +1769,16 @@ body.light-mode .theme-switch-toggle {
   align-items: center;
   justify-content: center;
   --knob-x: 0px;
-  --knob-hover-x: 6px; /* modo oscuro: al hover se desliza levemente a la derecha */
   transform: translateX(var(--knob-x));
-  transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color 1.8s, box-shadow 1.8s;
+  transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color .35s ease, box-shadow .35s ease;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
 }
 body.light-mode .tst-knob {
   background: #FFFDF4;
   --knob-x: 38px;
-  --knob-hover-x: -6px; /* modo claro: al hover se desliza levemente a la izquierda */
   box-shadow: 0 3px 8px rgba(11, 20, 55, 0.15);
-  transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color 2.6s, box-shadow 2.6s;
+  transition: transform 0.6s cubic-bezier(.45, .05, .25, 1), background-color .35s ease, box-shadow .35s ease;
 }
 .tst-icon {
   position: absolute;
@@ -1834,7 +1832,6 @@ body.light-mode .tst-icon-sun {
   }
   body.light-mode .tst-knob {
     --knob-x: 32px;
-    --knob-hover-x: -5px;
   }
   .tst-icon {
     width: 13px;
@@ -3015,12 +3012,11 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
 .btn-fav svg path{fill:currentColor;fill-opacity:0;transition:fill-opacity .3s var(--ease);}
 .btn-fav:hover svg path{fill-opacity:1;}
 
-/* --- Cambiar apariencia: la bola y el ícono (luna/sol) se iluminan en rosado; al hover
-   se desliza suave UNA vez hacia el lado donde caería al hacer clic (no rebota) --- */
+/* --- Cambiar apariencia: sin movimiento, solo resalte de color en rosado
+   (la bola y el ícono luna/sol) al pasar el mouse --- */
 .theme-switch-toggle:hover .tst-knob{
   background:var(--magenta-bright);
   box-shadow:0 3px 8px rgba(0,0,0,.35),0 0 10px rgba(247,47,184,.55);
-  transform:translateX(calc(var(--knob-x) + var(--knob-hover-x)));
 }
 .theme-switch-toggle:hover .tst-icon-moon,
 .theme-switch-toggle:hover .tst-icon-sun{
@@ -3042,7 +3038,7 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
   .pop-loading::before,.is-loading::after{animation:none !important;}
   [data-tooltip]::after,[data-tooltip]::before{transition:none !important;}
   .btn-fav:hover svg path{transition:none !important;}
-  .theme-switch-toggle:hover .tst-knob{transform:translateX(var(--knob-x)) !important;box-shadow:0 3px 8px rgba(0,0,0,.35) !important;}
+  .theme-switch-toggle:hover .tst-knob{box-shadow:0 3px 8px rgba(0,0,0,.35) !important;}
   .burger:hover:not(.active) span{transform:none !important;}
 }
 
