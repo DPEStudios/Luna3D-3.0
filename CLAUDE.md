@@ -4,6 +4,21 @@
 > global de Daniel: todo proyecto con `package.json`/similar debe revisarse
 > por instrucciones locales antes de ejecutar nada).
 
+## ⚠ Migración en curso (2026-07-01): el repo está saliendo de Google Drive
+
+Se está moviendo la copia de trabajo a una carpeta **local fuera de Drive**
+(`C:\Users\danie\Dev\Luna3D-3.0`). Antes de aplicar las reglas de abajo, fíjate
+DÓNDE estás trabajando:
+
+- **Carpeta local `C:\Users\danie\Dev\Luna3D-3.0` (fuera de Drive):** git
+  funciona normal y no hay corrupción de mount. Las dos "Reglas no negociables"
+  de más abajo (que son específicas de Google Drive) **ya no aplican**; trabaja
+  con git estándar: editar → commit → push a GitHub → Vercel despliega. El guard
+  `_tools/verificar_integridad.py` queda como red de seguridad opcional.
+- **Carpeta dentro de Google Drive (`...\AI\...\Web_Luna3D_v3`):** la migración
+  no se ha completado o estás en la copia vieja. Aplican TODAS las reglas de
+  abajo. Corre `MIGRAR_Luna3D_fuera_de_Drive.bat` y pásate a la carpeta local.
+
 ## Regla no negociable: esta carpeta NO es la fuente real de git
 
 Esta carpeta (`Web_Luna3D_v3`) está montada desde Google Drive. Git no opera
@@ -53,10 +68,9 @@ víctima más frecuente).
    archivo que no pasó la verificación JAMÁS llega a producción.
 4. Al cerrar sesión, correr `scan .` y confirmar que da 0 corruptos.
 
-> Solución de fondo recomendada (aprobada por Daniel el 2026-07-01): sacar el
-> repo de Google Drive y trabajar en una carpeta local normal. Pasos en
-> `DEPLOY_Vercel.md`. Mientras eso no se haga, las reglas de arriba son
-> obligatorias.
+> Solución de fondo (en curso): sacar el repo de Google Drive y trabajar en una
+> carpeta local normal — ver el banner de arriba y `DEPLOY_Vercel.md`. Mientras
+> sigas dentro de Drive, las reglas de arriba son obligatorias.
 
 ## Al terminar cualquier sesión que haya tocado archivos de producción
 
