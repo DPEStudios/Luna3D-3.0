@@ -2985,6 +2985,24 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
 }
 @keyframes fx-spin{to{transform:rotate(360deg);}}
 
+/* --- Favoritos: el corazón se rellena de color al pasar el mouse --- */
+.btn-fav svg path{fill:currentColor;fill-opacity:0;transition:fill-opacity .3s var(--ease);}
+.btn-fav:hover svg path{fill-opacity:1;}
+
+/* --- Cambiar apariencia: aro de color animado (magenta/púrpura de marca) al pasar el mouse --- */
+@keyframes fx-theme-glow{
+  0%,100%{box-shadow:0 0 0 3px rgba(232,31,157,.18),0 0 16px rgba(232,31,157,.35);}
+  50%{box-shadow:0 0 0 3px rgba(155,39,224,.18),0 0 16px rgba(155,39,224,.35);}
+}
+.theme-switch-toggle:hover{border-color:var(--magenta);animation:fx-theme-glow 1.6s var(--ease) infinite;}
+.theme-switch-toggle:hover .tst-knob{box-shadow:0 3px 8px rgba(0,0,0,.35),0 0 10px rgba(232,31,157,.55);}
+
+/* --- Hamburguesa: onda de apilado (distinta a la elevación de los demás botones) --- */
+.burger:hover:not(.active) span{background:var(--magenta-bright);}
+.burger:hover:not(.active) span:nth-child(1){transform:translateX(-3px);}
+.burger:hover:not(.active) span:nth-child(2){transform:translateX(3px);}
+.burger:hover:not(.active) span:nth-child(3){transform:translateX(-3px);}
+
 /* --- Movimiento reducido: desactiva los efectos de esta capa --- */
 @media (prefers-reduced-motion: reduce){
   .icon-btn:hover,.btn-catalog:hover,.btn-fav:hover,.mega-prod-card:hover{transform:none !important;}
@@ -2994,6 +3012,9 @@ body.light-mode [data-tooltip]::before{border-bottom-color:#fff;}
   .fx-ripple{display:none !important;}
   .pop-loading::before,.is-loading::after{animation:none !important;}
   [data-tooltip]::after,[data-tooltip]::before{transition:none !important;}
+  .btn-fav:hover svg path{transition:none !important;}
+  .theme-switch-toggle:hover{animation:none !important;box-shadow:none !important;}
+  .burger:hover:not(.active) span{transform:none !important;}
 }
 
 /* ============================================================
