@@ -981,7 +981,7 @@ function buildNav(active){
 
 function initSearchTyping(input){
   if(input.value) return;
-  const words = ['Lámpara','Macetero','Regalo','Pokémon','Dragon Ball','Mario Bros','Decoración','Figura Anime','Personalizado','Groot','Stitch','Portalápices','Organizador','Geek','Gamer','Hogar','Oficina','Cumpleaños','Coleccionable','Impresión 3D'];
+  const words = ['Jardín','Macetero','Anime','D&D','Juguetes','Dragon Ball','Gamer','Decoración','Herramientas','Librería','Lámpara','Perros','Organización','Llaveros','Hogar','Pokémon','BTS','Mario Bros','Regalo','Ofertas','Gatos'];
   let wi=0, ci=0, del=false, pause=0;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const tick=()=>{
