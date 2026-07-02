@@ -1,0 +1,14 @@
+#!/bin/sh
+# Guardián de integridad Luna3D — corre antes de cada commit.
+# Revisa SOLO los archivos que estás por commitear (rápido).
+# Bloquea el commit si alguno está corrupto/truncado.
+# Instalar una vez: sh _tools/instalar_hook.sh  (o instalar_hook.bat en Windows)
+ROOT="$(git rev-parse --show-toplevel)"
+FILES="$(git diff --cached --name-only --diff-filter=ACM)"
+[ -z "$FILES" ] && exit 0
+# shellcheck disable=SC2086
+node "$ROOT/_tools/check.js" $FILES || {
+  echo ""
+  echo "Commit BLOQUEADO por el guardián. Nada llegó a producción. Repará y reintentá."
+  exit 1
+}
