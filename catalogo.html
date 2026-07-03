@@ -51,22 +51,49 @@
     </div>
 
     <div class="wrap catalog-layout">
-      <aside class="filters" id="filters">
-        <div class="filter-group">
-          <h4>Categorías</h4>
-          <div class="filter-chips" id="filter-cats"></div>
-        </div>
-        <div class="filter-group">
-          <h4>Precio</h4>
-          <div class="filter-chips" id="filter-price"></div>
-        </div>
-      </aside>
-
       <div class="catalog-main">
         <div class="chiprow" id="collection-chips"></div>
+
         <div class="cat-toolbar">
-          <button class="btn glass filter-toggle" id="filter-toggle">Filtros</button>
+          <div class="filterbar" id="filterbar">
+            <div class="filter-pop-wrap">
+              <button type="button" class="btn glass filter-trigger" id="cat-toggle" aria-expanded="false" aria-controls="filters-cat">
+                Categoría<span class="filter-count" id="cat-count" hidden></span>
+                <svg class="fbchev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+              </button>
+              <div class="filters" id="filters-cat">
+                <div class="filter-group">
+                  <h4>Categorías</h4>
+                  <div class="filter-chips" id="filter-cats"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-pop-wrap">
+              <button type="button" class="btn glass filter-trigger" id="price-toggle" aria-expanded="false" aria-controls="filters-price">
+                Precio<span class="filter-count" id="price-count" hidden></span>
+                <svg class="fbchev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+              </button>
+              <div class="filters" id="filters-price">
+                <div class="filter-group">
+                  <h4>Precio</h4>
+                  <div class="filter-chips" id="filter-price"></div>
+                  <div class="price-custom">
+                    <span class="price-custom-label">Rango personalizado</span>
+                    <div class="price-custom-row">
+                      <input type="number" inputmode="numeric" min="0" placeholder="Mín. $" id="price-min">
+                      <span class="price-custom-sep">–</span>
+                      <input type="number" inputmode="numeric" min="0" placeholder="Máx. $" id="price-max">
+                    </div>
+                    <button type="button" class="btn glass price-apply" id="price-apply">Aplicar rango</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="res" id="result-count"></div>
+
           <div class="sortsel">
             <span class="muted" style="font-size:13px;">Ordenar:</span>
             <select id="sort">
@@ -78,9 +105,14 @@
             </select>
           </div>
         </div>
+
+        <div class="active-filters" id="active-filters"></div>
+
         <div class="prod-grid" id="catalog-grid"></div>
       </div>
     </div>
+
+    <div class="filters-backdrop" id="filters-backdrop" hidden></div>
   </section>
 
 </main>

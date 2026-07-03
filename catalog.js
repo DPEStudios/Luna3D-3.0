@@ -41,7 +41,7 @@
   });
   Object.values(SUBMAP).forEach(arr=>arr.sort((a,b)=>a.localeCompare(b,'es')));
 
-  const state={cat:'all',subcat:'all',collection:'all',price:'all',sort:'relevance'};
+  const state={cat:'all',subcat:'all',collection:'all',price:'all',priceMin:null,priceMax:null,sort:'relevance'};
 
   // read ?cat= y ?subcat=
   const params=new URLSearchParams(location.search);
@@ -81,7 +81,7 @@
   // ----- price filter -----
   const fp=document.getElementById('filter-price');
   fp.innerHTML=PRICE.map(p=>`<button data-price="${p.id}" class="${state.price===p.id?'active':''}">${p.label}</button>`).join('');
-  fp.onclick=e=>{const b=e.target.closest('button');if(!b)return;state.price=b.dataset.price;syncFilters();render();};
+  fp.onclick=e=>{const b=e.target.closest('button');if(!b)return;state.price=b.dataset.price;state.priceMin=null;state.priceMax=null;clearPriceInputs();syncFilters();render();};
 
   // ----- collection chips -----
   const cc=document.getElementById('collection-chips');
@@ -91,8 +91,102 @@
   // ----- sort -----
   document.getElementById('sort').onchange=e=>{state.sort=e.target.value;render();};
 
-  // ----- mobile filter toggle -----
-  document.getElementById('filter-toggle').onclick=()=>document.getElementById('filters').classList.toggle('open');
+  // ----- popovers de filtro (Categoría / Precio) -----
+  const filtersBackdrop=document.getElementById('filters-backdrop');
+  function wirePopover(btnId,panelId){
+    const btn=document.getElementById(btnId), panel=document.getElementById(panelId);
+    function updateBackdrop(){
+      const anyOpen=document.querySelector('.filters.open');
+      if(filtersBackdrop) filtersBackdrop.hidden=!anyOpen;
+    }
+    function open(){
+      document.querySelectorAll('.filters.open').forEach(p=>{
+        if(p!==panel){
+          p.classList.remove('open');
+          const b=document.querySelector(`[aria-controls="${p.id}"]`);
+          if(b) b.setAttribute('aria-expanded','false');
+        }
+      });
+      panel.classList.add('open'); btn.setAttribute('aria-expanded','true'); updateBackdrop();
+    }
+    function close(){ panel.classList.remove('open'); btn.setAttribute('aria-expanded','false'); updateBackdrop(); }
+    btn.onclick=e=>{ e.stopPropagation(); panel.classList.contains('open')?close():open(); };
+    return {open,close,panel,btn};
+  }
+  const popCat=wirePopover('cat-toggle','filters-cat');
+  const popPrice=wirePopover('price-toggle','filters-price');
+  document.addEventListener('click', e=>{
+    [popCat,popPrice].forEach(p=>{
+      if(!p.panel.classList.contains('open')) return;
+      if(p.panel.contains(e.target)||p.btn.contains(e.target)) return;
+      p.close();
+    });
+  });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ popCat.close(); popPrice.close(); } });
+  if(filtersBackdrop) filtersBackdrop.onclick=()=>{ popCat.close(); popPrice.close(); };
+
+  // ----- rango de precio personalizado -----
+  function clearPriceInputs(){
+    const mn=document.getElementById('price-min'), mx=document.getElementById('price-max');
+    if(mn) mn.value=''; if(mx) mx.value='';
+  }
+  const priceApplyBtn=document.getElementById('price-apply');
+  if(priceApplyBtn) priceApplyBtn.onclick=()=>{
+    const mnEl=document.getElementById('price-min'), mxEl=document.getElementById('price-max');
+    const mnV=mnEl.value.trim()===''?null:Math.max(0,parseInt(mnEl.value,10));
+    const mxV=mxEl.value.trim()===''?null:Math.max(0,parseInt(mxEl.value,10));
+    if(mnV==null&&mxV==null) return;
+    state.price='custom'; state.priceMin=mnV; state.priceMax=mxV;
+    syncFilters(); render(); popPrice.close();
+  };
+
+  // ----- chips de filtros activos -----
+  function activeFilterChips(){
+    const chips=[];
+    if(state.cat!=='all') chips.push({key:'cat', label:'Categoría: '+catNameOf(state.cat)});
+    if(state.subcat!=='all') chips.push({key:'subcat', label:'Subcategoría: '+state.subcat});
+    if(state.price==='custom'){
+      const parts=[];
+      if(state.priceMin!=null) parts.push('desde $'+state.priceMin.toLocaleString('es-CL'));
+      if(state.priceMax!=null) parts.push('hasta $'+state.priceMax.toLocaleString('es-CL'));
+      if(parts.length) chips.push({key:'price', label:'Precio: '+parts.join(' ')});
+    } else if(state.price!=='all'){
+      const pr=PRICE.find(p=>p.id===state.price);
+      if(pr) chips.push({key:'price', label:'Precio: '+pr.label});
+    }
+    return chips;
+  }
+  const afWrap=document.getElementById('active-filters');
+  function renderActiveFilters(){
+    const chips=activeFilterChips();
+    if(!chips.length){ afWrap.innerHTML=''; afWrap.classList.remove('show'); return; }
+    afWrap.classList.add('show');
+    afWrap.innerHTML=chips.map(c=>`<button type="button" class="af-chip" data-key="${c.key}">${c.label}<span class="af-x">✕</span></button>`).join('')
+      +'<button type="button" class="af-clear" id="af-clear-all">Limpiar todo</button>';
+  }
+  afWrap.onclick=e=>{
+    if(e.target.closest('#af-clear-all')){ resetFilters(); return; }
+    const chip=e.target.closest('.af-chip'); if(!chip) return;
+    const key=chip.dataset.key;
+    if(key==='cat'){ state.cat='all'; state.subcat='all'; }
+    else if(key==='subcat'){ state.subcat='all'; }
+    else if(key==='price'){ state.price='all'; state.priceMin=null; state.priceMax=null; clearPriceInputs(); }
+    syncFilters(); render();
+  };
+  function resetFilters(){
+    state.cat='all'; state.subcat='all'; state.price='all'; state.priceMin=null; state.priceMax=null;
+    clearPriceInputs(); syncFilters(); render();
+  }
+
+  // ----- badges de conteo en los botones "Categoría" / "Precio" -----
+  const catCountEl=document.getElementById('cat-count');
+  const priceCountEl=document.getElementById('price-count');
+  function updateTriggerCounts(){
+    const catN=(state.cat!=='all'?1:0)+(state.subcat!=='all'?1:0);
+    if(catN>0){ catCountEl.hidden=false; catCountEl.textContent=catN; } else { catCountEl.hidden=true; }
+    const priceOn=state.price!=='all';
+    if(priceOn){ priceCountEl.hidden=false; priceCountEl.textContent='1'; } else { priceCountEl.hidden=true; }
+  }
 
   function syncFilters(){
     fc.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.cat===state.cat));
@@ -103,6 +197,8 @@
     const tEl=document.getElementById('cat-title');
     if(state.cat==='all') tEl.textContent='Todo el catálogo';
     else tEl.textContent=catNameOf(state.cat)+(state.subcat!=='all'?(' › '+state.subcat):'');
+    renderActiveFilters();
+    updateTriggerCounts();
   }
 
   function apply(){
@@ -110,7 +206,12 @@
     if(state.cat!=='all') list=list.filter(p=>p.cat===state.cat);
     if(state.subcat!=='all') list=list.filter(p=>p.subcat===state.subcat);
     const col=COLLECTIONS.find(c=>c.id===state.collection); if(col&&col.test) list=list.filter(col.test);
-    const pr=PRICE.find(p=>p.id===state.price); if(pr) list=list.filter(pr.test);
+    if(state.price==='custom'){
+      if(state.priceMin!=null) list=list.filter(p=>p.price!=null&&p.price>=state.priceMin);
+      if(state.priceMax!=null) list=list.filter(p=>p.price!=null&&p.price<=state.priceMax);
+    } else {
+      const pr=PRICE.find(p=>p.id===state.price); if(pr) list=list.filter(pr.test);
+    }
 
     const searchInput = document.getElementById('nav-search-input');
     const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
