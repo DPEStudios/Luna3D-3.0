@@ -3240,6 +3240,7 @@ body.light-mode .po-dot:hover:not(.active){background:rgba(11,20,55,.42);}
 .about-hero{display:grid;grid-template-columns:1fr 1.05fr;gap:44px;align-items:center;}
 .about-hero-text .section-title{margin:10px 0 18px;}
 .about-cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;}
+.slogan-highlight{color:var(--magenta-bright);font-weight:600;}
 
 /* ---------- Historia + valores ---------- */
 .about-story{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start;}
