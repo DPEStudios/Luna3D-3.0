@@ -114,3 +114,30 @@ Dejar esta carpeta y el `main` de GitHub con contenido idéntico en los
 archivos tocados. Si quedan diferencias pendientes de reconciliar (por
 ejemplo, algo que el usuario pidió pero no se alcanzó a subir), decírselo
 explícitamente a Daniel — no asumir que "ya quedó" sin haberlo
+
+## Protocolo definitivo de escritura y git (2026-07-02) — OBLIGATORIO
+
+Resultado del diagnóstico del 2026-07-02 (ver `PROMPT_Diagnostico_Corrupcion_Archivos_y_Git_2026-07-02.md`).
+Estas reglas reemplazan cualquier flujo anterior de deploy (ya NO se clona a temporal):
+
+1. **Git corre SOLO en el PowerShell nativo de Daniel.** Ninguna sesión de IA
+   ejecuta `git add/commit/push/reset/checkout` en esta carpeta: el puente
+   corrompe el index ("cache entry has null sha1"), deja `index.lock` pegados
+   y bloquea `unlink` (el reset/checkout fallan a medias).
+2. **Publicar SIEMPRE con `_tools\subir_cambios.ps1`** (integridad → sincronía
+   → revisión → commit → push → verificación). Nada se sube a mano.
+3. **Las sesiones de IA NUNCA usan Edit/Write directo sobre archivos de este
+   repo** (evidencia 2026-07-02: `Edit` truncó 2 archivos al tamaño previo
+   incluso en ediciones que AGRANDABAN). Método obligatorio de escritura:
+   generar el archivo COMPLETO vía python a `<archivo>.nuevo` con
+   `flush()+os.fsync()`, verificar bytes (tamaño + sha256 + 0 nulos + cola
+   correcta), y recién ahí `mv` (rename) sobre el destino. Verificar de nuevo
+   después del rename. El rename es la única operación confiable del puente.
+4. **Locks de git pegados:** mover con `mv` a `_Papelera/` (nunca `rm`, está
+   bloqueado). Los `tmp_obj_*` de `.git/objects` igual.
+5. **Index corrupto** ("cache entry has null sha1"): desde PowerShell:
+   `Remove-Item .git\index -Force; git reset` (el index es caché, se
+   reconstruye sin riesgo).
+6. El hook pre-commit (guardián) + el workflow CI `integridad.yml` deben estar
+   siempre activos. Si un commit sale sin `[guardián] OK`, el hook se soltó:
+   reinstalar con `Copy-Item _tools\pre-commit .git\hooks\pre-commit -Force`.
