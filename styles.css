@@ -3239,6 +3239,8 @@ body.light-mode .po-dot:hover:not(.active){background:rgba(11,20,55,.42);}
 /* ---------- HERO Sobre Nosotros ---------- */
 .about-hero{display:grid;grid-template-columns:1fr 1.05fr;gap:44px;align-items:center;}
 .about-hero-text .section-title{margin:10px 0 18px;}
+.about-hero-text .lead{line-height:1.7;margin-bottom:14px;}
+.about-hero-text .lead:last-of-type{margin-bottom:0;}
 .about-cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;}
 .slogan-highlight{color:var(--magenta-bright);font-weight:600;}
 
