@@ -141,3 +141,9 @@ Estas reglas reemplazan cualquier flujo anterior de deploy (ya NO se clona a tem
 6. El hook pre-commit (guardián) + el workflow CI `integridad.yml` deben estar
    siempre activos. Si un commit sale sin `[guardián] OK`, el hook se soltó:
    reinstalar con `Copy-Item _tools\pre-commit .git\hooks\pre-commit -Force`.
+7. **PowerShell nueva siempre abre en `C:\Users\danie`, NO en la carpeta del
+   proyecto.** Antes de correr `_tools\subir_cambios.ps1` (o cualquier script),
+   hacer primero `cd C:\Daniel_Pardo\Estrella_3D_SpA\dev\Luna3D-3.0`. Si se
+   omite, PowerShell tira "El argumento '.\_tools\subir_cambios.ps1' para el
+   parámetro -File no existe" — no es un error del script, es el directorio
+   equivocado.
