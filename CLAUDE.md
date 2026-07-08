@@ -117,7 +117,7 @@ explícitamente a Daniel — no asumir que "ya quedó" sin haberlo
 
 ## Protocolo definitivo de escritura y git (2026-07-02) — OBLIGATORIO
 
-Resultado del diagnóstico del 2026-07-02 (ver `PROMPT_Diagnostico_Corrupcion_Archivos_y_Git_2026-07-02.md`).
+Resultado del diagnóstico del 2026-07-02 (ver `docs/historico/PROMPT_Diagnostico_Corrupcion_Archivos_y_Git_2026-07-02.md`).
 Estas reglas reemplazan cualquier flujo anterior de deploy (ya NO se clona a temporal):
 
 1. **Git corre SOLO en el PowerShell nativo de Daniel.** Ninguna sesión de IA

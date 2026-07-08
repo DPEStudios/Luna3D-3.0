@@ -1,7 +1,20 @@
+> ## ACTUALIZACION 2026-07-08 — LEER ANTES QUE EL RESTO DE ESTE ARCHIVO
+> Este contexto se escribio cuando el proyecto vivia en Google Drive. Desde julio 2026:
+>
+> - **Carpeta de trabajo UNICA:** `C:\Daniel_Pardo\Estrella_3D_SpA\dev\Luna3D-3.0` (la copia de
+>   Drive `AI\01_Estrella3D\Web_Luna3D_v3` fue archivada como `_OBSOLETO_..._2026-07`).
+> - **Hoja de ruta VIGENTE:** `PLAN_SESIONES_RESTANTES_Web_Luna3D_v3_2026-07-08.md` (misma carpeta).
+>   El plan viejo y la auditoria de junio estan en `docs/historico/`.
+> - **Flujo de codigo VIGENTE:** el del `CLAUDE.md` de esta carpeta (git SOLO en PowerShell de
+>   Daniel; publicacion con `_tools\subir_cambios.ps1`; escritura segura via python+rename).
+>   El flujo antiguo de bundle/clonado descrito mas abajo (seccion "git") quedo OBSOLETO.
+> - Las rutas `/mnt/AI/01_Estrella3D/Web_Luna3D_v3/...` de este archivo deben leerse como la
+>   carpeta de trabajo actual. Las rutas de memoria `/mnt/AI/00_Sistema_Respaldo/...` siguen validas.
+
 # CONTEXTO BASE — Web Luna 3D v3 (estable; no cambia entre sesiones)
 
 > Este archivo es el contexto permanente del proyecto. Se usa junto con
-> `PLAN_SESIONES_Web_Luna3D_v3.md`, que define qué se hace en cada sesión.
+> `PLAN_SESIONES_RESTANTES_Web_Luna3D_v3_2026-07-08.md` (vigente; el original `docs/historico/PLAN_SESIONES_Web_Luna3D_v3.md` quedo superado), que define qué se hace en cada sesión.
 > El nuevo chat debe leer ESTE archivo primero y luego la sesión que toque.
 
 ## 1) Rol y trato
@@ -12,7 +25,7 @@ Eres **Arquitecto de Sistemas Principal / desarrollador senior + QA de e-commerc
 2. `/mnt/AI/00_Sistema_Respaldo/Memoria_Proyectos/people/daniel-pardo.md`
 3. `/mnt/AI/00_Sistema_Respaldo/Memoria_Proyectos/projects/estrella3d.md` (bitácora completa de la web)
 4. `/mnt/AI/01_Estrella3D/Web_Luna3D_v3/README.md` (lecciones de git y de edición — punto 5)
-5. `/mnt/AI/01_Estrella3D/Web_Luna3D_v3/AUDITORIA_Web_Luna3D_v3_2026-06-18.md` (auditoría que origina el plan)
+5. `/mnt/AI/01_Estrella3D/Web_Luna3D_v3/docs/historico/AUDITORIA_Web_Luna3D_v3_2026-06-18.md` (auditoria historica; el plan vigente es PLAN_SESIONES_RESTANTES 2026-07-08)
 
 ## 3) Reglas permanentes (rigen TODO)
 - **No inventar datos.** Nada de precios, reseñas, productos ni textos ficticios. Sin fuente → no se incluye.

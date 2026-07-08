@@ -88,4 +88,4 @@ Sol Suave `#F4D488`, Rosa Bruma `#E5A8CD`, Azul Niebla `#9FBFE2`, Violeta Funcio
 
 ---
 **Regla de marca:** la identidad se conserva siempre; la filosofía "tienda real" la pone al
-servicio de vender (ver `PLAN_Mejoras_Tienda_2026-06-14.md` y memoria `projects/estrella3d.md`).
+servicio de vender (ver `docs/historico/PLAN_Mejoras_Tienda_2026-06-14.md` y memoria `projects/estrella3d.md`).
