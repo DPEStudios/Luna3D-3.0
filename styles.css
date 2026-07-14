@@ -1952,6 +1952,46 @@ body.light-mode .tst-icon-sun {
 }
 @keyframes ds-flap{from{transform:scaleY(1);}to{transform:scaleY(.5);}}
 
+/* ---------- ESTRELLAS FUGACES (modo noche) — capa + estela ----------
+   Restaurado 2026-07-13: el bloque base de estas reglas se había perdido de
+   styles.css (quedaba solo la de prefers-reduced-motion), por eso las fugaces
+   dejaron de verse aunque el generador de app.js seguía activo. */
+#shooting-stars{
+  position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;
+  transition:opacity 1.2s var(--ease-theme), visibility 1.2s;
+}
+body.light-mode #shooting-stars{ opacity:0; visibility:hidden; } /* sin fugaces de día */
+.shooting-star{
+  position:absolute; top:0; left:0; border-radius:99px;
+  background:linear-gradient(90deg,
+      rgba(255,255,255,0)   0%,
+      rgba(224,232,255,.35) 22%,
+      rgba(247,247,255,.9)  78%,
+      #ffffff              100%);
+  box-shadow:0 0 6px 1px rgba(224,232,255,.55), 0 0 2px rgba(255,255,255,.9);
+  will-change:transform, opacity;
+}
+.shooting-star::after{           /* cabeza brillante que lidera la estela */
+  content:""; position:absolute; right:-1px; top:50%;
+  width:3px; height:3px; margin-top:-1.5px; border-radius:50%;
+  background:#fff; box-shadow:0 0 8px 2px rgba(233,238,255,.85);
+}
+
+/* ---------- PÁJAROS DIURNOS (modo día) — generador realista en app.js ----------
+   Cada pájaro es un SVG que cruza el cielo (Web Animations API) con aleteo,
+   planeo y trayectorias variadas. Viven dentro de #daysky, así que aparecen y
+   desaparecen junto con el cielo diurno. */
+#day-birds{position:absolute; inset:0; overflow:hidden; pointer-events:none;}
+.bird-live{position:absolute; top:0; left:0; color:rgba(45,62,98,.42); will-change:transform;}
+.bird-live svg{display:block; width:100%; height:auto; overflow:visible;}
+.bird-live .wings{                          /* el aleteo: las alas suben y bajan */
+  transform-origin:50% 50%;
+  animation:bird-flap .5s ease-in-out infinite alternate;
+}
+.bird-live.gliding .wings{ animation:none; transform:scaleY(.8); } /* planeo (sin aletear) */
+@keyframes bird-flap{ 0%{transform:scaleY(1);} 100%{transform:scaleY(.34);} }
+@media (prefers-reduced-motion: reduce){ #day-birds{display:none;} }
+
 
 @media (prefers-reduced-motion: reduce){
   .ds-moon,.ds-cloud,.ds-birds .bird svg{animation:none;}

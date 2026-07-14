@@ -139,19 +139,125 @@ function buildDaySky(){
     <div class="ds-cloud c2">${cloud}</div>
     <div class="ds-cloud c3">${cloud}</div>
     <div class="ds-cloud c4">${cloud}</div>
-    <div class="ds-cloud c5">${cloud}</div>
-    <div class="ds-birds g1">
-      <span class="bird b1">${bird}</span>
-      <span class="bird b2">${bird}</span>
-      <span class="bird b3">${bird}</span>
-    </div>
-    <div class="ds-birds g2">
-      <span class="bird b1">${bird}</span>
-      <span class="bird b2">${bird}</span>
-      <span class="bird b3">${bird}</span>
-      <span class="bird b4">${bird}</span>
-    </div>`;
+    <div class="ds-cloud c5">${cloud}</div>`;
   document.body.prepend(d);
+}
+
+/* ---------- PÁJAROS DIURNOS (modo día: aparición aleatoria y realista) ----------
+   Mismo espíritu que las estrellas fugaces, pero de día: los pájaros aparecen
+   "de repente", cruzan el cielo y se van. Variedad: solos y en bandada (formación
+   en V), aleteo a distintas velocidades, planeos y trayectorias erráticas, y
+   distintos tamaños/alturas para dar profundidad. Se pausa en modo noche, con la
+   pestaña oculta o con prefers-reduced-motion. Viven dentro de #daysky, así que
+   aparecen/desaparecen junto con el cielo diurno. */
+function buildDaySkyBirds(){
+  const sky = document.getElementById('daysky'); if(!sky) return;
+  if(document.getElementById('day-birds')) return;
+  const layer = document.createElement('div');
+  layer.id = 'day-birds';
+  layer.setAttribute('aria-hidden','true');
+  sky.appendChild(layer);
+
+  const BIRD = '<svg viewBox="0 0 100 30" aria-hidden="true"><g class="wings">'
+    + '<path d="M3 18 Q27 3 48 15 Q50 16 52 15 Q73 3 97 18 Q73 11 53 18 Q50 20 47 18 Q27 11 3 18 Z" fill="currentColor"/>'
+    + '</g></svg>';
+
+  const reduce  = matchMedia('(prefers-reduced-motion: reduce)');
+  const rand    = (min,max) => min + Math.random()*(max-min);
+  const canPlay = () => document.body.classList.contains('light-mode')
+                     && !reduce.matches && document.visibilityState==='visible';
+
+  // un pájaro: alas que aletean a su propia velocidad; puede nacer "planeando"
+  function makeBird(size, opacity, glide){
+    const b = document.createElement('span');
+    b.className = 'bird-live' + (glide ? ' gliding' : '');
+    b.style.width = size.toFixed(1)+'px';
+    b.style.color = 'rgba(45,62,98,'+opacity.toFixed(2)+')';
+    b.innerHTML = BIRD;
+    if(!glide){
+      const w = b.querySelector('.wings');
+      w.style.animationDuration = rand(360,620).toFixed(0)+'ms';
+      w.style.animationDelay    = (-rand(0,400)).toFixed(0)+'ms';
+    }
+    return b;
+  }
+
+  // alterna aleteo/planeo durante el vuelo para que no se vea mecánico
+  function breathe(bird){
+    (function cycle(){
+      if(!bird.isConnected) return;
+      const goGlide = !bird.classList.contains('gliding') && Math.random() < 0.5;
+      const t = goGlide ? rand(700,1500) : rand(1400,2600);
+      setTimeout(()=>{
+        if(!bird.isConnected) return;
+        bird.classList.toggle('gliding', goGlide);
+        cycle();
+      }, t);
+    })();
+  }
+
+  function spawnFlock(){
+    if(!canPlay()) return;
+    const dir    = Math.random() < 0.5 ? 1 : -1;            // 1: izq→der, -1: der→izq
+    const solo   = Math.random() < 0.45;
+    const n      = solo ? 1 : (3 + (Math.random()*5|0));    // bandada de 3–7
+    const topPct = rand(6, 52);                             // altura en el cielo
+    const near   = 1 - topPct/70;                           // más alto ⇒ más lejos
+    const size   = rand(15, 30) * (0.7 + 0.5*near);
+    const alpha  = Math.min(0.55, rand(0.26,0.5) * (0.75 + 0.35*near));
+    const speed  = rand(solo ? 80 : 55, solo ? 150 : 105);  // px/s
+    const margin = 150;
+    const x0 = dir===1 ? -margin : innerWidth+margin;
+    const x1 = dir===1 ? innerWidth+margin : -margin;
+    const dur = Math.abs(x1-x0)/speed*1000;
+    const baseTop = topPct/100 * innerHeight;
+
+    const flock = document.createElement('div');
+    flock.className = 'bird-flock';
+    flock.style.position='absolute'; flock.style.left='0';
+    flock.style.top=baseTop.toFixed(0)+'px'; flock.style.willChange='transform';
+    layer.appendChild(flock);
+
+    const gap = size*1.6;
+    for(let i=0;i<n;i++){
+      const back    = -dir * i * gap;                       // se apilan hacia atrás
+      const spread  = Math.ceil(i/2) * gap * 0.62 * (i%2 ? 1 : -1);  // V arriba/abajo
+      const glide   = Math.random() < 0.32;
+      const b = makeBird(size*rand(0.9,1.08), alpha, glide);
+      b.style.left = (back  + rand(-6,6)).toFixed(0)+'px';
+      b.style.top  = (spread+ rand(-4,4)).toFixed(0)+'px';
+      flock.appendChild(b);
+      if(!glide) breathe(b);
+    }
+
+    // cruza en X con deriva y ondulación en Y (más errática si va solo)
+    const wobble = solo ? rand(6,16) : rand(3,8);
+    const yDrift = (Math.random()<.5?-1:1) * (solo ? rand(30,90) : rand(10,40));
+    const at = (pr, extra) => 'translate('+(x0+(x1-x0)*pr).toFixed(1)+'px,'+(yDrift*pr+(extra||0)).toFixed(1)+'px)';
+    const frames = [
+      { transform:at(0,0) },
+      { transform:at(0.25,-wobble) },
+      { transform:at(0.50, wobble) },
+      { transform:at(0.72,-wobble*0.7) },
+      { transform:at(1,0) }
+    ];
+    const anim = flock.animate(frames, { duration:dur, easing:'linear' });
+    anim.onfinish = () => flock.remove();
+  }
+
+  let timer;
+  function loop(){
+    spawnFlock();
+    if(Math.random() < 0.25){ setTimeout(spawnFlock, rand(600,1600)); } // a veces dos seguidas
+    timer = setTimeout(loop, rand(3500, 8000));
+  }
+  function start(){ clearTimeout(timer); if(canPlay()){ timer = setTimeout(loop, rand(600,1800)); } }
+  function stop(){ clearTimeout(timer); layer.querySelectorAll('.bird-flock').forEach(f=>{ f.getAnimations().forEach(a=>a.cancel()); f.remove(); }); }
+
+  start();
+  document.addEventListener('visibilitychange', () => document.visibilityState==='visible' ? start() : stop());
+  reduce.addEventListener?.('change', () => reduce.matches ? stop() : start());
+  window.LUNA_dayBirds = { start, stop };
 }
 
 /* ---------- SHOOTING STARS (modo noche: estrellas fugaces aleatorias) ----------
@@ -725,6 +831,10 @@ function buildNav(active){
     // arrancar/pausar las estrellas fugaces según el tema activo
     if (window.LUNA_shootingStars) {
       isLight ? window.LUNA_shootingStars.stop() : window.LUNA_shootingStars.start();
+    }
+    // arrancar/pausar los pájaros diurnos según el tema activo
+    if (window.LUNA_dayBirds) {
+      isLight ? window.LUNA_dayBirds.start() : window.LUNA_dayBirds.stop();
     }
   }
 
@@ -1379,7 +1489,7 @@ window.LUNA={ addToCart, add:addFromCard, changeQty, removeItem, openDrawer, clo
   checkoutWhatsapp, buildWhatsappOrder };
 
 function boot(){
-  buildLoader(); initStars(); buildDaySky(); buildShootingStars(); buildFloatingActions(); buildDrawer(); buildAuth(); syncCart(); syncFavs(); initReveal();
+  buildLoader(); initStars(); buildDaySky(); buildDaySkyBirds(); buildShootingStars(); buildFloatingActions(); buildDrawer(); buildAuth(); syncCart(); syncFavs(); initReveal();
 }
 if(document.readyState!=='loading') boot(); else addEventListener('DOMContentLoaded',boot);
 })();
