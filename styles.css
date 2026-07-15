@@ -1912,45 +1912,17 @@ body.light-mode .tst-icon-sun {
   }
 }
 
-/* nubes pastel a la deriva, muy lentas y a distintas alturas */
-.ds-cloud{position:absolute;filter:blur(7px);}
-.ds-cloud.c1{top:13%;width:300px;color:rgba(255,255,255,.85);animation:ds-drift 150s linear infinite;animation-delay:-30s;}
-.ds-cloud.c2{top:38%;width:230px;color:rgba(255,239,248,.6);animation:ds-drift 195s linear infinite;animation-delay:-110s;}
-.ds-cloud.c3{top:66%;width:260px;color:rgba(232,238,255,.65);animation:ds-drift 175s linear infinite;animation-delay:-70s;}
-.ds-cloud.c4{top:24%;width:180px;color:rgba(255,255,255,.5);filter:blur(9px);animation:ds-drift 240s linear infinite;animation-delay:-160s;}
-.ds-cloud.c5{top:54%;width:340px;color:rgba(244,246,255,.45);filter:blur(11px);animation:ds-drift 280s linear infinite;animation-delay:-40s;}
-@keyframes ds-drift{from{transform:translateX(-360px);}to{transform:translateX(calc(100vw + 360px));}}
-
-/* bandadas discretas y lejanas — cruzan y descansan fuera de pantalla */
-.ds-birds{position:absolute;color:rgba(45,62,98,.38);}
-.ds-birds .bird{position:absolute;}
-.ds-birds .bird svg{width:100%;height:auto;animation:ds-flap .52s ease-in-out infinite alternate;transform-origin:50% 100%;}
-.ds-birds .b1{left:0;top:22px;width:20px;}
-.ds-birds .b2{left:44px;top:2px;width:24px;}
-.ds-birds .b2 svg{animation-delay:-.18s;}
-.ds-birds .b3{left:92px;top:30px;width:17px;}
-.ds-birds .b3 svg{animation-delay:-.33s;}
-.ds-birds .b4{left:132px;top:12px;width:15px;}
-.ds-birds .b4 svg{animation-delay:-.26s;}
-
-/* bandada cercana (1) */
-.ds-birds.g1{top:17%;width:130px;height:54px;animation:ds-fly 42s linear infinite;animation-delay:7s;}
-/* bandada lejana (2): más pequeña, más alto, más lenta y en sentido contrario */
-.ds-birds.g2{top:9%;width:130px;height:46px;color:rgba(45,62,98,.24);animation:ds-fly2 78s linear infinite;animation-delay:30s;}
-.ds-birds.g2 .bird{transform:scale(.7);}
-.ds-birds.g2 .bird svg{animation-duration:.62s;}
-
-@keyframes ds-fly{
-  0%{transform:translateX(-200px) translateY(0);}
-  30%{transform:translateX(calc(100vw + 200px)) translateY(-7vh);}
-  100%{transform:translateX(calc(100vw + 200px)) translateY(-7vh);}
+/* nubes reales: video timelapse (assets/clouds.mp4) muy sutil bajo un lavado
+   pálido — aprobadas 2026-07-14, no tocar */
+.ds-clouds{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:.2;filter:blur(1.6px) brightness(1.14) saturate(.55) contrast(.82);
+  transform:scale(1.04);
 }
-@keyframes ds-fly2{
-  0%{transform:translateX(calc(100vw + 220px)) translateY(0);}
-  34%{transform:translateX(-280px) translateY(5vh);}
-  100%{transform:translateX(-280px) translateY(5vh);}
+.ds-wash{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(207,227,246,.5) 0%, rgba(234,242,250,.5) 48%, rgba(251,250,247,.6) 100%);
 }
-@keyframes ds-flap{from{transform:scaleY(1);}to{transform:scaleY(.5);}}
 
 /* ---------- ESTRELLAS FUGACES (modo noche) — capa + estela ----------
    Restaurado 2026-07-13: el bloque base de estas reglas se había perdido de
@@ -1961,46 +1933,31 @@ body.light-mode .tst-icon-sun {
   transition:opacity 1.2s var(--ease-theme), visibility 1.2s;
 }
 body.light-mode #shooting-stars{ opacity:0; visibility:hidden; } /* sin fugaces de día */
-.shooting-star{
+.shooting-star{           /* sutil y fina, sin destello en la punta (2026-07-14) */
   position:absolute; top:0; left:0; border-radius:99px;
   background:linear-gradient(90deg,
-      rgba(255,255,255,0)   0%,
-      rgba(224,232,255,.35) 22%,
-      rgba(247,247,255,.9)  78%,
-      #ffffff              100%);
-  box-shadow:0 0 6px 1px rgba(224,232,255,.55), 0 0 2px rgba(255,255,255,.9);
+      rgba(224,232,255,0)   0%,
+      rgba(224,232,255,.13) 52%,
+      rgba(230,238,255,.46) 100%);
+  box-shadow:0 0 3px rgba(210,224,255,.2);
   will-change:transform, opacity;
 }
-.shooting-star::after{           /* cabeza brillante que lidera la estela */
-  content:""; position:absolute; right:-1px; top:50%;
-  width:3px; height:3px; margin-top:-1.5px; border-radius:50%;
-  background:#fff; box-shadow:0 0 8px 2px rgba(233,238,255,.85);
-}
 
-/* ---------- PÁJAROS DIURNOS (modo día) — generador realista en app.js ----------
-   Cada pájaro es un SVG que cruza el cielo (Web Animations API) con aleteo,
-   planeo y trayectorias variadas. Viven dentro de #daysky, así que aparecen y
-   desaparecen junto con el cielo diurno. */
-#day-birds{position:absolute; inset:0; overflow:hidden; pointer-events:none;}
-.bird-live{position:absolute; top:0; left:0; color:rgba(45,62,98,.42); will-change:transform;}
-.bird-live svg{display:block; width:100%; height:auto; overflow:visible;}
-.bird-live .wings{                          /* el aleteo: las alas suben y bajan */
-  transform-origin:50% 50%;
-  animation:bird-flap .5s ease-in-out infinite alternate;
+/* ---------- PÁJAROS DIURNOS (modo día) — bandada real con chroma key ----------
+   app.js muestrea assets/birds.mp4 (fondo verde) en un buffer, recorta el
+   verde, tiñe al azul de la paleta y dibuja sprites pequeños en este canvas.
+   Vive dentro de #daysky, así que aparece/desaparece con el cielo diurno. */
+.ds-birdcanvas{
+  position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;
+  filter:blur(.35px);opacity:.55;
 }
-.bird-live.gliding .wings{ animation:none; transform:scaleY(.8); } /* planeo (sin aletear) */
-@keyframes bird-flap{ 0%{transform:scaleY(1);} 100%{transform:scaleY(.34);} }
-@media (prefers-reduced-motion: reduce){ #day-birds{display:none;} }
+.src-video{position:absolute;width:2px;height:2px;opacity:0;pointer-events:none;left:-10px;top:-10px;}
+@media (prefers-reduced-motion: reduce){ .ds-birdcanvas,.src-video{display:none;} }
 
 
 @media (prefers-reduced-motion: reduce){
-  .ds-moon,.ds-cloud,.ds-birds .bird svg{animation:none;}
-  .ds-birds{display:none;}
-  .ds-cloud.c1{transform:translateX(12vw);}
-  .ds-cloud.c2{transform:translateX(55vw);}
-  .ds-cloud.c3{transform:translateX(78vw);}
-  .ds-cloud.c4{transform:translateX(34vw);}
-  .ds-cloud.c5{transform:translateX(64vw);}
+  .ds-moon{animation:none;}
+  .ds-clouds{display:none;}   /* sin video de nubes: queda el degradado del cielo */
 }
 /* movimiento reducido: el cambio de tema es instantáneo y sin animaciones (manual §09) */
 @media (prefers-reduced-motion: reduce){

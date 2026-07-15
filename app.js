@@ -112,21 +112,20 @@ function initStars(){
   let to; addEventListener('resize',()=>{clearTimeout(to);to=setTimeout(()=>{cancelAnimationFrame(raf);build();if(reduce){frame();}else frame();},180);});
 }
 
-/* ---------- DAY SKY (modo día: luna pálida, nubes, pájaros) ---------- */
+/* ---------- DAY SKY (modo día: luna pálida, nubes de video, pájaros) ----------
+   Nubes: timelapse real (assets/clouds.mp4) muy sutil bajo un lavado pálido.
+   Carga diferida: preload="none" hasta pasar a modo día. Control start/stop
+   expuesto en window.LUNA_daySky (lo dispara setTheme). */
 function buildDaySky(){
   if(document.getElementById('daysky')) return;
-  const cloud = `<svg viewBox="0 0 220 80" aria-hidden="true"><g fill="currentColor">
-      <ellipse cx="62" cy="50" rx="48" ry="18"/>
-      <ellipse cx="105" cy="38" rx="40" ry="22"/>
-      <ellipse cx="150" cy="52" rx="50" ry="16"/>
-    </g></svg>`;
-  const bird = `<svg viewBox="0 0 24 12" aria-hidden="true">
-      <path d="M2 8.5 Q7 2.5 12 8.5 Q17 2.5 22 8.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-    </svg>`;
   const d = document.createElement('div');
   d.id = 'daysky';
   d.setAttribute('aria-hidden','true');
   d.innerHTML = `
+    <video id="cloudvid" class="ds-clouds" muted loop playsinline preload="none">
+      <source src="assets/clouds.mp4" type="video/mp4">
+    </video>
+    <div class="ds-wash"></div>
     <div class="ds-sunglow"></div>
     <svg class="ds-moon" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="46" fill="rgba(255,255,255,.6)"/>
@@ -134,130 +133,182 @@ function buildDaySky(){
       <circle cx="61" cy="56" r="9"   fill="rgba(178,193,219,.26)"/>
       <circle cx="44" cy="68" r="5"   fill="rgba(178,193,219,.3)"/>
       <circle cx="66" cy="32" r="4.5" fill="rgba(178,193,219,.24)"/>
-    </svg>
-    <div class="ds-cloud c1">${cloud}</div>
-    <div class="ds-cloud c2">${cloud}</div>
-    <div class="ds-cloud c3">${cloud}</div>
-    <div class="ds-cloud c4">${cloud}</div>
-    <div class="ds-cloud c5">${cloud}</div>`;
+    </svg>`;
   document.body.prepend(d);
+
+  const cloud = d.querySelector('#cloudvid');
+  cloud.loop = true; cloud.muted = true; cloud.playsInline = true;
+  const isDay = () => document.body.classList.contains('light-mode');
+  function start(){
+    if(!isDay() || document.visibilityState !== 'visible') return;
+    if(cloud.preload === 'none') cloud.preload = 'auto';
+    if(cloud.ended) cloud.currentTime = 0;
+    cloud.play().catch(()=>{});
+  }
+  function stop(){ cloud.pause(); }
+  document.addEventListener('visibilitychange', () => document.visibilityState==='visible' ? start() : stop());
+  window.LUNA_daySky = { start, stop };
+  start(); // por si la página ya carga en modo día
 }
 
-/* ---------- PÁJAROS DIURNOS (modo día: aparición aleatoria y realista) ----------
-   Mismo espíritu que las estrellas fugaces, pero de día: los pájaros aparecen
-   "de repente", cruzan el cielo y se van. Variedad: solos y en bandada (formación
-   en V), aleteo a distintas velocidades, planeos y trayectorias erráticas, y
-   distintos tamaños/alturas para dar profundidad. Se pausa en modo noche, con la
-   pestaña oculta o con prefers-reduced-motion. Viven dentro de #daysky, así que
-   aparecen/desaparecen junto con el cielo diurno. */
+/* ---------- PÁJAROS DIURNOS (modo día: bandada real con chroma key) ----------
+   Un <video> oculto (assets/birds.mp4, bandada sobre fondo verde) se muestrea
+   frame a frame en un buffer: el verde se vuelve transparente y el resto se
+   tiñe al azul de la paleta rgb(45,62,98). Sprites pequeños de ese buffer
+   cruzan la pantalla en distintos ángulos de caída — poco frecuentes, a lo
+   lejos, no protagonistas. Se pausa de noche, con la pestaña oculta o con
+   prefers-reduced-motion.
+   Anti-congelamiento (fix 2026-07-14): jamás se dibuja un sprite si el video
+   fuente no está entregando frames (evita pájaros "tiesos" con las alas fijas),
+   y los recortes de pájaro solo se eligen donde el buffer tiene contenido real. */
 function buildDaySkyBirds(){
   const sky = document.getElementById('daysky'); if(!sky) return;
-  if(document.getElementById('day-birds')) return;
-  const layer = document.createElement('div');
-  layer.id = 'day-birds';
-  layer.setAttribute('aria-hidden','true');
-  sky.appendChild(layer);
+  if(document.getElementById('birdcanvas')) return;
 
-  const BIRD = '<svg viewBox="0 0 100 30" aria-hidden="true"><g class="wings">'
-    + '<path d="M3 18 Q27 3 48 15 Q50 16 52 15 Q73 3 97 18 Q73 11 53 18 Q50 20 47 18 Q27 11 3 18 Z" fill="currentColor"/>'
-    + '</g></svg>';
+  const cv = document.createElement('canvas');
+  cv.id = 'birdcanvas'; cv.className = 'ds-birdcanvas'; cv.setAttribute('aria-hidden','true');
+  const video = document.createElement('video');
+  video.id = 'birdvid'; video.className = 'src-video';
+  video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'none';
+  video.setAttribute('muted',''); video.setAttribute('playsinline','');
+  video.innerHTML = '<source src="assets/birds.mp4" type="video/mp4">';
+  sky.appendChild(cv); sky.appendChild(video);
+
+  const PW = 1280, PH = 720;
+  cv.width = PW; cv.height = PH;
+  const ctx = cv.getContext('2d');
+  // buffer donde se recorta el verde del video (fuente de aleteo real)
+  const OW = 480, OH = 270;
+  const buf = document.createElement('canvas'); buf.width = OW; buf.height = OH;
+  const bctx = buf.getContext('2d', { willReadFrequently: true });
 
   const reduce  = matchMedia('(prefers-reduced-motion: reduce)');
-  const rand    = (min,max) => min + Math.random()*(max-min);
-  const canPlay = () => document.body.classList.contains('light-mode')
-                     && !reduce.matches && document.visibilityState==='visible';
+  const rand    = (a,b) => a + Math.random()*(b-a);
+  const isDay   = () => document.body.classList.contains('light-mode');
+  const canPlay = () => isDay() && !reduce.matches && document.visibilityState==='visible';
+  // ¿el video fuente está entregando frames de verdad?
+  const videoLive = () => video.readyState >= 2 && !video.paused && !video.ended;
 
-  // un pájaro: alas que aletean a su propia velocidad; puede nacer "planeando"
-  function makeBird(size, opacity, glide){
-    const b = document.createElement('span');
-    b.className = 'bird-live' + (glide ? ' gliding' : '');
-    b.style.width = size.toFixed(1)+'px';
-    b.style.color = 'rgba(45,62,98,'+opacity.toFixed(2)+')';
-    b.innerHTML = BIRD;
-    if(!glide){
-      const w = b.querySelector('.wings');
-      w.style.animationDuration = rand(360,620).toFixed(0)+'ms';
-      w.style.animationDelay    = (-rand(0,400)).toFixed(0)+'ms';
+  let raf = null, timer = null, sprites = [], colDensity = null;
+
+  function setRate(){ video.playbackRate = 1.35; } // aleteo relajado
+  video.addEventListener('loadedmetadata', setRate);
+
+  // recorta el verde y tiñe al azul paleta; además mide densidad por columna
+  function keyFrame(){
+    if(video.duration && video.currentTime >= video.duration - 0.05){ video.currentTime = 0; video.play().catch(()=>{}); }
+    if(video.readyState < 2) return false;
+    bctx.drawImage(video, 0, 0, OW, OH);
+    const img = bctx.getImageData(0, 0, OW, OH), d = img.data;
+    const dens = new Float32Array(OW);
+    for(let p = 0; p < d.length; p += 4){
+      const r = d[p], g = d[p+1], b = d[p+2];
+      if(g > 90 && g > r*1.25 && g > b*1.25){ d[p+3] = 0; }
+      else {
+        const luma = (r+g+b)/3, cover = Math.max(0, Math.min(1, 1 - luma/150));
+        d[p] = 45; d[p+1] = 62; d[p+2] = 98; d[p+3] = Math.round(255*cover);
+        if(cover > 0.25) dens[(p>>2) % OW]++;
+      }
     }
-    return b;
+    bctx.putImageData(img, 0, 0);
+    colDensity = dens;
+    return true;
   }
 
-  // alterna aleteo/planeo durante el vuelo para que no se vea mecánico
-  function breathe(bird){
-    (function cycle(){
-      if(!bird.isConnected) return;
-      const goGlide = !bird.classList.contains('gliding') && Math.random() < 0.5;
-      const t = goGlide ? rand(700,1500) : rand(1400,2600);
-      setTimeout(()=>{
-        if(!bird.isConnected) return;
-        bird.classList.toggle('gliding', goGlide);
-        cycle();
-      }, t);
-    })();
+  // ventana de recorte para pájaro "solo": solo donde SÍ hay pájaro en el buffer
+  function soloCrop(){
+    const cw = Math.round(OW * rand(0.16, 0.26));
+    if(!colDensity) return null;
+    const starts = [];
+    for(let x = 0; x <= OW - cw; x += 8){
+      let s = 0;
+      for(let k = x; k < x + cw; k += 4) s += colDensity[k];
+      if(s >= 6) starts.push(x);
+    }
+    if(!starts.length) return null;
+    return { x: starts[(Math.random()*starts.length)|0], w: cw };
   }
 
-  function spawnFlock(){
+  // un pájaro/manada que cruza la pantalla, pequeño y en ángulo de caída
+  function spawn(){
     if(!canPlay()) return;
-    const dir    = Math.random() < 0.5 ? 1 : -1;            // 1: izq→der, -1: der→izq
-    const solo   = Math.random() < 0.45;
-    const n      = solo ? 1 : (3 + (Math.random()*5|0));    // bandada de 3–7
-    const topPct = rand(6, 52);                             // altura en el cielo
-    const near   = 1 - topPct/70;                           // más alto ⇒ más lejos
-    const size   = rand(15, 30) * (0.7 + 0.5*near);
-    const alpha  = Math.min(0.55, rand(0.26,0.5) * (0.75 + 0.35*near));
-    const speed  = rand(solo ? 80 : 55, solo ? 150 : 105);  // px/s
-    const margin = 150;
-    const x0 = dir===1 ? -margin : innerWidth+margin;
-    const x1 = dir===1 ? innerWidth+margin : -margin;
-    const dur = Math.abs(x1-x0)/speed*1000;
-    const baseTop = topPct/100 * innerHeight;
-
-    const flock = document.createElement('div');
-    flock.className = 'bird-flock';
-    flock.style.position='absolute'; flock.style.left='0';
-    flock.style.top=baseTop.toFixed(0)+'px'; flock.style.willChange='transform';
-    layer.appendChild(flock);
-
-    const gap = size*1.6;
-    for(let i=0;i<n;i++){
-      const back    = -dir * i * gap;                       // se apilan hacia atrás
-      const spread  = Math.ceil(i/2) * gap * 0.62 * (i%2 ? 1 : -1);  // V arriba/abajo
-      const glide   = Math.random() < 0.32;
-      const b = makeBird(size*rand(0.9,1.08), alpha, glide);
-      b.style.left = (back  + rand(-6,6)).toFixed(0)+'px';
-      b.style.top  = (spread+ rand(-4,4)).toFixed(0)+'px';
-      flock.appendChild(b);
-      if(!glide) breathe(b);
+    if(!videoLive()){ video.play().catch(()=>{}); return; } // sin frames frescos no nacen pájaros tiesos
+    if(!keyFrame()) return;
+    const dir  = Math.random() < 0.5 ? 1 : -1;
+    const solo = Math.random() < 0.42;
+    let cropX = 0, cropW = OW;
+    if(solo){
+      const c = soloCrop();
+      if(c){ cropX = c.x; cropW = c.w; }
+      // si ninguna ventana tiene contenido, cruza la bandada completa en chico
     }
-
-    // cruza en X con deriva y ondulación en Y (más errática si va solo)
-    const wobble = solo ? rand(6,16) : rand(3,8);
-    const yDrift = (Math.random()<.5?-1:1) * (solo ? rand(30,90) : rand(10,40));
-    const at = (pr, extra) => 'translate('+(x0+(x1-x0)*pr).toFixed(1)+'px,'+(yDrift*pr+(extra||0)).toFixed(1)+'px)';
-    const frames = [
-      { transform:at(0,0) },
-      { transform:at(0.25,-wobble) },
-      { transform:at(0.50, wobble) },
-      { transform:at(0.72,-wobble*0.7) },
-      { transform:at(1,0) }
-    ];
-    const anim = flock.animate(frames, { duration:dur, easing:'linear' });
-    anim.onfinish = () => flock.remove();
+    const w = solo && cropW < OW ? rand(24, 44) : rand(60, 118); // pequeños, a lo lejos
+    const h = w * (OH / cropW);
+    const y0 = rand(0.04, 0.5) * PH;
+    const angle = rand(4, 22) * Math.PI/180;                    // distintos ángulos de caída
+    const dist  = PW + 300;
+    const drift = Math.tan(angle) * dist * (Math.random() < 0.12 ? -0.4 : 1); // casi siempre cae
+    const x0 = dir === 1 ? -w - 60 : PW + w + 60;
+    const x1 = dir === 1 ? PW + w + 60 : -w - 60;
+    const speed = rand(95, 165);
+    sprites.push({ x0, x1, y0, drift, w, h, cropX, cropW, dir,
+      born: performance.now(), dur: dist/speed*1000, wob: rand(4,14), wsp: rand(0.5,1.3) });
   }
 
-  let timer;
-  function loop(){
-    spawnFlock();
-    if(Math.random() < 0.25){ setTimeout(spawnFlock, rand(600,1600)); } // a veces dos seguidas
-    timer = setTimeout(loop, rand(3500, 8000));
+  function draw(){
+    raf = null;
+    if(!canPlay()){ ctx.clearRect(0, 0, PW, PH); return; }
+    ctx.clearRect(0, 0, PW, PH);
+    if(sprites.length){
+      if(!videoLive()){
+        if(video.paused) video.play().catch(()=>{}); // re-engancha sin dibujar frames viejos
+      } else if(keyFrame()){
+        const now = performance.now();
+        sprites = sprites.filter(s => {
+          const p = (now - s.born) / s.dur;
+          if(p >= 1) return false;
+          const x = s.x0 + (s.x1 - s.x0) * p;
+          const y = s.y0 + s.drift * p + Math.sin(p * Math.PI * 2 * s.wsp) * s.wob;
+          const alpha = Math.max(0, Math.min(1, Math.min(p, 1 - p) * 8)) * 0.9;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.translate(x, y);
+          if(s.dir === -1) ctx.scale(-1, 1);
+          ctx.drawImage(buf, s.cropX, 0, s.cropW, OH, -s.w/2, -s.h/2, s.w, s.h);
+          ctx.restore();
+          return true;
+        });
+      }
+    }
+    raf = requestAnimationFrame(draw);
   }
-  function start(){ clearTimeout(timer); if(canPlay()){ timer = setTimeout(loop, rand(600,1800)); } }
-  function stop(){ clearTimeout(timer); layer.querySelectorAll('.bird-flock').forEach(f=>{ f.getAnimations().forEach(a=>a.cancel()); f.remove(); }); }
 
-  start();
+  function scheduleLoop(){
+    if(!canPlay()) return;
+    spawn();
+    if(Math.random() < 0.28) setTimeout(spawn, rand(500, 1600)); // a veces un segundo grupo
+    timer = setTimeout(scheduleLoop, rand(6500, 14000));         // poco frecuentes, no protagonistas
+  }
+
+  function start(){
+    if(!canPlay()) return;
+    if(video.preload === 'none') video.preload = 'auto';
+    setRate();
+    video.play().catch(()=>{});
+    if(!raf) raf = requestAnimationFrame(draw);
+    clearTimeout(timer); timer = setTimeout(scheduleLoop, rand(1500, 3500));
+  }
+  function stop(){
+    clearTimeout(timer);
+    if(raf){ cancelAnimationFrame(raf); raf = null; }
+    sprites = []; video.pause(); ctx.clearRect(0, 0, PW, PH);
+  }
+
+  video.addEventListener('playing', () => { if(canPlay() && !raf) raf = requestAnimationFrame(draw); });
   document.addEventListener('visibilitychange', () => document.visibilityState==='visible' ? start() : stop());
   reduce.addEventListener?.('change', () => reduce.matches ? stop() : start());
   window.LUNA_dayBirds = { start, stop };
+  start(); // por si la página ya carga en modo día
 }
 
 /* ---------- SHOOTING STARS (modo noche: estrellas fugaces aleatorias) ----------
@@ -282,19 +333,20 @@ function buildShootingStars(){
     const star = document.createElement('span');
     star.className = 'shooting-star';
 
-    // trayectoria: cae hacia abajo-izquierda con ángulo variable
-    const angleDeg = rand(112, 152);          // 90=abajo, 180=izquierda
-    const angle    = angleDeg * Math.PI/180;
-    const distance = rand(velOf('dist')[0], velOf('dist')[1]);
-    const dx = Math.cos(angle)*distance;       // negativo (izquierda)
+    // trayectoria: caída en diagonal, mitad izq→der y mitad der→izq, misma velocidad
+    const fallRight = Math.random() < 0.5;
+    const angleDeg  = fallRight ? rand(30, 62) : rand(118, 150);
+    const angle     = angleDeg * Math.PI/180;
+    const distance  = rand(300, 560);
+    const dx = Math.cos(angle)*distance;
     const dy = Math.sin(angle)*distance;       // positivo (abajo)
 
-    // origen: franja superior, repartido por todo el ancho
-    const startX = rand(0.30, 1.05) * innerWidth;
-    const startY = rand(-0.04, 0.46) * innerHeight;
-    const len     = rand(70, 168);
-    const thick   = rand(1, 1.9);
-    const peak    = rand(0.5, 0.9);
+    // origen: franja superior, del lado desde el que viene cayendo
+    const startX = (fallRight ? rand(-0.05, 0.55) : rand(0.45, 1.05)) * innerWidth;
+    const startY = rand(-0.04, 0.38) * innerHeight;
+    const len     = rand(70, 140);
+    const thick   = rand(0.8, 1.5);            // finas
+    const peak    = rand(0.28, 0.5);           // sutiles, sin destello en la punta
     const duration= rand(900, 1750);           // velocidad por estrella
 
     star.style.left   = startX+'px';
@@ -314,17 +366,15 @@ function buildShootingStars(){
     anim.onfinish = () => star.remove();
   }
 
-  // densidad equilibrada: una fugaz cada ~3–6 s, a veces un par seguidas
+  // densidad equilibrada: una fugaz cada ~2.6–5.2 s, a veces un par seguidas
   function loop(){
     spawn();
-    if(Math.random() < 0.22){ setTimeout(spawn, rand(280, 620)); } // ráfaga doble ocasional
-    timer = setTimeout(loop, rand(3000, 6000));
+    if(Math.random() < 0.24){ setTimeout(spawn, rand(280, 620)); } // ráfaga doble ocasional
+    timer = setTimeout(loop, rand(2600, 5200));
   }
-  function start(){ clearTimeout(timer); if(canPlay()){ timer = setTimeout(loop, rand(900, 2200)); } }
+  function start(){ clearTimeout(timer); if(canPlay()){ timer = setTimeout(loop, rand(600, 1800)); } }
   function stop(){ clearTimeout(timer); layer.querySelectorAll('.shooting-star').forEach(s=>s.remove()); }
 
-  // velocidad/distancia (un único punto de ajuste)
-  function velOf(k){ return ({ dist:[300, 620] })[k]; }
 
   start();
   document.addEventListener('visibilitychange', () => document.visibilityState==='visible' ? start() : stop());
@@ -835,6 +885,10 @@ function buildNav(active){
     // arrancar/pausar los pájaros diurnos según el tema activo
     if (window.LUNA_dayBirds) {
       isLight ? window.LUNA_dayBirds.start() : window.LUNA_dayBirds.stop();
+    }
+    // arrancar/pausar las nubes de video del cielo diurno
+    if (window.LUNA_daySky) {
+      isLight ? window.LUNA_daySky.start() : window.LUNA_daySky.stop();
     }
   }
 
