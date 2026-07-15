@@ -137,12 +137,16 @@ function buildDaySky(){
   document.body.prepend(d);
 
   const cloud = d.querySelector('#cloudvid');
+  const CLOUD_RATE = 0.35; // deriva ultralenta (pedido 2026-07-15); el video ya trae loop con crossfade
   cloud.loop = true; cloud.muted = true; cloud.playsInline = true;
+  cloud.playbackRate = CLOUD_RATE;
+  cloud.addEventListener('loadedmetadata', () => { cloud.playbackRate = CLOUD_RATE; });
   const isDay = () => document.body.classList.contains('light-mode');
   function start(){
     if(!isDay() || document.visibilityState !== 'visible') return;
     if(cloud.preload === 'none') cloud.preload = 'auto';
     if(cloud.ended) cloud.currentTime = 0;
+    cloud.playbackRate = CLOUD_RATE;
     cloud.play().catch(()=>{});
   }
   function stop(){ cloud.pause(); }
@@ -1543,7 +1547,9 @@ window.LUNA={ addToCart, add:addFromCard, changeQty, removeItem, openDrawer, clo
   checkoutWhatsapp, buildWhatsappOrder };
 
 function boot(){
-  buildLoader(); initStars(); buildDaySky(); buildDaySkyBirds(); buildShootingStars(); buildFloatingActions(); buildDrawer(); buildAuth(); syncCart(); syncFavs(); initReveal();
+  // buildDaySkyBirds() pausado 2026-07-15: a la espera de un asset limpio de pájaros
+  // (el actual deja cuadros azules por artefactos del chroma key). Reactivar cuando llegue.
+  buildLoader(); initStars(); buildDaySky(); buildShootingStars(); buildFloatingActions(); buildDrawer(); buildAuth(); syncCart(); syncFavs(); initReveal();
 }
 if(document.readyState!=='loading') boot(); else addEventListener('DOMContentLoaded',boot);
 })();
